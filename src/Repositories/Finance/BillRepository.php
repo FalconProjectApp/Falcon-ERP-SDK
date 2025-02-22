@@ -1,6 +1,6 @@
 <?php
 
-namespace FalconERP\Skeleton\Finance;
+namespace FalconERP\Skeleton\Repositories\Finance;
 
 use Carbon\Carbon;
 use GustavoSantarosa\ValidateTrait\Data;
