@@ -1,0 +1,40 @@
+{
+  "name": "falconerp/skeleton",
+  "license": "MIT",
+  "homepage": "http://www.gustavosantarosa.esy.es/",
+  "description": "Controller Basics Extension",
+  "require": {
+    "php": "^8.0",
+    "laravel/framework": "^10.0 | ^11.0",
+    "gustavosantarosa/enum-basics-extension": "^2.0",
+    "gustavosantarosa/controller-basics-extension": "^2.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "FalconERP\\Skeleton\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Luis Gustavo Santarosa",
+      "email": "gustavo-computacao@hotmail.com",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "email": "gustavo-computacao@hotmail.com"
+  },
+  "minimum-stability": "stable",
+  "extra": {
+    "laravel": {
+      "providers": [
+        "FalconERP\\Skeleton\\Providers\\SkeletonProvider"
+      ]
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
+  }
+}
