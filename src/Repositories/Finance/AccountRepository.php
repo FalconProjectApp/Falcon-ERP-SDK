@@ -3,8 +3,8 @@
 namespace FalconERP\Skeleton\Repositories\Finance;
 
 use Carbon\Carbon;
-use GustavoSantarosa\ValidateTrait\Data;
 use Illuminate\Support\Facades\Http;
+use QuantumTecnology\ValidateTrait\Data;
 
 class AccountRepository
 {

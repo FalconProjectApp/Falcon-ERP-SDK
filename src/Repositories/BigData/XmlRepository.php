@@ -2,8 +2,8 @@
 
 namespace FalconERP\Skeleton\Repositories\BigData;
 
-use GustavoSantarosa\ValidateTrait\Data;
 use Illuminate\Support\Facades\Http;
+use QuantumTecnology\ValidateTrait\Data;
 
 class XmlRepository
 {

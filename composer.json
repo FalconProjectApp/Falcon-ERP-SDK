@@ -6,8 +6,8 @@
   "require": {
     "php": "^8.0",
     "laravel/framework": "^10.0 | ^11.0",
-    "gustavosantarosa/enum-basics-extension": "^2.0",
-    "gustavosantarosa/controller-basics-extension": "^2.0"
+    "quantumtecnology/controller-basics-extension": "^2.0",
+    "quantumtecnology/enum-basics-extension": "^2.0"
   },
   "autoload": {
     "psr-4": {
