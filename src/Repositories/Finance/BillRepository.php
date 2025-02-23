@@ -21,7 +21,11 @@ class BillRepository
 
     public function __construct()
     {
-        $this->urlApi        = config('services.falcon.finance.url_api');
+        $this->urlApi = sprintf(
+            '%s/erp/private/bills/v1',
+            config('falconservices.finance.'.config('app.env').'.url_api')
+        );
+
         $this->authorization = request()->header('Authorization');
     }
 
@@ -31,7 +35,7 @@ class BillRepository
             ->retry(3, 2000, throw: false)
             ->acceptJson()
             ->asJson()
-            ->get("{$this->urlApi}/erp/private/bills/v1");
+            ->get("{$this->urlApi}");
 
         if (!$response->successful()) {
             $this->data = collect();
@@ -56,7 +60,7 @@ class BillRepository
             ->retry(3, 2000, throw: false)
             ->acceptJson()
             ->asJson()
-            ->get("{$this->urlApi}/erp/private/bills/v1/{$this->id}");
+            ->get("{$this->urlApi}/{$this->id}");
 
         if (!$response->successful()) {
             $this->http_code = $response->status();
@@ -114,7 +118,7 @@ class BillRepository
             'Pessoa não informada.'
         );
 
-        $this->urlApi = "{$this->urlApi}/erp/private/bills/v1";
+        $this->urlApi = $this->urlApi;
 
         $response = Http::withToken($this->authorization, null)
             ->retry(3, 2000, throw: false)

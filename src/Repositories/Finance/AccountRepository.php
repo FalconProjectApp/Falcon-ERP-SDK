@@ -22,7 +22,7 @@ class AccountRepository
     {
         $this->urlApi = sprintf(
             '%s/erp/private/financial-accounts/v1',
-            config('services.falcon.finance.url_api')
+            config('falconservices.finance.'.config('app.env').'.url_api')
         );
 
         $this->authorization = request()->header('Authorization');

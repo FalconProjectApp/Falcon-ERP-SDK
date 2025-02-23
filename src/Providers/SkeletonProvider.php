@@ -15,8 +15,18 @@ class SkeletonProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/hashids.php',
+            __DIR__.'/../config/hashids.php',
             'hashids'
+        );
+
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/perpage.php',
+            'perpage'
+        );
+
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/falconservices.php',
+            'falconservices'
         );
     }
 
@@ -27,5 +37,8 @@ class SkeletonProvider extends ServiceProvider
      */
     public function boot(Router $router)
     {
+        $this->publishes([
+            __DIR__.'/../config/falconservices.php' => config_path('falconservices.php'),
+        ], 'config');
     }
 }
