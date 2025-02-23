@@ -3268,16 +3268,16 @@
         },
         {
             "name": "quantumtecnology/service-basics-extension",
-            "version": "2.0.1",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Service-Basics-Extension.git",
-                "reference": "f5857fd68305e6a52b8e68dfcb947888cf235fde"
+                "reference": "064677a350f9b5c50c0a4473e69de071f854492d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Service-Basics-Extension/zipball/f5857fd68305e6a52b8e68dfcb947888cf235fde",
-                "reference": "f5857fd68305e6a52b8e68dfcb947888cf235fde",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Service-Basics-Extension/zipball/064677a350f9b5c50c0a4473e69de071f854492d",
+                "reference": "064677a350f9b5c50c0a4473e69de071f854492d",
                 "shasum": ""
             },
             "require": {
@@ -3317,9 +3317,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Service-Basics-Extension/issues",
-                "source": "https://github.com/Quantum-Tecnology/Service-Basics-Extension/tree/2.0.1"
+                "source": "https://github.com/Quantum-Tecnology/Service-Basics-Extension/tree/2.0.2"
             },
-            "time": "2025-02-23T15:35:48+00:00"
+            "time": "2025-02-23T21:24:16+00:00"
         },
         {
             "name": "quantumtecnology/setschema-trait-postgresql",
@@ -3374,21 +3374,21 @@
         },
         {
             "name": "quantumtecnology/validate-trait",
-            "version": "2.0.1",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Validate-Trait.git",
-                "reference": "0532b23a1284f788c9d6517c687bd696afcd4233"
+                "reference": "7d9693ede228317e376a42cc31ae2ce996c2dd21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Validate-Trait/zipball/0532b23a1284f788c9d6517c687bd696afcd4233",
-                "reference": "0532b23a1284f788c9d6517c687bd696afcd4233",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Validate-Trait/zipball/7d9693ede228317e376a42cc31ae2ce996c2dd21",
+                "reference": "7d9693ede228317e376a42cc31ae2ce996c2dd21",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "^v10|^v11",
-                "laravel/framework": "^10.0 | ^11.0",
+                "illuminate/support": "^v10|^v11|^v12",
+                "laravel/framework": "^10.0 | ^11.0 | ^12.0",
                 "php": "^8.0"
             },
             "type": "library",
@@ -3400,6 +3400,9 @@
                 }
             },
             "autoload": {
+                "files": [
+                    "src/Libs/Helpers.php"
+                ],
                 "psr-4": {
                     "QuantumTecnology\\ValidateTrait\\": "src/"
                 }
@@ -3420,9 +3423,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Validate-Trait/issues",
-                "source": "https://github.com/Quantum-Tecnology/Validate-Trait/tree/2.0.1"
+                "source": "https://github.com/Quantum-Tecnology/Validate-Trait/tree/2.1.0"
             },
-            "time": "2025-02-22T20:49:46+00:00"
+            "time": "2025-02-23T21:22:29+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
