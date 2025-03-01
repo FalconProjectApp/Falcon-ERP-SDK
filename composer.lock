@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bc4229bc538aada9bb1d785054ca4a11",
+    "content-hash": "6f7de5a0d6575aa87151bad3dd94e128",
     "packages": [
         {
             "name": "brick/math",
@@ -3149,23 +3149,23 @@
         },
         {
             "name": "quantumtecnology/controller-basics-extension",
-            "version": "2.1.6",
+            "version": "2.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension.git",
-                "reference": "65a1b7a268676a57f4412b4292116c87540906ca"
+                "reference": "f65a5c1bfb9feee20120140dd0e1e0868d5cce33"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Controller-Basics-Extension/zipball/65a1b7a268676a57f4412b4292116c87540906ca",
-                "reference": "65a1b7a268676a57f4412b4292116c87540906ca",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Controller-Basics-Extension/zipball/f65a5c1bfb9feee20120140dd0e1e0868d5cce33",
+                "reference": "f65a5c1bfb9feee20120140dd0e1e0868d5cce33",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "^10.0 | ^11.0| ^12.0",
-                "php": "^8.0",
-                "quantumtecnology/service-basics-extension": "^2.0",
-                "vinkla/hashids": "^12.0"
+                "laravel/framework": "^11.44",
+                "php": "^8.2",
+                "quantumtecnology/hashids": "^13.0",
+                "quantumtecnology/service-basics-extension": "^2.0"
             },
             "type": "library",
             "extra": {
@@ -3199,9 +3199,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension/issues",
-                "source": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension/tree/2.1.6"
+                "source": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension/tree/2.1.7"
             },
-            "time": "2025-03-01T20:50:08+00:00"
+            "time": "2025-03-01T21:37:42+00:00"
         },
         {
             "name": "quantumtecnology/enum-basics-extension",
@@ -3305,6 +3305,68 @@
                 "source": "https://github.com/Quantum-Tecnology/Handler-Basics-Extension/tree/2.0.1"
             },
             "time": "2025-02-25T00:20:31+00:00"
+        },
+        {
+            "name": "quantumtecnology/hashids",
+            "version": "13.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Quantum-Tecnology/laravel-hashids.git",
+                "reference": "db98961c88e07603bb381d0008e2a4ae38ca90bc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/laravel-hashids/zipball/db98961c88e07603bb381d0008e2a4ae38ca90bc",
+                "reference": "db98961c88e07603bb381d0008e2a4ae38ca90bc",
+                "shasum": ""
+            },
+            "require": {
+                "graham-campbell/manager": "^5.0",
+                "hashids/hashids": "^5.0",
+                "php": "^8.2"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "12.0-dev"
+                },
+                "laravel": {
+                    "aliases": {
+                        "Hashids": "Vinkla\\Hashids\\Facades\\Hashids"
+                    },
+                    "providers": [
+                        "Vinkla\\Hashids\\HashidsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Vinkla\\Hashids\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Vinkla\\Tests\\Hashids\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vincent Klaiber",
+                    "homepage": "https://github.com/vinkla"
+                }
+            ],
+            "description": "A Hashids bridge for Laravel",
+            "keywords": [
+                "hashids",
+                "laravel"
+            ],
+            "support": {
+                "source": "https://github.com/Quantum-Tecnology/laravel-hashids/tree/13.0.2"
+            },
+            "time": "2025-03-01T21:35:45+00:00"
         },
         {
             "name": "quantumtecnology/model-basics-extension",
@@ -6405,73 +6467,6 @@
                 "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/v2.3.0"
             },
             "time": "2024-12-21T16:25:41+00:00"
-        },
-        {
-            "name": "vinkla/hashids",
-            "version": "12.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/vinkla/laravel-hashids.git",
-                "reference": "71e4be8347d8c77dd728b61c1ff3b53cb4941ef1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/vinkla/laravel-hashids/zipball/71e4be8347d8c77dd728b61c1ff3b53cb4941ef1",
-                "reference": "71e4be8347d8c77dd728b61c1ff3b53cb4941ef1",
-                "shasum": ""
-            },
-            "require": {
-                "graham-campbell/manager": "^5.0",
-                "hashids/hashids": "^5.0",
-                "illuminate/contracts": "^11.0",
-                "illuminate/support": "^11.0",
-                "php": "^8.2"
-            },
-            "require-dev": {
-                "graham-campbell/analyzer": "^4.1",
-                "graham-campbell/testbench": "^6.1",
-                "mockery/mockery": "^1.6.6",
-                "phpunit/phpunit": "^10.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": {
-                        "Hashids": "Vinkla\\Hashids\\Facades\\Hashids"
-                    },
-                    "providers": [
-                        "Vinkla\\Hashids\\HashidsServiceProvider"
-                    ]
-                },
-                "branch-alias": {
-                    "dev-master": "12.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Vinkla\\Hashids\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Vincent Klaiber",
-                    "homepage": "https://github.com/vinkla"
-                }
-            ],
-            "description": "A Hashids bridge for Laravel",
-            "keywords": [
-                "hashids",
-                "laravel"
-            ],
-            "support": {
-                "issues": "https://github.com/vinkla/laravel-hashids/issues",
-                "source": "https://github.com/vinkla/laravel-hashids/tree/12.0.0"
-            },
-            "time": "2024-02-05T08:07:21+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
