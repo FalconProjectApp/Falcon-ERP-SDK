@@ -3149,20 +3149,20 @@
         },
         {
             "name": "quantumtecnology/controller-basics-extension",
-            "version": "2.1.7",
+            "version": "2.1.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension.git",
-                "reference": "f65a5c1bfb9feee20120140dd0e1e0868d5cce33"
+                "reference": "09e94d2fdbe00bd7792705672565a59ff53211be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Controller-Basics-Extension/zipball/f65a5c1bfb9feee20120140dd0e1e0868d5cce33",
-                "reference": "f65a5c1bfb9feee20120140dd0e1e0868d5cce33",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Controller-Basics-Extension/zipball/09e94d2fdbe00bd7792705672565a59ff53211be",
+                "reference": "09e94d2fdbe00bd7792705672565a59ff53211be",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "^11.44",
+                "laravel/framework": "^11.44 | ^12.0",
                 "php": "^8.2",
                 "quantumtecnology/hashids": "^13.0",
                 "quantumtecnology/service-basics-extension": "^2.0"
@@ -3199,9 +3199,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension/issues",
-                "source": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension/tree/2.1.7"
+                "source": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension/tree/2.1.8"
             },
-            "time": "2025-03-01T21:37:42+00:00"
+            "time": "2025-03-01T21:53:27+00:00"
         },
         {
             "name": "quantumtecnology/enum-basics-extension",
