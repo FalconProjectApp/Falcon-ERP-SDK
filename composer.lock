@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4668c743995287138ddabdfcca23c6f1",
+    "content-hash": "e16bd7d7d38cd9c2cf54954a182d97a1",
     "packages": [
         {
             "name": "brick/math",
@@ -1184,16 +1184,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v12.0.1",
+            "version": "v12.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "d99e2385a6d4324782d52f4423891966425641be"
+                "reference": "9be5738f1ca1530055bb9d6db81f909a7ed34842"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/d99e2385a6d4324782d52f4423891966425641be",
-                "reference": "d99e2385a6d4324782d52f4423891966425641be",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/9be5738f1ca1530055bb9d6db81f909a7ed34842",
+                "reference": "9be5738f1ca1530055bb9d6db81f909a7ed34842",
                 "shasum": ""
             },
             "require": {
@@ -1301,7 +1301,7 @@
                 "league/flysystem-read-only": "^3.25.1",
                 "league/flysystem-sftp-v3": "^3.25.1",
                 "mockery/mockery": "^1.6.10",
-                "orchestra/testbench-core": "^10.0",
+                "orchestra/testbench-core": "^10.0.0",
                 "pda/pheanstalk": "^5.0.6",
                 "php-http/discovery": "^1.15",
                 "phpstan/phpstan": "^2.0",
@@ -1395,7 +1395,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2025-02-24T13:31:23+00:00"
+            "time": "2025-03-05T15:31:19+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -3227,16 +3227,16 @@
         },
         {
             "name": "quantumtecnology/controller-basics-extension",
-            "version": "2.1.9",
+            "version": "2.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension.git",
-                "reference": "cfc6c94cbbf392f76e2980ce46169a966b0b241d"
+                "reference": "ab5ebadba93d17e78db5c2ac9e5efe7bc9a85ee9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Controller-Basics-Extension/zipball/cfc6c94cbbf392f76e2980ce46169a966b0b241d",
-                "reference": "cfc6c94cbbf392f76e2980ce46169a966b0b241d",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Controller-Basics-Extension/zipball/ab5ebadba93d17e78db5c2ac9e5efe7bc9a85ee9",
+                "reference": "ab5ebadba93d17e78db5c2ac9e5efe7bc9a85ee9",
                 "shasum": ""
             },
             "require": {
@@ -3245,6 +3245,9 @@
                 "php": "^8.2",
                 "quantumtecnology/hashids": "^13.0",
                 "quantumtecnology/service-basics-extension": "^2.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.70"
             },
             "type": "library",
             "extra": {
@@ -3278,9 +3281,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension/issues",
-                "source": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension/tree/2.1.9"
+                "source": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension/tree/2.2.1"
             },
-            "time": "2025-03-01T22:14:43+00:00"
+            "time": "2025-03-11T01:06:01+00:00"
         },
         {
             "name": "quantumtecnology/enum-basics-extension",
@@ -3335,16 +3338,16 @@
         },
         {
             "name": "quantumtecnology/handler-basics-extension",
-            "version": "2.0.1",
+            "version": "2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Handler-Basics-Extension.git",
-                "reference": "594c79cc01299918fc5a9a66f773d6172d41f735"
+                "reference": "54711b4b2e3f44b43a92d66ace5bf6fbbd4ffd9a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Handler-Basics-Extension/zipball/594c79cc01299918fc5a9a66f773d6172d41f735",
-                "reference": "594c79cc01299918fc5a9a66f773d6172d41f735",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Handler-Basics-Extension/zipball/54711b4b2e3f44b43a92d66ace5bf6fbbd4ffd9a",
+                "reference": "54711b4b2e3f44b43a92d66ace5bf6fbbd4ffd9a",
                 "shasum": ""
             },
             "require": {
@@ -3381,9 +3384,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Handler-Basics-Extension/issues",
-                "source": "https://github.com/Quantum-Tecnology/Handler-Basics-Extension/tree/2.0.1"
+                "source": "https://github.com/Quantum-Tecnology/Handler-Basics-Extension/tree/2.0.3"
             },
-            "time": "2025-02-25T00:20:31+00:00"
+            "time": "2025-03-12T01:12:16+00:00"
         },
         {
             "name": "quantumtecnology/hashids",
@@ -3448,16 +3451,16 @@
         },
         {
             "name": "quantumtecnology/model-basics-extension",
-            "version": "2.0.5",
+            "version": "2.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Model-Basics-Extension.git",
-                "reference": "c33a937526d0718403a2b8ce286679cf08ef5a83"
+                "reference": "1a25cddee6ccaa2925d468d34ac3baef0d9e6519"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Model-Basics-Extension/zipball/c33a937526d0718403a2b8ce286679cf08ef5a83",
-                "reference": "c33a937526d0718403a2b8ce286679cf08ef5a83",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Model-Basics-Extension/zipball/1a25cddee6ccaa2925d468d34ac3baef0d9e6519",
+                "reference": "1a25cddee6ccaa2925d468d34ac3baef0d9e6519",
                 "shasum": ""
             },
             "require": {
@@ -3494,9 +3497,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Model-Basics-Extension/issues",
-                "source": "https://github.com/Quantum-Tecnology/Model-Basics-Extension/tree/2.0.5"
+                "source": "https://github.com/Quantum-Tecnology/Model-Basics-Extension/tree/2.0.6"
             },
-            "time": "2025-02-25T00:21:36+00:00"
+            "time": "2025-03-10T14:09:21+00:00"
         },
         {
             "name": "quantumtecnology/perpage-trait",
@@ -3756,16 +3759,16 @@
         },
         {
             "name": "ramsey/collection",
-            "version": "2.0.0",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ramsey/collection.git",
-                "reference": "a4b48764bfbb8f3a6a4d1aeb1a35bb5e9ecac4a5"
+                "reference": "3c5990b8a5e0b79cd1cf11c2dc1229e58e93f109"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ramsey/collection/zipball/a4b48764bfbb8f3a6a4d1aeb1a35bb5e9ecac4a5",
-                "reference": "a4b48764bfbb8f3a6a4d1aeb1a35bb5e9ecac4a5",
+                "url": "https://api.github.com/repos/ramsey/collection/zipball/3c5990b8a5e0b79cd1cf11c2dc1229e58e93f109",
+                "reference": "3c5990b8a5e0b79cd1cf11c2dc1229e58e93f109",
                 "shasum": ""
             },
             "require": {
@@ -3773,25 +3776,22 @@
             },
             "require-dev": {
                 "captainhook/plugin-composer": "^5.3",
-                "ergebnis/composer-normalize": "^2.28.3",
-                "fakerphp/faker": "^1.21",
+                "ergebnis/composer-normalize": "^2.45",
+                "fakerphp/faker": "^1.24",
                 "hamcrest/hamcrest-php": "^2.0",
-                "jangregor/phpstan-prophecy": "^1.0",
-                "mockery/mockery": "^1.5",
+                "jangregor/phpstan-prophecy": "^2.1",
+                "mockery/mockery": "^1.6",
                 "php-parallel-lint/php-console-highlighter": "^1.0",
-                "php-parallel-lint/php-parallel-lint": "^1.3",
-                "phpcsstandards/phpcsutils": "^1.0.0-rc1",
-                "phpspec/prophecy-phpunit": "^2.0",
-                "phpstan/extension-installer": "^1.2",
-                "phpstan/phpstan": "^1.9",
-                "phpstan/phpstan-mockery": "^1.1",
-                "phpstan/phpstan-phpunit": "^1.3",
-                "phpunit/phpunit": "^9.5",
-                "psalm/plugin-mockery": "^1.1",
-                "psalm/plugin-phpunit": "^0.18.4",
-                "ramsey/coding-standard": "^2.0.3",
-                "ramsey/conventional-commits": "^1.3",
-                "vimeo/psalm": "^5.4"
+                "php-parallel-lint/php-parallel-lint": "^1.4",
+                "phpspec/prophecy-phpunit": "^2.3",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-mockery": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpunit/phpunit": "^10.5",
+                "ramsey/coding-standard": "^2.3",
+                "ramsey/conventional-commits": "^1.6",
+                "roave/security-advisories": "dev-latest"
             },
             "type": "library",
             "extra": {
@@ -3829,19 +3829,9 @@
             ],
             "support": {
                 "issues": "https://github.com/ramsey/collection/issues",
-                "source": "https://github.com/ramsey/collection/tree/2.0.0"
+                "source": "https://github.com/ramsey/collection/tree/2.1.0"
             },
-            "funding": [
-                {
-                    "url": "https://github.com/ramsey",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/ramsey/collection",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2022-12-31T21:50:55+00:00"
+            "time": "2025-03-02T04:48:29+00:00"
         },
         {
             "name": "ramsey/uuid",
@@ -7164,16 +7154,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.70.1",
+            "version": "v3.71.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "add1b3a05256392dbad63875240041b2c0349ceb"
+                "reference": "3825ffdc69501e1c9230291b79f036a0c0d8749d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/add1b3a05256392dbad63875240041b2c0349ceb",
-                "reference": "add1b3a05256392dbad63875240041b2c0349ceb",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/3825ffdc69501e1c9230291b79f036a0c0d8749d",
+                "reference": "3825ffdc69501e1c9230291b79f036a0c0d8749d",
                 "shasum": ""
             },
             "require": {
@@ -7255,7 +7245,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.70.1"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.71.0"
             },
             "funding": [
                 {
@@ -7263,7 +7253,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-03-01T22:05:46+00:00"
+            "time": "2025-03-07T23:06:56+00:00"
         },
         {
             "name": "react/cache",
