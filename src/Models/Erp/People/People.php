@@ -2,17 +2,18 @@
 
 namespace FalconERP\Skeleton\Models\Erp\People;
 
-use FalconERP\Skeleton\Enums\ArchiveEnum;
-use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use FalconERP\Skeleton\Models\Erp\Archive;
-use FalconERP\Skeleton\Models\User;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
+use FalconERP\Skeleton\Models\User;
+use FalconERP\Skeleton\Enums\ArchiveEnum;
+use FalconERP\Skeleton\Models\Erp\Archive;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
+use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class People extends BaseModel implements AuditableContract
 {
@@ -20,6 +21,7 @@ class People extends BaseModel implements AuditableContract
     use SoftDeletes;
     use SetSchemaTrait;
     use Auditable;
+    use ActionTrait;
 
     protected $table = 'peoples';
 
@@ -100,5 +102,16 @@ class People extends BaseModel implements AuditableContract
     public function scopeByCnpjCpf($query, $cnpjCpf)
     {
         return $query->where('cnpj_cpf', $cnpjCpf);
+    }
+
+    
+    protected function setActions(): array
+    {
+        return [
+            'can_view'    => true,
+            'can_restore' => $this->trashed(),
+            'can_update'  => !$this->trashed(),
+            'can_delete'  => !$this->trashed(),
+        ];
     }
 }
