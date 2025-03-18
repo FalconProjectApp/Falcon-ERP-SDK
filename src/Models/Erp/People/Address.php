@@ -33,9 +33,4 @@ class Address extends BaseModel
     protected $attributes = [
         'main' => false,
     ];
-
-    public function city()
-    {
-        return $this->belongsTo(City::class, 'cities_id');
-    }
 }

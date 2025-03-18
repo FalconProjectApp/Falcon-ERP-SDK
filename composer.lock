@@ -3464,12 +3464,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Model-Basics-Extension.git",
-                "reference": "2e1a4492b5d7cff0dc3ee9f6afdcc6db5fbe5171"
+                "reference": "0070bb6ea2a2352071a55b08700759bed9530d85"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Model-Basics-Extension/zipball/2e1a4492b5d7cff0dc3ee9f6afdcc6db5fbe5171",
-                "reference": "2e1a4492b5d7cff0dc3ee9f6afdcc6db5fbe5171",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Model-Basics-Extension/zipball/0070bb6ea2a2352071a55b08700759bed9530d85",
+                "reference": "0070bb6ea2a2352071a55b08700759bed9530d85",
                 "shasum": ""
             },
             "require": {
@@ -3507,7 +3507,7 @@
                 "issues": "https://github.com/Quantum-Tecnology/Model-Basics-Extension/issues",
                 "source": "https://github.com/Quantum-Tecnology/Model-Basics-Extension/tree/2.1.0"
             },
-            "time": "2025-03-18T00:17:51+00:00"
+            "time": "2025-03-18T01:32:32+00:00"
         },
         {
             "name": "quantumtecnology/perpage-trait",
