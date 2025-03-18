@@ -5,7 +5,7 @@ namespace FalconERP\Skeleton\Models\Erp\Service;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Models\Erp\Shop\Shop;
 use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
-use QuantumTecnology\SetSchemaTrait\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;

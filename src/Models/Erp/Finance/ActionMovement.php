@@ -4,7 +4,7 @@ namespace FalconERP\Skeleton\Models\Erp\Finance;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use QuantumTecnology\SetSchemaTrait\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

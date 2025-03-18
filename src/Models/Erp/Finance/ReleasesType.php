@@ -4,7 +4,7 @@ namespace FalconERP\Skeleton\Models\Erp\Finance;
 
 use FalconERP\Skeleton\Enums\ReleaseTypeEnum;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use QuantumTecnology\SetSchemaTrait\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 

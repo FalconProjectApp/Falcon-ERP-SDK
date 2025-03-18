@@ -4,7 +4,7 @@ namespace FalconERP\Skeleton\Models\Erp\Stock;
 
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Models\Erp\People\People;
-use QuantumTecnology\SetSchemaTrait\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;

@@ -6,12 +6,12 @@ use OwenIt\Auditing\Auditable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use QuantumTecnology\SetSchemaTrait\SetSchemaTrait;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use QuantumTecnology\ModelBasicsExtension\HasManySyncable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class Action extends BaseModel implements AuditableContract
 {

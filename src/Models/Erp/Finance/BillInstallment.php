@@ -7,7 +7,7 @@ use OwenIt\Auditing\Auditable;
 use FalconERP\Skeleton\Models\Erp\Archive;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use QuantumTecnology\SetSchemaTrait\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;

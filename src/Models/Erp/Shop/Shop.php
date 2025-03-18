@@ -7,7 +7,7 @@ use FalconERP\Skeleton\Models\BackOffice\Shop as BackOfficeShop;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Models\Erp\Archive;
 use FalconERP\Skeleton\Models\Erp\Service\Service;
-use QuantumTecnology\SetSchemaTrait\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

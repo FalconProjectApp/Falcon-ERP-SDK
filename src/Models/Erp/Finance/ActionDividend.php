@@ -2,12 +2,12 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use QuantumTecnology\SetSchemaTrait\SetSchemaTrait;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class ActionDividend extends BaseModel
 {

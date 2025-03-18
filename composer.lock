@@ -3460,22 +3460,21 @@
         },
         {
             "name": "quantumtecnology/model-basics-extension",
-            "version": "2.0.6",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Model-Basics-Extension.git",
-                "reference": "1a25cddee6ccaa2925d468d34ac3baef0d9e6519"
+                "reference": "2e1a4492b5d7cff0dc3ee9f6afdcc6db5fbe5171"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Model-Basics-Extension/zipball/1a25cddee6ccaa2925d468d34ac3baef0d9e6519",
-                "reference": "1a25cddee6ccaa2925d468d34ac3baef0d9e6519",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Model-Basics-Extension/zipball/2e1a4492b5d7cff0dc3ee9f6afdcc6db5fbe5171",
+                "reference": "2e1a4492b5d7cff0dc3ee9f6afdcc6db5fbe5171",
                 "shasum": ""
             },
             "require": {
                 "laravel/framework": "^10.0 | ^11.0| ^12.0",
-                "php": "^8.0",
-                "quantumtecnology/setschema-trait-postgresql": "*"
+                "php": "^8.0"
             },
             "type": "library",
             "extra": {
@@ -3506,9 +3505,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Model-Basics-Extension/issues",
-                "source": "https://github.com/Quantum-Tecnology/Model-Basics-Extension/tree/2.0.6"
+                "source": "https://github.com/Quantum-Tecnology/Model-Basics-Extension/tree/2.1.0"
             },
-            "time": "2025-03-10T14:09:21+00:00"
+            "time": "2025-03-18T00:17:51+00:00"
         },
         {
             "name": "quantumtecnology/perpage-trait",
@@ -3567,12 +3566,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Service-Basics-Extension.git",
-                "reference": "9affe4fe2d02e201f25e07a1f4760481c96b7852"
+                "reference": "531abc4b74f0786e9f38f82fc78c1700d3215d01"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Service-Basics-Extension/zipball/9affe4fe2d02e201f25e07a1f4760481c96b7852",
-                "reference": "9affe4fe2d02e201f25e07a1f4760481c96b7852",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Service-Basics-Extension/zipball/531abc4b74f0786e9f38f82fc78c1700d3215d01",
+                "reference": "531abc4b74f0786e9f38f82fc78c1700d3215d01",
                 "shasum": ""
             },
             "require": {
@@ -3617,58 +3616,7 @@
                 "issues": "https://github.com/Quantum-Tecnology/Service-Basics-Extension/issues",
                 "source": "https://github.com/Quantum-Tecnology/Service-Basics-Extension/tree/2.1.0"
             },
-            "time": "2025-03-16T23:21:05+00:00"
-        },
-        {
-            "name": "quantumtecnology/setschema-trait-postgresql",
-            "version": "2.0.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Quantum-Tecnology/SetSchema-Trait-Postgresql.git",
-                "reference": "c79a8997f441e98316afb8c21e863f94c8c4b6a2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/SetSchema-Trait-Postgresql/zipball/c79a8997f441e98316afb8c21e863f94c8c4b6a2",
-                "reference": "c79a8997f441e98316afb8c21e863f94c8c4b6a2",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/support": "^v10|^v11|^v12",
-                "php": "^8.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "QuantumTecnology\\SetSchemaTrait\\Provider\\SetSchemaTraitProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "QuantumTecnology\\SetSchemaTrait\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Luis Gustavo Santarosa",
-                    "email": "gustavo-computacao@hotmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "SetSchema Trait Postgresql for Laravel",
-            "homepage": "http://www.gustavosantarosa.esy.es/",
-            "support": {
-                "email": "gustavo-computacao@hotmail.com",
-                "issues": "https://github.com/Quantum-Tecnology/SetSchema-Trait-Postgresql/issues",
-                "source": "https://github.com/Quantum-Tecnology/SetSchema-Trait-Postgresql/tree/2.0.5"
-            },
-            "time": "2025-02-25T00:17:08+00:00"
+            "time": "2025-03-16T23:47:12+00:00"
         },
         {
             "name": "quantumtecnology/validate-trait",

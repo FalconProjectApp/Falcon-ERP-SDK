@@ -3,7 +3,7 @@
 namespace FalconERP\Skeleton\Models\Erp\People;
 
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use QuantumTecnology\SetSchemaTrait\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notification;
