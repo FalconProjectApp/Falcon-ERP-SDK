@@ -9,7 +9,7 @@
     "quantumtecnology/enum-basics-extension": "^2.0",
     "quantumtecnology/controller-basics-extension": "^2.0",
     "laravel/sanctum": "^3.0 | ^4.0",
-    "owen-it/laravel-auditing": "^14.0"
+    "owen-it/laravel-auditing": "^13.0 | ^14.0"
   },
   "repositories": [
     {
