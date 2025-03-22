@@ -2,19 +2,21 @@
 
 namespace FalconERP\Skeleton\Models\Erp\People;
 
-use FalconERP\Skeleton\Enums\ArchiveEnum;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use FalconERP\Skeleton\Models\Erp\Archive;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Notifications\Notifiable;
+use FalconERP\Skeleton\Enums\ArchiveEnum;
+use FalconERP\Skeleton\Models\Erp\Archive;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
 class Email extends BaseModel
 {
     use HasFactory;
     use Notifiable;
     use SetSchemaTrait;
+    use ArchiveModelTrait;
 
     protected $fillable = [
         'responsible_people_id',
@@ -25,14 +27,6 @@ class Email extends BaseModel
     ];
 
     public $allowedIncludes = [];
-
-    /**
-     * Archives function.
-     */
-    public function archives(): MorphMany
-    {
-        return $this->morphMany(Archive::class, 'archivable');
-    }
 
     /**
      * attachments function.

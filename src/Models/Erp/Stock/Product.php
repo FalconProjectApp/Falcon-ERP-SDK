@@ -3,19 +3,18 @@
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
 use FalconERP\Skeleton\Enums\ArchiveEnum;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use FalconERP\Skeleton\Models\Erp\Archive;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
 class Product extends BaseModel implements AuditableContract
 {
@@ -23,6 +22,7 @@ class Product extends BaseModel implements AuditableContract
     use SoftDeletes;
     use SetSchemaTrait;
     use Auditable;
+    use ArchiveModelTrait;
 
     protected $fillable = [
         'groups_id',
@@ -55,14 +55,6 @@ class Product extends BaseModel implements AuditableContract
     public function group(): BelongsTo
     {
         return $this->belongsTo(Group::class, 'groups_id');
-    }
-
-    /**
-     * Archives function.
-     */
-    public function archives(): MorphMany
-    {
-        return $this->morphMany(Archive::class, 'archivable');
     }
 
     /**

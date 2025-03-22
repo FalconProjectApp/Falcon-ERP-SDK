@@ -2,18 +2,19 @@
 
 namespace FalconERP\Skeleton\Models\Erp\People;
 
-use OwenIt\Auditing\Auditable;
-use FalconERP\Skeleton\Models\User;
 use FalconERP\Skeleton\Enums\ArchiveEnum;
-use FalconERP\Skeleton\Models\Erp\Archive;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
-use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
+use FalconERP\Skeleton\Models\Erp\Archive;
+use FalconERP\Skeleton\Models\User;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
 class People extends BaseModel implements AuditableContract
 {
@@ -22,6 +23,7 @@ class People extends BaseModel implements AuditableContract
     use SetSchemaTrait;
     use Auditable;
     use ActionTrait;
+    use ArchiveModelTrait;
 
     protected $table = 'peoples';
 
@@ -83,14 +85,6 @@ class People extends BaseModel implements AuditableContract
     }
 
     /**
-     * Archives function.
-     */
-    public function archives(): MorphMany
-    {
-        return $this->morphMany(Archive::class, 'archivable');
-    }
-
-    /**
      * PeopleImages function.
      */
     public function peopleImages()
@@ -104,7 +98,6 @@ class People extends BaseModel implements AuditableContract
         return $query->where('cnpj_cpf', $cnpjCpf);
     }
 
-    
     protected function setActions(): array
     {
         return [

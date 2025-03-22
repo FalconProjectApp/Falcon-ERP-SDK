@@ -4,10 +4,7 @@ namespace FalconERP\Skeleton\Models\Erp\Shop;
 
 use FalconERP\Skeleton\Enums\ArchiveEnum;
 use FalconERP\Skeleton\Models\BackOffice\Shop as BackOfficeShop;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use FalconERP\Skeleton\Models\Erp\Archive;
 use FalconERP\Skeleton\Models\Erp\Service\Service;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +14,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
 class Shop extends BaseModel implements AuditableContract
 {
@@ -24,6 +24,7 @@ class Shop extends BaseModel implements AuditableContract
     use SoftDeletes;
     use SetSchemaTrait;
     use Auditable;
+    use ArchiveModelTrait;
 
     protected $fillable = [
         'name',
@@ -40,14 +41,6 @@ class Shop extends BaseModel implements AuditableContract
     ];
 
     protected $appends = [];
-
-    /**
-     * Archives function.
-     */
-    public function archives(): MorphMany
-    {
-        return $this->morphMany(Archive::class, 'archivable');
-    }
 
     /**
      * Services function.
