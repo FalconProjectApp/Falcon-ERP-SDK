@@ -2,12 +2,10 @@
 
 namespace FalconERP\Skeleton\Models\Erp\People;
 
-use Illuminate\Notifications\Notifiable;
 use FalconERP\Skeleton\Enums\ArchiveEnum;
-use FalconERP\Skeleton\Models\Erp\Archive;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Notifications\Notifiable;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
