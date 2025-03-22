@@ -31,15 +31,13 @@ class FinancialAccount extends BaseModel implements AuditableContract
         'type' => FinancialAccountsTypeEnum::CLIENT_TYPE,
     ];
 
-    public $allowedIncludes = [
-        'people',
-        'people.peopleDocuments',
-        'people.peopleContacts',
-        'people.peopleImages',
-    ];
-
     public function people(): BelongsTo
     {
         return $this->belongsTo(People::class);
+    }
+
+    public function financialMovement(): HasMany
+    {
+        return $this->hasMany(FinancialMovement::class, 'financial_accounts_id');
     }
 }

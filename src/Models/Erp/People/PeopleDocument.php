@@ -19,5 +19,8 @@ class PeopleDocument extends BaseModel
         'is_accessible',
     ];
 
-    public $allowedIncludes = [];
+    public function people()
+    {
+        return $this->belongsTo(People::class);
+    }
 }

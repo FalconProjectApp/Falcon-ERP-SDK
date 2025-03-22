@@ -76,4 +76,33 @@ class BillInstallment extends BaseModel implements AuditableContract
             get: fn () => $this->value + $this->value_interest,
         );
     }
+
+    protected function value(): Attribute
+    {
+        return new Attribute(
+            set: fn ($value) => $value ?? 0,
+        );
+    }
+
+    protected function dueDate(): Attribute
+    {
+        return new Attribute(
+            set: fn ($value) => $value ?? Carbon::now(),
+        );
+    }
+
+    protected function issueDate(): Attribute
+    {
+        return new Attribute(
+            set: fn ($value) => $value ?? Carbon::now(),
+        );
+    }
+
+    protected function scopeByBills(Builder $query, array $bills = []): Builder
+    {
+        return $query->when(
+            $this->filtered($bills, 'bill_ids'),
+            fn ($query, $bills) => $query->whereIn('bill_id', $bills)
+        );
+    }
 }

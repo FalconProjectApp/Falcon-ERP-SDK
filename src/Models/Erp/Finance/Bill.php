@@ -59,6 +59,11 @@ class Bill extends BaseModel implements AuditableContract
         return $this->hasMany(BillInstallment::class);
     }
 
+    public function paymentMethod(): HasOne
+    {
+        return $this->hasOne(PaymentMethod::class);
+    }
+
     protected function isInstallment(): Attribute
     {
         return new Attribute(
@@ -101,10 +106,66 @@ class Bill extends BaseModel implements AuditableContract
         );
     }
 
+    protected function installmentPaidTotal(): Attribute
+    {
+        return new Attribute(
+            get: fn () => $this->billInstallments->sum('value_paid'),
+        );
+    }
+
     protected function installmentTotal(): Attribute
     {
         return new Attribute(
             get: fn () => $this->billInstallments->sum('value_total'),
         );
+    }
+
+    
+    public function scopeByPeople($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'people_ids'), fn ($query, $params) => $query->whereIn('people_id', $params));
+    }
+
+    public function scopeByFinancialAccount($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'financial_account_ids'), fn ($query, $params) => $query->whereIn('financial_account_id', $params));
+    }
+
+    public function scopeByType($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'type'), fn ($query, $params) => $query->whereIn('type', $params));
+    }
+
+    public function scopeByRepetition($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'repetition'), fn ($query, $params) => $query->whereIn('repetition', $params));
+    }
+
+    public function scopeByPeriodicity($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'periodicity'), fn ($query, $params) => $query->whereIn('periodicity', $params));
+    }
+
+    public function scopeByStatus($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'status'), fn ($query, $params) => $query->whereIn('status', $params));
+    }
+
+    public static function booting(): void
+    {
+        static::addGlobalScope('withRelations', function ($query) {
+            $query->with([
+                'billInstallments',
+            ]);
+        });
+    }
+
+    public static function boot(): void
+    {
+        parent::boot();
+
+        static::deleting(function ($bill) {
+            $bill->billInstallments()->delete();
+        });
     }
 }

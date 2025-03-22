@@ -46,6 +46,11 @@ class RequestHeader extends BaseModel
         return $this->belongsTo(People::class, 'allower_id');
     }
 
+    public function paymentMethod(): HasOne
+    {
+        return $this->hasOne(PaymentMethod::class);
+    }
+
     public function requestType(): BelongsTo
     {
         return $this->belongsTo(RequestType::class);

@@ -87,7 +87,7 @@ class Product extends BaseModel implements AuditableContract
         );
     }
 
-    public function scopeByGroup(Builder $query, string|array $params = []): Builder
+    public function scopeByGroupsIds(Builder $query, string|array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'groups_id'), function ($query, $params) {

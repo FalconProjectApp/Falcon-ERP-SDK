@@ -13,7 +13,15 @@ class FinancialMovement extends BaseModel
     use SoftDeletes;
     use SetSchemaTrait;
 
-    protected $fillable = [];
+    protected $fillable = [
+        'releases_types_id',
+        'financial_account_id',
+        /*  'bill_id',
+        'date',
+        'value',
+        'status', */
+        'obs',
+    ];
 
     protected $attributes = [];
 
