@@ -26,6 +26,21 @@ class Import extends BaseModel
         'observation',
     ];
 
+    public function scopeByStatus($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'status'), fn ($query, $params) => $query->whereIn('status', $params));
+    }
+
+    public function scopeByIssuerPeopleId($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'issuer_people_id'), fn ($query, $params) => $query->whereIn('issuer_people_id', $params));
+    }
+
+    public function scopeByRecipientPeopleId($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'recipient_people_id'), fn ($query, $params) => $query->whereIn('recipient_people_id', $params));
+    }
+
     protected function dataStd(): Attribute
     {
         $xml = $this->data ?? null;
@@ -43,6 +58,17 @@ class Import extends BaseModel
 
         return new Attribute(
             get: fn () => $xml,
+        );
+    }
+
+        /**
+     * Get the data.
+     */
+    protected function data(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => json_decode($value),
+            set: fn ($value) => json_encode($value)
         );
     }
 }
