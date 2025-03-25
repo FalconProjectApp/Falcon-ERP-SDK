@@ -65,6 +65,11 @@ class People extends BaseModel implements AuditableContract
         return $this->hasMany(PeopleDocument::class);
     }
 
+    public function followers()
+    {
+        return $this->morphToMany(People::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')->withTimestamps();
+    }
+
     public function users()
     {
         return $this
@@ -101,10 +106,27 @@ class People extends BaseModel implements AuditableContract
     protected function setActions(): array
     {
         return [
-            'can_view'    => true,
-            'can_restore' => $this->trashed(),
-            'can_update'  => !$this->trashed(),
-            'can_delete'  => !$this->trashed(),
+            'can_view'     => true,
+            'can_restore'  => $this->trashed(),
+            'can_update'   => !$this->trashed(),
+            'can_delete'   => !$this->trashed(),
+            'can_follow'   => $this->canFollow(),
+            'can_unfollow' => $this->canUnfollow(),
         ];
+    }
+
+    private function canFollow(): bool
+    {
+        return !$this->trashed()
+            && !$this->is_public
+            && !$this->followers()->where('follower_people_id', auth()->people()->id)->exists()
+            && $this->id !== auth()->people()->id;
+    }
+
+    private function canUnfollow(): bool
+    {
+        return !$this->trashed()
+            && !$this->is_public
+            && $this->followers()->where('follower_people_id', auth()->people()->id)->exists();
     }
 }

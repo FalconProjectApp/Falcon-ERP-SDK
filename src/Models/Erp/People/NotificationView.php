@@ -2,11 +2,11 @@
 
 namespace FalconERP\Skeleton\Models\Erp\People;
 
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notification;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class NotificationView extends BaseModel
 {
@@ -15,8 +15,18 @@ class NotificationView extends BaseModel
     use SetSchemaTrait;
 
     protected $fillable = [
-        'notification_id',
-        'people_id',
+        'viewed_at',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'viewed_at'  => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function notification()
