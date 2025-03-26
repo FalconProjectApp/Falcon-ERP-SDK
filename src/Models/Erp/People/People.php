@@ -4,10 +4,8 @@ namespace FalconERP\Skeleton\Models\Erp\People;
 
 use FalconERP\Skeleton\Enums\ArchiveEnum;
 use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
-use FalconERP\Skeleton\Models\Erp\Archive;
 use FalconERP\Skeleton\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
@@ -117,16 +115,16 @@ class People extends BaseModel implements AuditableContract
 
     private function canFollow(): bool
     {
-        return !$this->trashed()
+        return (!$this->trashed()
             && !$this->is_public
             && !$this->followers()->where('follower_people_id', auth()->people()->id)->exists()
-            && $this->id !== auth()->people()->id;
+            && $this->id !== auth()->people()->id) ?? false;
     }
 
     private function canUnfollow(): bool
     {
-        return !$this->trashed()
+        return (!$this->trashed()
             && !$this->is_public
-            && $this->followers()->where('follower_people_id', auth()->people()->id)->exists();
+            && $this->followers()->where('follower_people_id', auth()->people()->id)->exists()) ?? false;
     }
 }

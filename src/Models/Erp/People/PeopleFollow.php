@@ -1,6 +1,6 @@
 <?php
 
-namespace FalconERP\Skeleton\Models\People;
+namespace FalconERP\Skeleton\Models\Erp\People;
 
 use FalconERP\Skeleton\Models\Erp\People\People;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
