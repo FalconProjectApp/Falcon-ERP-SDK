@@ -3,6 +3,7 @@
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
 use FalconERP\Skeleton\Enums\ArchiveEnum;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -25,17 +26,29 @@ class Product extends BaseModel implements AuditableContract
     use ActionTrait;
     use ArchiveModelTrait;
 
+    public const ATTRIBUTE_ID              = 'id';
+    public const ATTRIBUTE_GROUPS_ID       = 'groups_id';
+    public const ATTRIBUTE_VOLUME_TYPES_ID = 'volume_types_id';
+    public const ATTRIBUTE_STATUS          = 'status';
+    public const ATTRIBUTE_DESCRIPTION     = 'description';
+    public const ATTRIBUTE_BAR_CODE        = 'bar_code';
+    public const ATTRIBUTE_LAST_BUY_VALUE  = 'last_buy_value';
+    public const ATTRIBUTE_LAST_SELL_VALUE = 'last_sell_value';
+    public const ATTRIBUTE_LAST_RENT_VALUE = 'last_rent_value';
+    public const ATTRIBUTE_PROVIDER_CODE   = 'provider_code';
+    public const ATTRIBUTE_OBSERVATIONS    = 'observations';
+
     protected $fillable = [
-        'groups_id',
-        'volume_types_id',
-        'status',
-        'description',
-        'bar_code',
-        'last_buy_value',
-        'last_sell_value',
-        'last_rent_value',
-        'provider_code',
-        'observations',
+        self::ATTRIBUTE_GROUPS_ID,
+        self::ATTRIBUTE_VOLUME_TYPES_ID,
+        self::ATTRIBUTE_STATUS,
+        self::ATTRIBUTE_DESCRIPTION,
+        self::ATTRIBUTE_BAR_CODE,
+        self::ATTRIBUTE_LAST_BUY_VALUE,
+        self::ATTRIBUTE_LAST_SELL_VALUE,
+        self::ATTRIBUTE_LAST_RENT_VALUE,
+        self::ATTRIBUTE_PROVIDER_CODE,
+        self::ATTRIBUTE_OBSERVATIONS,
     ];
 
     /*
@@ -59,12 +72,25 @@ class Product extends BaseModel implements AuditableContract
 
     public function volumeType(): BelongsTo
     {
-        return $this->belongsTo(VolumeType::class, 'volume_types_id')->withTrashed();
+        return $this->belongsTo(VolumeType::class, self::ATTRIBUTE_VOLUME_TYPES_ID)->withTrashed();
     }
 
     public function group(): BelongsTo
     {
-        return $this->belongsTo(Group::class, 'groups_id');
+        return $this->belongsTo(Group::class, self::ATTRIBUTE_GROUPS_ID);
+    }
+
+    public function followers()
+    {
+        return $this
+            ->morphToMany(
+                static::class,
+                'followable',
+                PeopleFollow::class,
+                'followable_id',
+                'follower_people_id'
+            )
+            ->withTimestamps();
     }
 
     /*
@@ -119,7 +145,7 @@ class Product extends BaseModel implements AuditableContract
     {
         return $query
             ->when($this->filtered($params, 'group_ids'), function ($query, $params) {
-                $query->whereIn('groups_id', $params);
+                $query->whereIn(self::ATTRIBUTE_GROUPS_ID, $params);
             });
     }
 
@@ -127,15 +153,15 @@ class Product extends BaseModel implements AuditableContract
     {
         return $query
             ->when($this->filtered($params, 'volume_type_ids'), function ($query, $params) {
-                $query->whereIn('volume_types_id', $params);
+                $query->whereIn(self::ATTRIBUTE_VOLUME_TYPES_ID, $params);
             });
     }
 
     public function scopeById(Builder $query, string|array $params = []): Builder
     {
         return $query
-            ->when($this->filtered($params, 'id'), function ($query, $params) {
-                $query->whereIn('id', $params);
+            ->when($this->filtered($params, 'ids'), function ($query, $params) {
+                $query->whereIn(self::ATTRIBUTE_ID, $params);
             });
     }
 
@@ -151,11 +177,12 @@ class Product extends BaseModel implements AuditableContract
     protected function setActions(): array
     {
         return [
-            'can_view'    => $this->canView(),
-            'can_restore' => $this->canRestore(),
-            'can_create'  => $this->canCreate(),
-            'can_update'  => $this->canUpdate(),
-            'can_delete'  => $this->canDelete(),
+            'can_view'     => $this->canView(),
+            'can_restore'  => $this->canRestore(),
+            'can_update'   => $this->canUpdate(),
+            'can_delete'   => $this->canDelete(),
+            'can_follow'   => $this->canFollow(),
+            'can_unfollow' => $this->canUnfollow(),
         ];
     }
 
@@ -169,11 +196,6 @@ class Product extends BaseModel implements AuditableContract
         return $this->trashed();
     }
 
-    public function canCreate(): bool
-    {
-        return true;
-    }
-
     private function canUpdate(): bool
     {
         return !$this->trashed();
@@ -182,5 +204,19 @@ class Product extends BaseModel implements AuditableContract
     private function canDelete(): bool
     {
         return !$this->trashed();
+    }
+
+    private function canFollow(): bool
+    {
+        return (!$this->trashed()
+            && !$this->followers()->where('follower_people_id', auth()->people()->id)->exists())
+            ?? false;
+    }
+
+    private function canUnfollow(): bool
+    {
+        return (!$this->trashed()
+            && $this->followers()->where('follower_people_id', auth()->people()->id)->exists())
+            ?? false;
     }
 }
