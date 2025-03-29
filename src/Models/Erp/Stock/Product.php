@@ -6,13 +6,13 @@ use FalconERP\Skeleton\Enums\ArchiveEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
@@ -22,6 +22,7 @@ class Product extends BaseModel implements AuditableContract
     use SoftDeletes;
     use SetSchemaTrait;
     use Auditable;
+    use ActionTrait;
     use ArchiveModelTrait;
 
     protected $fillable = [
@@ -36,6 +37,15 @@ class Product extends BaseModel implements AuditableContract
         'provider_code',
         'observations',
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the relationships that the model should have with
+    |
+    */
 
     public function stocks(): HasMany
     {
@@ -56,6 +66,15 @@ class Product extends BaseModel implements AuditableContract
     {
         return $this->belongsTo(Group::class, 'groups_id');
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Attributes
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the attributes that should be cast to native types.
+    |
+    */
 
     /**
      * ProductImages function.
@@ -87,11 +106,28 @@ class Product extends BaseModel implements AuditableContract
         );
     }
 
-    public function scopeByGroupsIds(Builder $query, string|array $params = []): Builder
+    /*
+    |--------------------------------------------------------------------------
+    | Scopes
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the scopes that the model should have with
+    |
+    */
+
+    public function scopeByGroupIds(Builder $query, string|array $params = []): Builder
     {
         return $query
-            ->when($this->filtered($params, 'groups_id'), function ($query, $params) {
+            ->when($this->filtered($params, 'group_ids'), function ($query, $params) {
                 $query->whereIn('groups_id', $params);
+            });
+    }
+
+    public function scopeByVolumeTypeIds(Builder $query, string|array $params = []): Builder
+    {
+        return $query
+            ->when($this->filtered($params, 'volume_type_ids'), function ($query, $params) {
+                $query->whereIn('volume_types_id', $params);
             });
     }
 
@@ -104,10 +140,47 @@ class Product extends BaseModel implements AuditableContract
     }
 
     /*
-        public static function boot(): void
-        {
-            parent::boot();
-            static::created(function (Model $model) {
-            });
-        } */
+    |--------------------------------------------------------------------------
+    | Actions
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the actions that the model should have with
+    |
+    */
+
+    protected function setActions(): array
+    {
+        return [
+            'can_view'    => $this->canView(),
+            'can_restore' => $this->canRestore(),
+            'can_create'  => $this->canCreate(),
+            'can_update'  => $this->canUpdate(),
+            'can_delete'  => $this->canDelete(),
+        ];
+    }
+
+    public function canView(): bool
+    {
+        return true;
+    }
+
+    private function canRestore(): bool
+    {
+        return $this->trashed();
+    }
+
+    public function canCreate(): bool
+    {
+        return true;
+    }
+
+    private function canUpdate(): bool
+    {
+        return !$this->trashed();
+    }
+
+    private function canDelete(): bool
+    {
+        return !$this->trashed();
+    }
 }
