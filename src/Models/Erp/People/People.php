@@ -2,6 +2,8 @@
 
 namespace FalconERP\Skeleton\Models\Erp\People;
 
+use App\Events\ModelRestore;
+use App\Events\ModelUpdated;
 use FalconERP\Skeleton\Enums\ArchiveEnum;
 use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
 use FalconERP\Skeleton\Models\User;
@@ -13,6 +15,7 @@ use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
+use QuantumTecnology\ValidateTrait\Data;
 
 class People extends BaseModel implements AuditableContract
 {
@@ -65,7 +68,12 @@ class People extends BaseModel implements AuditableContract
 
     public function followers()
     {
-        return $this->morphToMany(People::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')->withTimestamps();
+        return $this->morphToMany(static::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')->withTimestamps();
+    }
+
+    public function notifications()
+    {
+        return $this->morphMany(Notification::class, 'notifiable');
     }
 
     public function users()
@@ -94,6 +102,15 @@ class People extends BaseModel implements AuditableContract
     {
         return $this->archives()
             ->where('name', ArchiveEnum::NAME_PEOPLE_IMAGE);
+    }
+
+    /**
+     * PeopleImages function.
+     */
+    public function files()
+    {
+        return $this->archives()
+            ->where('name', ArchiveEnum::NAME_PEOPLE_FILE);
     }
 
     public function scopeByCnpjCpf($query, $cnpjCpf)
@@ -126,5 +143,32 @@ class People extends BaseModel implements AuditableContract
         return (!$this->trashed()
             && !$this->is_public
             && $this->followers()->where('follower_people_id', auth()->people()->id)->exists()) ?? false;
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updated(function ($model) {
+            event(new ModelUpdated(new Data([
+                'model'   => $model,
+                'message' => "A pessoa {$model->name} foi atualizada recentemente.",
+                'updated' => $model->getChanges(),
+            ])));
+        });
+
+        static::deleted(function ($model) {
+            event(new ModelUpdated(new Data([
+                'model'   => $model,
+                'message' => "A pessoa {$model->name} foi movida para a lixeira.",
+            ])));
+        });
+
+        static::restored(function ($model) {
+            event(new ModelRestore(new Data([
+                'model'   => $model,
+                'message' => "A pessoa {$model->name} foi restaurada.",
+            ])));
+        });
     }
 }

@@ -38,4 +38,15 @@ class Notification extends BaseModel
     {
         return $this->belongsTo(NotificationView::class);
     }
+
+        /**
+     * Get the valueTotal.
+     */
+    protected function content(): Attribute
+    {
+        return new Attribute(
+            get: fn () => json_decode($this->content),
+            set: fn ($value) => json_encode($value),
+        );
+    }
 }
