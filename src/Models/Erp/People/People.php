@@ -9,6 +9,7 @@ use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
 use FalconERP\Skeleton\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Http\Response;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
@@ -68,7 +69,10 @@ class People extends BaseModel implements AuditableContract
 
     public function followers()
     {
-        return $this->morphToMany(static::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')->withTimestamps();
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')
+            ->withTimestamps()
+            ->withTrashed();
     }
 
     public function notifications()
@@ -121,28 +125,49 @@ class People extends BaseModel implements AuditableContract
     protected function setActions(): array
     {
         return [
-            'can_view'     => true,
-            'can_restore'  => $this->trashed(),
-            'can_update'   => !$this->trashed(),
-            'can_delete'   => !$this->trashed(),
+            'can_view'     => $this->canView(),
+            'can_restore'  => $this->canRestore(),
+            'can_update'   => $this->can_update(),
+            'can_delete'   => $this->can_delete(),
             'can_follow'   => $this->canFollow(),
             'can_unfollow' => $this->canUnfollow(),
         ];
+    }
+
+    private function canView(): bool
+    {
+        return true;
+    }
+
+    private function canRestore(): bool
+    {
+        return $this->trashed();
+    }
+
+    private function can_update(): bool
+    {
+        return !$this->trashed();
+    }
+
+    private function can_delete(): bool
+    {
+        return !$this->trashed()
+            && $this->id !== auth()->people()?->id;
     }
 
     private function canFollow(): bool
     {
         return (!$this->trashed()
             && !$this->is_public
-            && !$this->followers()->where('follower_people_id', auth()->people()->id)->exists()
-            && $this->id !== auth()->people()->id) ?? false;
+            && !$this->followers()->where('follower_people_id', auth()->people()?->id)->exists()
+            && $this->id !== auth()->people()?->id) ?? false;
     }
 
     private function canUnfollow(): bool
     {
         return (!$this->trashed()
             && !$this->is_public
-            && $this->followers()->where('follower_people_id', auth()->people()->id)->exists()) ?? false;
+            && $this->followers()->where('follower_people_id', auth()->people()?->id)->exists()) ?? false;
     }
 
     protected static function boot()
