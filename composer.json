@@ -21,6 +21,9 @@
     }
   ],
   "autoload": {
+    "files": [
+      "src/Libs/Helpers.php"
+    ],
     "psr-4": {
       "FalconERP\\Skeleton\\": "src/"
     }
