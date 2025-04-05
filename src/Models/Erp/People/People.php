@@ -2,21 +2,30 @@
 
 namespace FalconERP\Skeleton\Models\Erp\People;
 
-use App\Events\ModelRestore;
-use App\Events\ModelUpdated;
-use FalconERP\Skeleton\Enums\ArchiveEnum;
-use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
-use FalconERP\Skeleton\Models\User;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use FalconERP\Skeleton\Models\User;
+use FalconERP\Skeleton\Enums\ArchiveEnum;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Observers\CacheObserver;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
+use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
-use QuantumTecnology\ValidateTrait\Data;
 
+#[ObservedBy([
+    CacheObserver::class,
+    NotificationObserver::class,
+])]
 class People extends BaseModel implements AuditableContract
 {
     use HasFactory;
@@ -46,27 +55,36 @@ class People extends BaseModel implements AuditableContract
         'is_public' => false,
     ];
 
-    public function types()
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the relationships that the model should have with
+    |
+    */
+
+    public function types(): BelongsTo
     {
         return $this->belongsTo(Type::class);
     }
 
-    public function addresses()
+    public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
     }
 
-    public function peopleContacts()
+    public function peopleContacts(): HasMany
     {
         return $this->hasMany(PeopleContact::class);
     }
 
-    public function peopleDocuments()
+    public function peopleDocuments(): HasMany
     {
         return $this->hasMany(PeopleDocument::class);
     }
 
-    public function followers()
+    public function followers(): MorphToMany
     {
         return $this
             ->morphToMany(static::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')
@@ -74,12 +92,20 @@ class People extends BaseModel implements AuditableContract
             ->withTrashed();
     }
 
-    public function notifications()
+    public function followings(): MorphToMany
+    {
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'follower_people_id', 'followable_id')
+            ->withTimestamps()
+            ->withTrashed();
+    }
+
+    public function notifications(): MorphMany
     {
         return $this->morphMany(Notification::class, 'notifiable');
     }
 
-    public function users()
+    public function users(): BelongsToMany
     {
         return $this
             ->belongsToMany(User::class, DatabasesUsersAccess::class, 'base_people_id', 'user_id')
@@ -89,6 +115,21 @@ class People extends BaseModel implements AuditableContract
                 'environment',
             ]);
     }
+
+    public function files(): MorphMany
+    {
+        return $this->archives()
+            ->where('name', ArchiveEnum::NAME_PEOPLE_FILE);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Attributes
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the attributes that should be cast to native types.
+    |
+    */
 
     public function user()
     {
@@ -107,27 +148,36 @@ class People extends BaseModel implements AuditableContract
             ->where('name', ArchiveEnum::NAME_PEOPLE_IMAGE);
     }
 
-    /**
-     * PeopleImages function.
-     */
-    public function files()
-    {
-        return $this->archives()
-            ->where('name', ArchiveEnum::NAME_PEOPLE_FILE);
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | Scopes
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the scopes that the model should have with
+    |
+    */
 
     public function scopeByCnpjCpf($query, $cnpjCpf)
     {
         return $query->where('cnpj_cpf', $cnpjCpf);
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Actions
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the actions that the model should have with
+    |
+    */
+
     protected function setActions(): array
     {
         return [
             'can_view'     => $this->canView(),
             'can_restore'  => $this->canRestore(),
-            'can_update'   => $this->can_update(),
-            'can_delete'   => $this->can_delete(),
+            'can_update'   => $this->canUpdate(),
+            'can_delete'   => $this->canDelete(),
             'can_follow'   => $this->canFollow(),
             'can_unfollow' => $this->canUnfollow(),
         ];
@@ -143,12 +193,12 @@ class People extends BaseModel implements AuditableContract
         return $this->trashed();
     }
 
-    private function can_update(): bool
+    private function canUpdate(): bool
     {
         return !$this->trashed();
     }
 
-    private function can_delete(): bool
+    private function canDelete(): bool
     {
         return !$this->trashed()
             && $this->id !== auth()->people()?->id;
@@ -169,30 +219,17 @@ class People extends BaseModel implements AuditableContract
             && $this->followers()->where('follower_people_id', auth()->people()?->id)->exists()) ?? false;
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Others
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the others that the model should have with
+    |
+    */
+
     protected static function boot()
     {
         parent::boot();
-
-        static::updated(function ($model) {
-            event(new ModelUpdated(new Data([
-                'model'   => $model,
-                'message' => "A pessoa {$model->name} foi atualizada recentemente.",
-                'updated' => $model->getChanges(),
-            ])));
-        });
-
-        static::deleted(function ($model) {
-            event(new ModelUpdated(new Data([
-                'model'   => $model,
-                'message' => "A pessoa {$model->name} foi movida para a lixeira.",
-            ])));
-        });
-
-        static::restored(function ($model) {
-            event(new ModelRestore(new Data([
-                'model'   => $model,
-                'message' => "A pessoa {$model->name} foi restaurada.",
-            ])));
-        });
     }
 }

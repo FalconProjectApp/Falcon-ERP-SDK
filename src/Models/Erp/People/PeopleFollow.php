@@ -2,12 +2,18 @@
 
 namespace FalconERP\Skeleton\Models\Erp\People;
 
-use FalconERP\Skeleton\Models\Erp\People\People;
+use FalconERP\Skeleton\Observers\CacheObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Notifications\Notifiable;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
+#[ObservedBy([
+    CacheObserver::class,
+])]
 class PeopleFollow extends BaseModel
 {
     use HasFactory;
@@ -31,13 +37,27 @@ class PeopleFollow extends BaseModel
         'updated_at' => 'datetime',
     ];
 
-    public function followable()
+    public function followable(): MorphTo
     {
         return $this->morphTo();
     }
 
-    public function follower()
+    public function follower(): BelongsTo
     {
         return $this->belongsTo(People::class, 'follower_people_id');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Others
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the others that the model should have with
+    |
+    */
+
+    protected static function boot()
+    {
+        parent::boot();
     }
 }
