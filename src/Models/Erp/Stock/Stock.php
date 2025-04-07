@@ -4,6 +4,9 @@ namespace FalconERP\Skeleton\Models\Erp\Stock;
 
 use FalconERP\Skeleton\Models\Erp\Shop\Shop;
 use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
+use FalconERP\Skeleton\Observers\CacheObserver;
+use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -14,6 +17,10 @@ use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
+#[ObservedBy([
+    CacheObserver::class,
+    NotificationObserver::class,
+])]
 class Stock extends BaseModel implements AuditableContract
 {
     use HasFactory;

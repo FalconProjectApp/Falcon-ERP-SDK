@@ -4,6 +4,9 @@ namespace FalconERP\Skeleton\Models\Erp\Stock;
 
 use FalconERP\Skeleton\Enums\ArchiveEnum;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use FalconERP\Skeleton\Observers\CacheObserver;
+use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +20,10 @@ use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
+#[ObservedBy([
+    CacheObserver::class,
+    NotificationObserver::class,
+])]
 class Product extends BaseModel implements AuditableContract
 {
     use HasFactory;
