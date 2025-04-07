@@ -27,3 +27,12 @@ if (!function_exists('database')) {
         return auth()->database($active, $refresh);
     }
 }
+
+if (!function_exists('cache')) {
+    function cache(
+        string $key,
+        callable $callback,
+    ) {
+        return cache()->rememberForever(config('database.connections.pgsql_bases.database').'_'.$key, $callback);
+    }
+}
