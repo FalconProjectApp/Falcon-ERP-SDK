@@ -28,8 +28,8 @@ if (!function_exists('database')) {
     }
 }
 
-if (!function_exists('cache')) {
-    function cache(
+if (!function_exists('rememberForever')) {
+    function rememberForever(
         string $key,
         callable $callback,
     ) {

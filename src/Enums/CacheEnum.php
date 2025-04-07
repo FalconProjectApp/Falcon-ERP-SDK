@@ -16,6 +16,15 @@ abstract class CacheEnum extends BaseEnum
     public const KEY_PEOPLE_IS_PUBLIC_COUNT    = 'people_is_public_count';
     public const KEY_PEOPLE_IS_PRIVATE_COUNT   = 'people_is_private_count';
 
+    public const KEY_PRODUCT_TOTAL_COUNT         = 'product_total_count';
+    public const KEY_PRODUCT_TRASHED_COUNT       = 'product_trashed_count';
+    public const KEY_PRODUCT_STOCK_TOTAL_COUNT   = 'product_stock_total_count';
+    public const KEY_PRODUCT_STOCK_TRASHED_COUNT = 'product_stock_trashed_count';
+    public const KEY_PRODUCT_STOCK_TOTAL_VALUE   = 'product_stock_total_value';
+    public const KEY_PRODUCT_STOCK_TRASHED_VALUE = 'product_stock_trashed_value';
+    public const KEY_PRODUCT_BALANCE_STOCK       = 'product_balance_stock';
+    public const KEY_PRODUCT_BALANCE_TRANSIT     = 'product_balance_transit';
+
     public static function keys(): Collection
     {
         return new Collection(static::filterConstants('KEY'));
