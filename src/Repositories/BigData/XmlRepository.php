@@ -16,14 +16,19 @@ class XmlRepository
     public array|object $errors = [];
     public array|object $data   = [];
 
-    public function __construct()
+    /**
+     * Timeout in seconds.
+     */
+    public int $timeout = 30;
+
+    public function __construct($auth)
     {
         $this->urlApi = sprintf(
             '%s/private/v1/xmls',
-            config('falconservices.big_data.'.config('app.env').'.url_api')
+            config('services.falcon.big_data.url_api')
         );
 
-        $this->authorization = request()->header('Authorization');
+        $this->authorization = $auth->data->access_token;
     }
 
     public function store(Data $data): self
@@ -32,10 +37,11 @@ class XmlRepository
             $this->data = $data;
         }
 
-        $response = Http::withToken($this->authorization, null)
+        $response = Http::withToken($this->authorization)
             ->retry(3, 2000, throw: false)
             ->acceptJson()
             ->asJson()
+            ->connectTimeout($this->timeout)
             ->post($this->urlApi, $this->data);
 
         $this->http_code = $response->status();
@@ -61,10 +67,11 @@ class XmlRepository
             $this->cnpj = $cnpj;
         }
 
-        $response = Http::withToken($this->authorization, null)
+        $response = Http::withToken($this->authorization)
             ->retry(3, 2000, throw: false)
             ->acceptJson()
             ->asJson()
+            ->connectTimeout($this->timeout)
             ->get("{$this->urlApi}/{$this->cnpj}/search");
 
         $this->http_code = $response->status();
@@ -82,36 +89,5 @@ class XmlRepository
         $this->data    = collect($response->object()->data);
 
         return $this;
-    }
-
-    public function auth()
-    {
-        echo "<a href='https://auth.mercadolivre.com.br/authorization?response_type=code&client_id=3543217050675060&redirect_uri={$this->redirect_uri}'>teste</a>";
-
-        $result = json_decode(Http::withHeaders([
-            'accept'       => 'application/json',
-            'content-type' => 'application/x-www-form-urlencoded',
-        ])->post("{$this->urlApi}/oauth/token", [
-            'grant_type'    => 'authorization_code',
-            'client_id'     => $this->client_id,
-            'client_secret' => $this->client_secret,
-            'code'          => request()->code,
-            'redirect_uri'  => $this->redirect_uri,
-        ])->getBody()->getContents());
-
-        if (isset($result->error)) {
-            dd($result, $this);
-        }
-        $this->access_token  = $result->access_token;
-        $this->refresh_token = $result->refresh_token;
-        dd($result, $this);
-    }
-
-    public function getUser()
-    {
-        return Http::withHeaders([
-            'accept'        => 'application/json',
-            'Authorization' => "Bearer {$this->access_token}",
-        ])->get("{$this->urlApi}/users/me")->getBody()->getContents();
     }
 }
