@@ -36,3 +36,13 @@ if (!function_exists('rememberForever')) {
         return cache()->rememberForever(config('database.connections.pgsql_bases.database').'_'.$key, $callback);
     }
 }
+
+if (!function_exists('deleteCache')) {
+    function deleteCache(
+        array $keys,
+    ): void {
+        foreach ($keys as $key) {
+            cache()->delete(config('database.connections.pgsql_bases.database').'_'.$key);
+        }
+    }
+}
