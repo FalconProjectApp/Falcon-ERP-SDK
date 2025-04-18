@@ -2,6 +2,7 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use FalconERP\Skeleton\Models\Erp\Shop\Shop;
 use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
 use FalconERP\Skeleton\Observers\CacheObserver;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
@@ -30,6 +32,7 @@ class Stock extends BaseModel implements AuditableContract
     use ActionTrait;
 
     public const ATTRIBUTE_ID              = 'id';
+    public const ATTRIBUTE_PRODUCT_ID      = 'product_id';
     public const ATTRIBUTE_DESCRIPTION     = 'description';
     public const ATTRIBUTE_BALANCE_TRANSIT = 'balance_transit';
     public const ATTRIBUTE_BALANCE_STOCK   = 'balance_stock';
@@ -46,6 +49,7 @@ class Stock extends BaseModel implements AuditableContract
 
     protected $fillable = [
         self::ATTRIBUTE_ID,
+        self::ATTRIBUTE_PRODUCT_ID,
         self::ATTRIBUTE_DESCRIPTION,
         self::ATTRIBUTE_BALANCE_TRANSIT,
         self::ATTRIBUTE_BALANCE_STOCK,
@@ -85,6 +89,22 @@ class Stock extends BaseModel implements AuditableContract
             name: 'linkable',
             table: ShopLinked::class
         )->withTimestamps();
+    }
+
+    public function followers(): MorphToMany
+    {
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')
+            ->withTimestamps()
+            ->withTrashed();
+    }
+
+    public function followings(): MorphToMany
+    {
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'follower_people_id', 'followable_id')
+            ->withTimestamps()
+            ->withTrashed();
     }
 
     /*
