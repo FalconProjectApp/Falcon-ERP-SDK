@@ -1,6 +1,6 @@
 <?php
 
-namespace FalconERP\Skeleton\Models\Erp\Revenue;
+namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
 use FalconERP\Skeleton\Observers\CacheObserver;
 use FalconERP\Skeleton\Observers\NotificationObserver;

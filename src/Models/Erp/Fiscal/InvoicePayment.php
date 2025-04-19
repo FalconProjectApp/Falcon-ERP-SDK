@@ -1,6 +1,6 @@
 <?php
 
-namespace FalconERP\Skeleton\Models\Erp\Revenue;
+namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
 use App\Models\Erp\Finance\PaymentMethod;
 use FalconERP\Skeleton\Observers\CacheObserver;

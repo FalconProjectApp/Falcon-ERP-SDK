@@ -1,6 +1,6 @@
 <?php
 
-namespace FalconERP\Skeleton\Models\Erp\Revenue;
+namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 use FalconERP\Skeleton\Models\Erp\Stock\Stock;
