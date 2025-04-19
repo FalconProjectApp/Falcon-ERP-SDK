@@ -1,13 +1,20 @@
 <?php
 
-namespace FalconERP\Skeleton\Models\Erp\Revenue;
+namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Observers\CacheObserver;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
+#[ObservedBy([
+    CacheObserver::class,
+    NotificationObserver::class,
+])]
 class Import extends BaseModel
 {
     use HasFactory;
