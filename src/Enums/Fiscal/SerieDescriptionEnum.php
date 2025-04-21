@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Enums\Fiscal;
 
@@ -18,14 +18,14 @@ enum SerieDescriptionEnum: string
     public function model(): SerieModelEnum
     {
         return match ($this) {
-            self::DESCRIPTION_NFE   => SerieModelEnum::MODEL_NFE,
-            self::DESCRIPTION_NFCE  => SerieModelEnum::MODEL_NFCE,
-            self::DESCRIPTION_NFSE  => SerieModelEnum::MODEL_NFSE,
-            self::DESCRIPTION_CTE   => SerieModelEnum::MODEL_CTE,
-            self::DESCRIPTION_CTEAN => SerieModelEnum::MODEL_CTEAN,
-            self::DESCRIPTION_CTEOS => SerieModelEnum::MODEL_CTEOS,
-            self::DESCRIPTION_CTEE  => SerieModelEnum::MODEL_CTEE,
-            self::DESCRIPTION_NF3E  => SerieModelEnum::MODEL_NF3E,
+            self::DESCRIPTION_NFE  => SerieModelEnum::MODEL_NFE,
+            self::DESCRIPTION_NFCE => SerieModelEnum::MODEL_NFCE,
+            self::DESCRIPTION_NFSE => SerieModelEnum::MODEL_NFSE,
+            self::DESCRIPTION_CTEAN,
+            self::DESCRIPTION_CTEOS,
+            self::DESCRIPTION_CTEE,
+            self::DESCRIPTION_CTE  => SerieModelEnum::MODEL_CTE,
+            self::DESCRIPTION_NF3E => SerieModelEnum::MODEL_NF3E,
         };
     }
 

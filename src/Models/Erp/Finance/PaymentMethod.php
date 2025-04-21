@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Models\Erp\Finance;
+namespace FalconERP\Skeleton\Models\Erp\Finance;
 
-use App\Models\BaseModel;
-use App\Models\Erp\Stock\RequestHeader;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use FalconERP\Skeleton\Models\Erp\Stock\RequestHeader;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 

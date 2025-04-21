@@ -2,12 +2,12 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use App\Models\Erp\Finance\PaymentMethod;
+use FalconERP\Skeleton\Models\Erp\Finance\PaymentMethod;
 use FalconERP\Skeleton\Models\Erp\People\People;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
@@ -71,9 +71,9 @@ class RequestHeader extends BaseModel implements AuditableContract
         return $this->belongsTo(People::class, self::ATTRIBUTE_ALLOWER_ID);
     }
 
-    public function paymentMethod(): HasOne
+    public function paymentMethod(): BelongsTo
     {
-        return $this->hasOne(PaymentMethod::class);
+        return $this->belongsTo(PaymentMethod::class);
     }
 
     public function requestType(): BelongsTo
@@ -89,6 +89,41 @@ class RequestHeader extends BaseModel implements AuditableContract
     | Here you may specify the attributes that should be cast to native types.
     |
     */
+
+    protected function indPres(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => (int) true, // Acrescentar este input no request
+        );
+    }
+
+    protected function itensValueTotal(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->requestBodies->sum('value_total'),
+        );
+    }
+
+    protected function itensValueTotalWithDiscount(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->requestBodies->sum('value_total_with_discount'),
+        );
+    }
+
+    protected function sameState(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => (bool) ($this->responsible->mainAddress?->state === $this->third->mainAddress?->state ?? false)
+        );
+    }
+
+    protected function sameCountry(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => (bool) ($this->responsible->mainAddress?->country === $this->third->mainAddress?->country ?? false)
+        );
+    }
 
     /*
     |--------------------------------------------------------------------------

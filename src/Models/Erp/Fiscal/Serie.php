@@ -2,10 +2,12 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
+use FalconERP\Skeleton\Enums\Fiscal\SerieEnvironmentEnum;
 use FalconERP\Skeleton\Models\Erp\People\People;
 use FalconERP\Skeleton\Observers\CacheObserver;
 use FalconERP\Skeleton\Observers\NotificationObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
@@ -83,4 +85,11 @@ class Serie extends BaseModel
     | Here you may specify the attributes that should be cast to native types.
     |
     */
+
+    protected function environmentCode(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => collect(SerieEnvironmentEnum::cases())->firstWhere('value', $this->environment)->tpAmb(),
+        );
+    }
 }

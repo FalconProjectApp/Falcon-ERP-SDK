@@ -15,4 +15,5 @@ abstract class PeopleDocumentEnum extends BaseEnum
     public const TYPE_TITULO_ELEITORAL    = 'Titulo Eleitoral';
     public const TYPE_CTPS                = 'CTPS';
     public const TYPE_CERTIFICADO_MILITAR = 'Certificado Militar';
+    public const TYPE_IM                  = 'im';
 }

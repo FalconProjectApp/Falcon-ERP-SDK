@@ -1,10 +1,11 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\People;
 
 use FalconERP\Skeleton\Enums\ArchiveEnum;
+use FalconERP\Skeleton\Enums\People\PeopleDocumentEnum;
 use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
 use FalconERP\Skeleton\Models\User;
 use FalconERP\Skeleton\Observers\CacheObserver;
@@ -209,6 +210,62 @@ class People extends BaseModel implements AuditableContract
     | Here you may specify the attributes that should be cast to native types.
     |
     */
+
+    protected function mainDocument(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->peopleDocuments->first()?->value,
+        );
+    }
+
+    protected function mainAddress(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->addresses->where('main', true)->first(),
+        );
+    }
+
+    protected function cnpj(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->peopleDocuments->where('type', PeopleDocumentEnum::TYPE_CNPJ)->first()?->value,
+        );
+    }
+
+    protected function cpf(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->peopleDocuments->where('type', PeopleDocumentEnum::TYPE_CPF)->first()?->value,
+        );
+    }
+
+    protected function indFinal(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => (int) ((bool) $this->cpf ?? false),
+        );
+    }
+
+    protected function ie(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->peopleDocuments->where('type', PeopleDocumentEnum::TYPE_IE)->first()?->value,
+        );
+    }
+
+    protected function im(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->peopleDocuments->where('type', PeopleDocumentEnum::TYPE_IM)->first()?->value,
+        );
+    }
+
+    protected function mainCnae(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => '4789099',
+        );
+    }
 
     protected function bank(): Attribute
     {
