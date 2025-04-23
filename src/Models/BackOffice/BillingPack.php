@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Models\BackOffice;
+namespace FalconERP\Skeleton\Models\BackOffice;
 
-use App\Models\BaseModel;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Notifications\Notifiable;
+use FalconERP\Skeleton\Models\BackOffice\Billing;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class BillingPack extends BaseModel
 {

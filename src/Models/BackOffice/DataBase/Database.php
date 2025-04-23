@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\BackOffice\DataBase;
 
@@ -76,7 +76,7 @@ class Database extends BaseModel
     public function scopeByActiveAndUser(
         $query,
         bool $active,
-        User $user
+        User $user,
     ) {
         return $query->with([
             'databasesUsersAccess' => fn ($query) => $query

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models\BackOffice;
+namespace FalconERP\Skeleton\Models\BackOffice;
 
-use App\Models\BaseModel;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Builder;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 
 class UserSession extends BaseModel
 {

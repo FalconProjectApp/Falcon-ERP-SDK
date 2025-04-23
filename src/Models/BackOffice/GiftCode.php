@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Models\BackOffice;
+namespace FalconERP\Skeleton\Models\BackOffice;
 
-use App\Models\BaseModel;
-use App\Models\User;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
+use FalconERP\Skeleton\Models\User;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class GiftCode extends BaseModel implements AuditableContract

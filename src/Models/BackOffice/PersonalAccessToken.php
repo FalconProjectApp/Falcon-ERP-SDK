@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\BackOffice;
+namespace FalconERP\Skeleton\Models\BackOffice;
 
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\PersonalAccessToken as SanctumPersonalAccessToken;
