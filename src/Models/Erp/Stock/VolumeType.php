@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
@@ -36,17 +37,20 @@ class VolumeType extends BaseModel implements AuditableContract
     |
     */
 
-    public function followers()
+    public function followers(): MorphToMany
     {
         return $this
-            ->morphToMany(
-                static::class,
-                'followable',
-                PeopleFollow::class,
-                'followable_id',
-                'follower_people_id'
-            )
-            ->withTimestamps();
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')
+            ->withTimestamps()
+            ->withTrashed();
+    }
+
+    public function followings(): MorphToMany
+    {
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'follower_people_id', 'followable_id')
+            ->withTimestamps()
+            ->withTrashed();
     }
 
     /*
