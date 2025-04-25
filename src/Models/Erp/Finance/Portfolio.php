@@ -117,52 +117,6 @@ class Portfolio extends BaseModel implements AuditableContract
         return $this->hasMany(Action::class);
     }
 
-    /**
-     * TODO Remover quando migrar para aws
-     * Utilizado para quando o request vim com array com coluna repetida.
-     * orWhere[][descricao].
-     */
-    public function arrayWhereOr(Builder $query, array $orWhere): Builder
-    {
-        foreach ($orWhere as $indice => $value) {
-            if (is_array($value)) {
-                $this->arrayWhereOr($query, $value);
-            } else {
-                $indice = 'cpfcnpj' == $indice ?
-                    "translate({$indice}, '.,-/', '')" : $indice;
-                $query->orWhereRaw(
-                    "UPPER({$indice}::text)
-                    like UPPER('%{$value}%')"
-                );
-            }
-        }
-
-        return $query;
-    }
-
-    /**
-     * TODO Remover quando migrar para aws
-     * Utilizado para quando o request vim com array com coluna repetida.
-     * Where[][descricao].
-     */
-    public function arrayWhere(Builder $query, array $where): Builder
-    {
-        foreach ($where as $indice => $value) {
-            if (is_array($value)) {
-                $this->arrayWhere($query, $value);
-            } else {
-                $indice = 'cpfcnpj' == $indice ?
-                    "translate({$indice}, '.,-/', '')" : $indice;
-                $query->WhereRaw(
-                    "UPPER({$indice}::text)
-                    like UPPER('%{$value}%')"
-                );
-            }
-        }
-
-        return $query;
-    }
-
     public static function boot(): void
     {
         parent::boot();
