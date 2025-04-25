@@ -2,19 +2,19 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use FalconERP\Skeleton\Models\Erp\Billing;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use FalconERP\Skeleton\Models\HasManySyncable;
 use Carbon\Carbon;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
+use Illuminate\Database\Eloquent\Builder;
+use FalconERP\Skeleton\Models\Erp\Billing;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Models\Erp\People\People;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use QuantumTecnology\ModelBasicsExtension\HasManySyncable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class Portfolio extends BaseModel implements AuditableContract
 {

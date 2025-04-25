@@ -24,6 +24,4 @@ class FinancialMovement extends BaseModel
     ];
 
     protected $attributes = [];
-
-    public $allowedIncludes = [];
 }
