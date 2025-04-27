@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\BackOffice\DataBase;
 
@@ -110,16 +110,16 @@ class Database extends BaseModel
 
     protected function environment(): Attribute
     {
-        return Attribute::get(fn () => $this->databasesUsersAccess()->first()?->environment);
+        return Attribute::get(fn () => $this->userAccess->first()?->pivot->environment);
     }
 
     protected function isActive(): Attribute
     {
-        return Attribute::get(fn () => $this->databasesUsersAccess()->first()?->is_active);
+        return Attribute::get(fn () => $this->userAccess->first()?->pivot->is_active);
     }
 
     protected function basePeopleId(): Attribute
     {
-        return Attribute::get(fn () => $this->databasesUsersAccess()->first()?->base_people_id);
+        return Attribute::get(fn () => $this->userAccess->first()?->pivot->base_people_id);
     }
 }
