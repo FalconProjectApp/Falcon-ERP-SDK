@@ -6,6 +6,7 @@ use FalconERP\Skeleton\Observers\CacheObserver;
 use FalconERP\Skeleton\Observers\NotificationObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
@@ -38,7 +39,7 @@ class NatureOperation extends BaseModel
     |
     */
 
-    public function serie()
+    public function serie(): BelongsTo
     {
         return $this->belongsTo(Serie::class);
     }
@@ -52,9 +53,9 @@ class NatureOperation extends BaseModel
     |
     */
 
-    public function scopeBySerieId($query, array $params = [])
+    public function scopeBySerieIds($query, array $params = [])
     {
-        return $query->when($this->filtered($params, 'serie_id'), fn ($query, $params) => $query->whereIn('serie_id', $params));
+        return $query->when($this->filtered($params, 'serie_ids'), fn ($query, $params) => $query->whereIn('serie_id', $params));
     }
 
     /*

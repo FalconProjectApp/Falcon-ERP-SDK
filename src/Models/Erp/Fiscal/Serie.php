@@ -58,14 +58,19 @@ class Serie extends BaseModel
     |
     */
 
-    public function scopeByPeopleIssuerId($query, array $params = [])
+    public function scopeByPeopleIssuerIds($query, array $params = [])
     {
-        return $query->when($this->filtered($params, 'people_issuer_id'), fn ($query, $params) => $query->whereIn('people_issuer_id', $params));
+        return $query->when($this->filtered($params, 'people_issuer_ids'), fn ($query, $params) => $query->whereIn('people_issuer_id', $params));
     }
 
-    public function scopeByModel($query, array $params = [])
+    public function scopeByModels($query, array $params = [])
     {
-        return $query->when($this->filtered($params, 'model'), fn ($query, $params) => $query->whereIn('model', $params));
+        return $query->when($this->filtered($params, 'models'), fn ($query, $params) => $query->whereIn('model', $params));
+    }
+
+    public function scopeByEnvironments($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'environments'), fn ($query, $params) => $query->whereIn('environment', $params));
     }
 
     /*

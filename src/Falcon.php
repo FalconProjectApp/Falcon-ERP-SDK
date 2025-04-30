@@ -5,6 +5,7 @@ namespace FalconERP\Skeleton;
 use FalconERP\Skeleton\Repositories\BigData\XmlRepository;
 use FalconERP\Skeleton\Repositories\BigData\AuthRepository;
 use FalconERP\Skeleton\Repositories\Finance\BillRepository;
+use FalconERP\Skeleton\Repositories\Fiscal\InvoiceRepository;
 use FalconERP\Skeleton\Repositories\Finance\AccountRepository;
 
 class Falcon
@@ -30,6 +31,14 @@ class Falcon
         return match ($module) {
             'bill'    => new BillRepository(),
             'account' => new AccountRepository(),
+            default   => false,
+        };
+    }
+
+    public static function fiscalService(string $module)
+    {
+        return match ($module) {
+            'invoice'    => new InvoiceRepository(),
             default   => false,
         };
     }
