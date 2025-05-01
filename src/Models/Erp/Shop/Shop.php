@@ -6,14 +6,14 @@ namespace FalconERP\Skeleton\Models\Erp\Shop;
 
 use Illuminate\Support\Str;
 use OwenIt\Auditing\Auditable;
-use FalconERP\Skeleton\Enums\ArchiveEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Models\Erp\People\People;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use FalconERP\Skeleton\Models\Erp\Service\Service;
-use FalconERP\Skeleton\Models\Erp\Shop\ShopSegment;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -31,8 +31,9 @@ class Shop extends BaseModel implements AuditableContract
     use SoftDeletes;
 
     protected $fillable = [
+        'responsible_people_id',
+        'issuer_people_id',
         'name',
-        'slug',
         'instagram',
         'whatsapp',
         'main_color',
@@ -92,15 +93,22 @@ class Shop extends BaseModel implements AuditableContract
         return $this->hasMany(ShopSegment::class);
     }
 
-    /**
-     * Archives function.
-     */
-    public function lastArchiveByName(string $name)
+    public function peopleIssuer(): BelongsTo
     {
-        return $this->archives()
-            ->where('name', $name)
-            ->orderBy('created_at', 'desc')
-            ->first();
+        return $this->belongsTo(
+            related: People::class,
+            foreignKey: 'issuer_people_id',
+            ownerKey: 'id',
+        );
+    }
+
+    public function peopleResponsible(): BelongsTo
+    {
+        return $this->belongsTo(
+            related: People::class,
+            foreignKey: 'responsible_people_id',
+            ownerKey: 'id',
+        );
     }
 
     /*
@@ -143,24 +151,10 @@ class Shop extends BaseModel implements AuditableContract
     |
     */
 
-    protected function logoImageUrl(): Attribute
-    {
-        return new Attribute(
-            get: fn () => $this->lastArchiveByName(ArchiveEnum::NAME_SHOP_LOGO)->url ?? null,
-        );
-    }
-
-    protected function logoImageMime(): Attribute
-    {
-        return new Attribute(
-            get: fn () => $this->lastArchiveByName(ArchiveEnum::NAME_SHOP_LOGO)->mime ?? null,
-        );
-    }
-
     protected function slug(): Attribute
     {
         return new Attribute(
-            set: fn (string $value) => Str::slug($value),
+            get: fn () => Str::slug($this->name),
         );
     }
 
