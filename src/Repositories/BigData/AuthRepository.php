@@ -24,7 +24,7 @@ class AuthRepository
     public function __construct()
     {
         $this->urlApi = sprintf(
-            '%s/auth/v1/login',
+            '%s/auth/v1',
             config('services.falcon.big_data.url_api')
         );
 
@@ -66,6 +66,34 @@ class AuthRepository
                 'email'    => $data->email,
                 'password' => $data->password, // TODO: mudar para secret
             ]);
+
+        $this->http_code = $response->status();
+
+        if (!$response->successful()) {
+            $this->message = $response->object()->message ?? $this->message;
+            $this->errors  = $response->object()->data ?? $this->errors;
+            $this->data    = collect();
+
+            return $this;
+        }
+
+        $this->success = $response->successful() && $response->object()->success;
+        $this->message = $response->object()->message;
+        $this->data    = new Data($response->object()->data);
+
+        return $this;
+    }
+
+    public function createUser(Data $data): self
+    {
+        if (!$this->data) {
+            $this->data = $data;
+        }
+
+        $response = Http::retry(3, 2000, throw: false)
+            ->acceptJson()
+            ->asJson()
+            ->post($this->urlApi, $this->data->toArray());
 
         $this->http_code = $response->status();
 

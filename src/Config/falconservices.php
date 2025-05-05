@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -42,6 +44,14 @@ return [
         ],
         'local' => [
             'url_api' => env('FALCON_FISCAL_URL', 'http://localhost:8002'),
+        ],
+    ],
+    'shop' => [
+        'production' => [
+            'url_api' => env('FALCON_SHOP_URL', 'https://n0isrx5qib.execute-api.us-east-1.amazonaws.com'),
+        ],
+        'local' => [
+            'url_api' => env('FALCON_SHOP_URL', 'http://falcon-nginx:90'),
         ],
     ],
 ];
