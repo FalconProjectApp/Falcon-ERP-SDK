@@ -38,7 +38,9 @@ class Setting extends BaseModel
 
     public function scopeByName($query, $name): Data
     {
-        return data(json_decode($query->where('name', $name)->first()->value));
+        $setting = $query->where('name', $name)->first();
+
+        return data($setting ? json_decode($setting?->value) : []);
     }
 
     /*

@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models;
 
+use Carbon\Carbon;
 use FalconERP\Skeleton\Models\BackOffice\CreditCard;
 use FalconERP\Skeleton\Models\BackOffice\DataBase\Database;
 use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
-use Carbon\Carbon;
+use FalconERP\Skeleton\Models\BackOffice\GiftCode;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Auth\Passwords\CanResetPassword;
@@ -14,6 +17,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -24,14 +28,14 @@ use QuantumTecnology\ModelBasicsExtension\BaseModel;
 
 class User extends BaseModel implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract
 {
-    use HasApiTokens;
-    use HasFactory;
-    use Notifiable;
-    use SoftDeletes;
     use Authenticatable;
     use Authorizable;
     use CanResetPassword;
+    use HasApiTokens;
+    use HasFactory;
     use MustVerifyEmail;
+    use Notifiable;
+    use SoftDeletes;
 
     protected $connection = 'pgsql';
 
@@ -42,6 +46,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
      */
     protected $fillable = [
         'email',
+        'gift_code_id',
         'payment_customer_hash',
     ];
 
@@ -124,5 +129,15 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     public function purchaseHistories(): HasMany
     {
         return $this->hasMany(PurchaseHistory::class);
+    }
+
+    public function giftCodes(): HasMany
+    {
+        return $this->hasMany(GiftCode::class, 'owner_id');
+    }
+
+    public function giftCodeUsed(): BelongsTo
+    {
+        return $this->belongsTo(GiftCode::class, 'gift_code_id');
     }
 }

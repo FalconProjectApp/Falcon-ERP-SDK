@@ -17,7 +17,16 @@ class GiftCode extends BaseModel implements AuditableContract
 
     protected $connection = 'pgsql';
 
-    protected $fillable = [];
+    protected $fillable = [
+        'owner_id',
+        'code',
+        'owner_bonus',
+        'client_bonus',
+        'max_uses',
+        'uses',
+        'used_at',
+        'expires_at',
+    ];
 
     public function owner()
     {
