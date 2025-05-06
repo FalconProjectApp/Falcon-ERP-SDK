@@ -62,10 +62,7 @@ class AuthRepository
         $response = Http::retry(3, 2000, throw: false)
             ->acceptJson()
             ->asJson()
-            ->post($this->urlApi, [
-                'email'    => $data->email,
-                'password' => $data->password, // TODO: mudar para secret
-            ]);
+            ->post("{$this->urlApi}/login", $data->toArray());
 
         $this->http_code = $response->status();
 
