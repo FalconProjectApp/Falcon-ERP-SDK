@@ -33,6 +33,10 @@ class RequestHeader extends BaseModel implements AuditableContract
     public const ATTRIBUTE_RESPONSIBLE_ID  = 'responsible_id';
     public const ATTRIBUTE_THIRD_ID        = 'third_id';
     public const ATTRIBUTE_ALLOWER_ID      = 'allower_id';
+    public const ATTRIBUTE_PAYMENT_METHOD  = 'payment_method_id';
+    public const ATTRIBUTE_DISCOUNT_VALUE  = 'discount_value';
+    public const ATTRIBUTE_FREIGHT_VALUE   = 'freight_value';
+
 
     protected $fillable = [
         self::ATTRIBUTE_DESCRIPTION,
@@ -42,6 +46,9 @@ class RequestHeader extends BaseModel implements AuditableContract
         self::ATTRIBUTE_RESPONSIBLE_ID,
         self::ATTRIBUTE_THIRD_ID,
         self::ATTRIBUTE_ALLOWER_ID,
+        self::ATTRIBUTE_PAYMENT_METHOD,
+        self::ATTRIBUTE_DISCOUNT_VALUE,
+        self::ATTRIBUTE_FREIGHT_VALUE,
     ];
 
     /*
