@@ -2,15 +2,16 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
-use FalconERP\Skeleton\Enums\FinancialAccountsTypeEnum;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Models\Erp\People\People;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use FalconERP\Skeleton\Enums\FinancialAccountsTypeEnum;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class FinancialAccount extends BaseModel implements AuditableContract
 {

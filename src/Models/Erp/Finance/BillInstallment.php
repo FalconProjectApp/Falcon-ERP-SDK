@@ -2,17 +2,18 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
-use FalconERP\Skeleton\Enums\ArchiveEnum;
 use OwenIt\Auditing\Auditable;
-use FalconERP\Skeleton\Models\Erp\Archive;
+use FalconERP\Skeleton\Enums\ArchiveEnum;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use QuantumTecnology\ServiceBasicsExtension\Models\Archive;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class BillInstallment extends BaseModel implements AuditableContract
 {
@@ -87,14 +88,14 @@ class BillInstallment extends BaseModel implements AuditableContract
     protected function dueDate(): Attribute
     {
         return new Attribute(
-            set: fn ($value) => $value ?? Carbon::now(),
+            set: fn ($value) => $value ?? now(),
         );
     }
 
     protected function issueDate(): Attribute
     {
         return new Attribute(
-            set: fn ($value) => $value ?? Carbon::now(),
+            set: fn ($value) => $value ?? now(),
         );
     }
 
