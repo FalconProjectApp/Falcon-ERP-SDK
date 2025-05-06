@@ -22,7 +22,7 @@ class ShopRepository
     public function __construct(array $params = [])
     {
         $this->urlApi = sprintf(
-            '%s/erp/private/shops/v1',
+            '%s/erp/private/shop/shops/v1',
             config('falconservices.shop.' . config('app.env') . '.url_api')
         );
 
