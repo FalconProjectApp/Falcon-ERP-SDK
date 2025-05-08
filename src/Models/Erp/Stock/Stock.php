@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
@@ -25,11 +27,11 @@ use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 ])]
 class Stock extends BaseModel implements AuditableContract
 {
-    use HasFactory;
-    use SoftDeletes;
-    use SetSchemaTrait;
-    use Auditable;
     use ActionTrait;
+    use Auditable;
+    use HasFactory;
+    use SetSchemaTrait;
+    use SoftDeletes;
 
     public const ATTRIBUTE_ID              = 'id';
     public const ATTRIBUTE_PRODUCT_ID      = 'product_id';
@@ -125,12 +127,35 @@ class Stock extends BaseModel implements AuditableContract
     |
     */
 
-    public function scopeByStockId(Builder $query, string|array $params = []): Builder
+    public function scopeByStockIds(Builder $query, string | array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'stock_ids'), function ($query, $params) {
                 $query->whereIn(self::ATTRIBUTE_ID, $params);
             });
+    }
+
+    public function scopeByProductIds(Builder $query, string | array $params = []): Builder
+    {
+        return $query
+            ->when($this->filtered($params, 'product_ids'), function ($query, $params) {
+                $query->whereIn(self::ATTRIBUTE_PRODUCT_ID, $params);
+            });
+    }
+
+    public function scopeByShopIds(Builder $query, string | array $params = []): Builder
+    {
+        return $query
+            ->when($this->filtered($params, 'shop_ids'), function ($query, $params) {
+                $query->whereHas('shops', function ($query) use ($params) {
+                    $query->whereIn('shops.id', $params);
+                });
+            });
+    }
+
+    public function canView(): bool
+    {
+        return true;
     }
 
     /*
@@ -151,11 +176,6 @@ class Stock extends BaseModel implements AuditableContract
             'can_follow'   => $this->canFollow(),
             'can_unfollow' => $this->canUnfollow(),
         ];
-    }
-
-    public function canView(): bool
-    {
-        return true;
     }
 
     private function canRestore(): bool
