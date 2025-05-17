@@ -2,18 +2,19 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use OwenIt\Auditing\Auditable;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use FalconERP\Skeleton\Models\Erp\Finance\PaymentMethod;
+use FalconERP\Skeleton\Models\Erp\People\People;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\RequestNfeTrait;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
@@ -24,6 +25,7 @@ class RequestHeader extends BaseModel implements AuditableContract
     use SetSchemaTrait;
     use Auditable;
     use ActionTrait;
+    use RequestNfeTrait;
 
     public const ATTRIBUTE_ID              = 'id';
     public const ATTRIBUTE_DESCRIPTION     = 'description';
@@ -33,10 +35,6 @@ class RequestHeader extends BaseModel implements AuditableContract
     public const ATTRIBUTE_RESPONSIBLE_ID  = 'responsible_id';
     public const ATTRIBUTE_THIRD_ID        = 'third_id';
     public const ATTRIBUTE_ALLOWER_ID      = 'allower_id';
-    public const ATTRIBUTE_PAYMENT_METHOD  = 'payment_method_id';
-    public const ATTRIBUTE_DISCOUNT_VALUE  = 'discount_value';
-    public const ATTRIBUTE_FREIGHT_VALUE   = 'freight_value';
-
 
     protected $fillable = [
         self::ATTRIBUTE_DESCRIPTION,
@@ -46,9 +44,6 @@ class RequestHeader extends BaseModel implements AuditableContract
         self::ATTRIBUTE_RESPONSIBLE_ID,
         self::ATTRIBUTE_THIRD_ID,
         self::ATTRIBUTE_ALLOWER_ID,
-        self::ATTRIBUTE_PAYMENT_METHOD,
-        self::ATTRIBUTE_DISCOUNT_VALUE,
-        self::ATTRIBUTE_FREIGHT_VALUE,
     ];
 
     /*
@@ -115,6 +110,9 @@ class RequestHeader extends BaseModel implements AuditableContract
     |
     */
 
+    /**
+     * ind_pres.
+     */
     protected function indPres(): Attribute
     {
         return Attribute::make(
@@ -129,6 +127,9 @@ class RequestHeader extends BaseModel implements AuditableContract
         );
     }
 
+    /**
+     * itens_value_total_with_discount.
+     */
     protected function itensValueTotalWithDiscount(): Attribute
     {
         return Attribute::make(

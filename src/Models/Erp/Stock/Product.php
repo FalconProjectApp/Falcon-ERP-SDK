@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use OwenIt\Auditing\Auditable;
 use FalconERP\Skeleton\Enums\ArchiveEnum;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use FalconERP\Skeleton\Observers\CacheObserver;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use FalconERP\Skeleton\Observers\CacheObserver;
 use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
@@ -27,12 +29,12 @@ use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 ])]
 class Product extends BaseModel implements AuditableContract
 {
-    use HasFactory;
-    use SoftDeletes;
-    use SetSchemaTrait;
-    use Auditable;
     use ActionTrait;
     use ArchiveModelTrait;
+    use Auditable;
+    use HasFactory;
+    use SetSchemaTrait;
+    use SoftDeletes;
 
     public const ATTRIBUTE_ID              = 'id';
     public const ATTRIBUTE_GROUPS_ID       = 'groups_id';
@@ -57,6 +59,10 @@ class Product extends BaseModel implements AuditableContract
         self::ATTRIBUTE_LAST_RENT_VALUE,
         self::ATTRIBUTE_PROVIDER_CODE,
         self::ATTRIBUTE_OBSERVATIONS,
+    ];
+
+    protected $casts = [
+        'birth_date' => 'date',
     ];
 
     /*
@@ -104,6 +110,11 @@ class Product extends BaseModel implements AuditableContract
             ->withTrashed();
     }
 
+    public function segments(): HasMany
+    {
+        return $this->hasMany(ProductSegment::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Attributes
@@ -133,6 +144,44 @@ class Product extends BaseModel implements AuditableContract
             ->first();
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Scopes
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the scopes that the model should have with
+    |
+    */
+
+    public function scopeByGroupIds(Builder $query, string | array $params = []): Builder
+    {
+        return $query
+            ->when($this->filtered($params, 'group_ids'), function ($query, $params) {
+                $query->whereIn(self::ATTRIBUTE_GROUPS_ID, $params);
+            });
+    }
+
+    public function scopeByVolumeTypeIds(Builder $query, string | array $params = []): Builder
+    {
+        return $query
+            ->when($this->filtered($params, 'volume_type_ids'), function ($query, $params) {
+                $query->whereIn(self::ATTRIBUTE_VOLUME_TYPES_ID, $params);
+            });
+    }
+
+    public function scopeById(Builder $query, string | array $params = []): Builder
+    {
+        return $query
+            ->when($this->filtered($params, 'ids'), function ($query, $params) {
+                $query->whereIn(self::ATTRIBUTE_ID, $params);
+            });
+    }
+
+    public function canView(): bool
+    {
+        return true;
+    }
+
     /**
      * ProductImageUrl function.
      */
@@ -143,37 +192,25 @@ class Product extends BaseModel implements AuditableContract
         );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Scopes
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify the scopes that the model should have with
-    |
-    */
-
-    public function scopeByGroupIds(Builder $query, string|array $params = []): Builder
+    protected function ncm(): Attribute
     {
-        return $query
-            ->when($this->filtered($params, 'group_ids'), function ($query, $params) {
-                $query->whereIn(self::ATTRIBUTE_GROUPS_ID, $params);
-            });
+        return Attribute::make(
+            get: fn () => $this->segments->where('name', 'ncm')->first()?->value,
+        );
     }
 
-    public function scopeByVolumeTypeIds(Builder $query, string|array $params = []): Builder
+    protected function unitAbbreviation(): Attribute
     {
-        return $query
-            ->when($this->filtered($params, 'volume_type_ids'), function ($query, $params) {
-                $query->whereIn(self::ATTRIBUTE_VOLUME_TYPES_ID, $params);
-            });
+        return Attribute::make(
+            get: fn () => $this->segments->where('name', 'unit_abbreviation')->first()?->value,
+        );
     }
 
-    public function scopeById(Builder $query, string|array $params = []): Builder
+    protected function unitDescription(): Attribute
     {
-        return $query
-            ->when($this->filtered($params, 'ids'), function ($query, $params) {
-                $query->whereIn(self::ATTRIBUTE_ID, $params);
-            });
+        return Attribute::make(
+            get: fn () => $this->segments->where('name', 'unit_description')->first()?->value,
+        );
     }
 
     /*
@@ -195,11 +232,6 @@ class Product extends BaseModel implements AuditableContract
             'can_follow'   => $this->canFollow(),
             'can_unfollow' => $this->canUnfollow(),
         ];
-    }
-
-    public function canView(): bool
-    {
-        return true;
     }
 
     private function canRestore(): bool
