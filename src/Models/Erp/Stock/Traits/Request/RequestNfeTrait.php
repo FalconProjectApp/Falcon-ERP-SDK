@@ -6,25 +6,23 @@ namespace FalconERP\Skeleton\Models\Erp\Stock\Traits\Request;
 
 use FalconERP\Skeleton\Enums\RequestEnum;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use NFePHP\NFe\Make;
 use QuantumTecnology\ValidateTrait\Data;
 
 trait RequestNfeTrait
 {
-    /**
-     * precisa ser um atributo em requestbody.
-     */
-    private function generateCfop(): string
-    {
-        $cfopBase = match ($this->requestType->request_type) {
-            RequestEnum::REQUEST_TYPE_INPUT  => $this->same_state ? 1 : ($this->same_country ? 2 : 3),
-            RequestEnum::REQUEST_TYPE_OUTPUT => $this->same_state ? 5 : ($this->same_country ? 6 : 7),
-            default                          => 0,
-        };
+    abstract public function third(): BelongsTo;
 
-        return $cfopBase.$this->requestType->natureOperationDefault->operation_type->operationType();
-    }
+    abstract public function responsible(): BelongsTo;
+
+    abstract public function paymentMethod(): BelongsTo;
+
+    abstract public function requestType(): BelongsTo;
+
+    abstract public function requestBodies(): HasMany;
 
     protected function xml(): Attribute
     {
@@ -48,7 +46,7 @@ trait RequestNfeTrait
 
             $nfe->tagprod($item->tag_prod->merge([
                 'item' => $itemNumber,
-                'CFOP' => $this->generateCfop(),
+                'CFOP' => $this->cfop,
             ])->toObject());
 
             $nfe->tagimposto($item->tag_imposto->merge([
@@ -216,11 +214,12 @@ trait RequestNfeTrait
                 'xFant' => $this->responsible->fantasy_name,
                 'IE'    => $this->responsible->ie,
                 'IEST'  => null,
-                'IM'    => null,
-                'CNAE'  => null,
-                'CRT'   => $this->responsible->crt,
-                'CNPJ'  => $this->responsible->cnpj,
-                'CPF'   => $this->responsible->cnpj ?: $this->responsible->cpf,
+                'IM'    => $this->responsible->im,
+                // TODO: o cnae utilizado para emitir a nota deveria estar na request
+                'CNAE' => $this->responsible->mainCnae,
+                'CRT'  => $this->responsible->crt,
+                'CNPJ' => $this->responsible->cnpj,
+                'CPF'  => $this->responsible->cnpj ?: $this->responsible->cpf,
             ])
         );
     }
@@ -236,7 +235,7 @@ trait RequestNfeTrait
                 'nro'     => $this->responsible->mainAddress?->number,
                 'xCpl'    => $this->responsible->mainAddress?->complement,
                 'xBairro' => $this->responsible->mainAddress?->neighborhood,
-                'cMun'    => $this->responsible->mainAddress?->city,
+                'cMun'    => $this->responsible->mainAddress?->city_ibge,
                 'xMun'    => $this->responsible->mainAddress?->city,
                 'UF'      => $this->responsible->mainAddress?->state,
                 'CEP'     => $this->responsible->mainAddress?->zip_code,
@@ -258,7 +257,7 @@ trait RequestNfeTrait
                 'indIEDest'     => 1,
                 'IE'            => $this->third->ie,
                 'ISUF'          => null,
-                'IM'            => null,
+                'IM'            => $this->third->im,
                 'email'         => $this->third->email,
                 'CNPJ'          => $this->third->cnpj,
                 'CPF'           => $this->third->cnpj ?: $this->third->cpf,
@@ -278,7 +277,7 @@ trait RequestNfeTrait
                 'nro'     => $this->third->mainAddress?->number,
                 'xCpl'    => $this->third->mainAddress?->complement,
                 'xBairro' => $this->third->mainAddress?->neighborhood,
-                'cMun'    => $this->third->mainAddress?->city,
+                'cMun'    => $this->third->mainAddress?->city_ibge,
                 'xMun'    => $this->third->mainAddress?->city,
                 'UF'      => $this->third->mainAddress?->state,
                 'CEP'     => $this->third->mainAddress?->zip_code,
@@ -298,14 +297,37 @@ trait RequestNfeTrait
     */
 
     /**
+     * cfop.
+     */
+    protected function cfop(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->id_dest.$this->requestType->natureOperationDefault->operation_type->operationType(),
+        );
+    }
+
+    /**
+     * id_dest.
+     */
+    protected function idDest(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => match ($this->requestType->request_type) {
+                RequestEnum::REQUEST_TYPE_INPUT  => $this->same_state ? 1 : ($this->same_country ? 2 : 3),
+                RequestEnum::REQUEST_TYPE_OUTPUT => $this->same_state ? 5 : ($this->same_country ? 6 : 7),
+                default                          => 0,
+            }
+        );
+    }
+
+    /**
      * c_mun_fg.
      * TODO: fazer a integração com o datahub para ver o ibge da cidade.
      */
     protected function cMunFg(): Attribute
     {
         return Attribute::make(
-            // $request->responsible->main_address ? '3501608' : null
-            get: fn () => $this->responsible->mainAddress?->city->code ?? null,
+            get: fn () => $this->responsible->mainAddress?->city_ibge ?? null,
         );
     }
 
@@ -336,7 +358,7 @@ trait RequestNfeTrait
     protected function cUf(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->responsible->main_address ? '35' : null,
+            get: fn () => $this->responsible->main_address?->state_ibge,
         );
     }
 
@@ -454,6 +476,26 @@ trait RequestNfeTrait
     {
         return Attribute::make(
             get: fn () => $this->requestType->natureOperationDefault->serie->fin_nfe ?? 1,
+        );
+    }
+
+    /**
+     * same_state.
+     */
+    protected function sameState(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => (bool) ($this->responsible->mainAddress?->state === $this->third->mainAddress?->state ?? false)
+        );
+    }
+
+    /**
+     * same_country.
+     */
+    protected function sameCountry(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => (bool) ($this->responsible->mainAddress?->country === $this->third->mainAddress?->country ?? false)
         );
     }
 }
