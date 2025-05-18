@@ -137,20 +137,6 @@ class RequestHeader extends BaseModel implements AuditableContract
         );
     }
 
-    protected function sameState(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => (bool) ($this->responsible->mainAddress?->state === $this->third->mainAddress?->state ?? false)
-        );
-    }
-
-    protected function sameCountry(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => (bool) ($this->responsible->mainAddress?->country === $this->third->mainAddress?->country ?? false)
-        );
-    }
-
     /*
     |--------------------------------------------------------------------------
     | Scopes

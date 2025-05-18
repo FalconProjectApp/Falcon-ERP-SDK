@@ -236,6 +236,16 @@ class RequestBody extends BaseModel
     }
 
     /**
+     * ncm.
+     */
+    protected function ncm(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->stock->product->ncm,
+        );
+    }
+
+    /**
      * tag_prod.
      */
     protected function tagProd(): Attribute
@@ -246,7 +256,7 @@ class RequestBody extends BaseModel
                 'cEAN'     => $this->c_ean,
                 'cBarra'   => $this->c_barra,
                 'xProd'    => $this->x_prod,
-                'NCM'      => $this->stock->product->main_ncm,
+                'NCM'      => $this->ncm,
                 'uCom'     => $this->u_com,
                 'qCom'     => $this->q_com,
                 'vUnCom'   => $this->v_un_com,

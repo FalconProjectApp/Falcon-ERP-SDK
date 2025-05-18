@@ -2,6 +2,7 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
+use FalconERP\Skeleton\Enums\Fiscal\NatureOperationTypeEnum;
 use FalconERP\Skeleton\Observers\CacheObserver;
 use FalconERP\Skeleton\Observers\NotificationObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -26,8 +27,9 @@ class NatureOperation extends BaseModel
         'people_issuer_id',
     ];
     protected $casts = [
-        'description' => 'string',
-        'serie_id'    => 'integer',
+        'description'    => 'string',
+        'serie_id'       => 'integer',
+        'operation_type' => NatureOperationTypeEnum::class,
     ];
 
     /*

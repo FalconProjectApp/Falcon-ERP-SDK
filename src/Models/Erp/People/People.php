@@ -4,25 +4,26 @@ declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\People;
 
-use FalconERP\Skeleton\Enums\ArchiveEnum;
-use FalconERP\Skeleton\Enums\People\PeopleDocumentEnum;
-use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
-use FalconERP\Skeleton\Models\User;
-use FalconERP\Skeleton\Observers\CacheObserver;
-use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use FalconERP\Skeleton\Models\User;
+use FalconERP\Skeleton\Enums\ArchiveEnum;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Observers\CacheObserver;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use FalconERP\Skeleton\Enums\People\PeopleCrtEnum;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use FalconERP\Skeleton\Enums\People\PeopleDocumentEnum;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
+use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
@@ -86,6 +87,7 @@ class People extends BaseModel implements AuditableContract
         'first_job'                               => 'boolean',
         'has_disability'                          => 'boolean',
         'works_simultaneously_in_another_company' => 'boolean',
+        'crt'                                     => PeopleCrtEnum::class,
     ];
 
     /*
@@ -467,6 +469,13 @@ class People extends BaseModel implements AuditableContract
     {
         return Attribute::make(
             get: fn () => $this->segments->where('name', 'works_simultaneously_in_another_company')->first()?->value,
+        );
+    }
+
+    protected function crt(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->segments->where('name', 'crt')->first()?->value,
         );
     }
 

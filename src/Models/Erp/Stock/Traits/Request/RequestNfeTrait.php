@@ -33,10 +33,10 @@ trait RequestNfeTrait
         $nfe = new Make();
         $nfe->taginfNFe($this->tag_inf_nfe->toObject());
         $nfe->tagide($this->tag_ide->toObject());
-        $nfe->tagemit($this->responsible->tag_emit);
-        $nfe->tagenderEmit($this->responsible->tag_ender_emit_dest);
-        $nfe->tagdest($this->third->tag_dest);
-        $nfe->tagenderDest($this->third->tag_ender_emit_dest);
+        $nfe->tagemit($this->tag_emit->toObject());
+        $nfe->tagenderEmit($this->tag_ender_emit->toObject());
+        $nfe->tagdest($this->tag_dest->toObject());
+        $nfe->tagenderDest($this->tag_ender_dest->toObject());
         $nfe->tagpag($this->tag_pag->toObject());
         $nfe->tagdetPag($this->tag_det_pag->toObject());
         $nfe->tagobsCont($this->tag_obs_cont->toObject());
@@ -202,6 +202,89 @@ trait RequestNfeTrait
                 'prod'    => $item->tag_prod->toObject(),
                 'imposto' => $item->tag_imposto->toObject(),
             ]))
+        );
+    }
+
+    /**
+     * tag_emit.
+     */
+    protected function tagEmit(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'xNome' => $this->responsible->name,
+                'xFant' => $this->responsible->fantasy_name,
+                'IE'    => $this->responsible->ie,
+                'IEST'  => null,
+                'IM'    => null,
+                'CNAE'  => null,
+                'CRT'   => $this->responsible->crt,
+                'CNPJ'  => $this->responsible->cnpj,
+                'CPF'   => $this->responsible->cnpj ?: $this->responsible->cpf,
+            ])
+        );
+    }
+
+    /**
+     * tag_ender_emit.
+     */
+    protected function tagEnderEmit(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'xLgr'    => $this->responsible->mainAddress?->street,
+                'nro'     => $this->responsible->mainAddress?->number,
+                'xCpl'    => $this->responsible->mainAddress?->complement,
+                'xBairro' => $this->responsible->mainAddress?->neighborhood,
+                'cMun'    => $this->responsible->mainAddress?->city,
+                'xMun'    => $this->responsible->mainAddress?->city,
+                'UF'      => $this->responsible->mainAddress?->state,
+                'CEP'     => $this->responsible->mainAddress?->zip_code,
+                'cPais'   => 1058,
+                'xPais'   => 'Brasil',
+            ])
+        );
+    }
+
+    /**
+     * tag_dest.
+     */
+    protected function tagDest(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'xNome'         => $this->third->name,
+                'xFant'         => $this->third->fantasy_name,
+                'indIEDest'     => 1,
+                'IE'            => $this->third->ie,
+                'ISUF'          => null,
+                'IM'            => null,
+                'email'         => $this->third->email,
+                'CNPJ'          => $this->third->cnpj,
+                'CPF'           => $this->third->cnpj ?: $this->third->cpf,
+                'idEstrangeiro' => null,
+            ])
+        );
+    }
+
+    /**
+     * tag_ender_dest.
+     */
+    protected function tagEnderDest(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'xLgr'    => $this->third->mainAddress?->street,
+                'nro'     => $this->third->mainAddress?->number,
+                'xCpl'    => $this->third->mainAddress?->complement,
+                'xBairro' => $this->third->mainAddress?->neighborhood,
+                'cMun'    => $this->third->mainAddress?->city,
+                'xMun'    => $this->third->mainAddress?->city,
+                'UF'      => $this->third->mainAddress?->state,
+                'CEP'     => $this->third->mainAddress?->zip_code,
+                'cPais'   => 1058,
+                'xPais'   => 'Brasil',
+            ])
         );
     }
 
