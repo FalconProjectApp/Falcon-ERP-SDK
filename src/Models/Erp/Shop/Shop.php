@@ -225,7 +225,7 @@ class Shop extends BaseModel implements AuditableContract
     protected function hasAutomaticallyFinish(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->segments->where('name', 'automatically_finish')->first()?->value,
+            get: fn () => (bool) $this->segments->where('name', 'automatically_finish')->first()?->value,
         );
     }
 }
