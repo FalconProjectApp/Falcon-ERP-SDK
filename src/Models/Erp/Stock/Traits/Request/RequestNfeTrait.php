@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock\Traits\Request;
 
@@ -26,42 +26,44 @@ trait RequestNfeTrait
 
     protected function xml(): Attribute
     {
-        $this->loadMissing('requestBodies.stock.product');
+        if (class_exists('Make')) {
+            $this->loadMissing('requestBodies.stock.product');
 
-        $nfe = new Make();
-        $nfe->taginfNFe($this->tag_inf_nfe->toObject());
-        $nfe->tagide($this->tag_ide->toObject());
-        $nfe->tagemit($this->tag_emit->toObject());
-        $nfe->tagenderEmit($this->tag_ender_emit->toObject());
-        $nfe->tagdest($this->tag_dest->toObject());
-        $nfe->tagenderDest($this->tag_ender_dest->toObject());
-        $nfe->tagpag($this->tag_pag->toObject());
-        $nfe->tagdetPag($this->tag_det_pag->toObject());
-        $nfe->tagobsCont($this->tag_obs_cont->toObject());
-        $nfe->tagobsFisco($this->tag_obs_fisco->toObject());
-        $nfe->taginfAdic($this->tag_inf_adic->toObject());
+            $nfe = new Make();
+            $nfe->taginfNFe($this->tag_inf_nfe->toObject());
+            $nfe->tagide($this->tag_ide->toObject());
+            $nfe->tagemit($this->tag_emit->toObject());
+            $nfe->tagenderEmit($this->tag_ender_emit->toObject());
+            $nfe->tagdest($this->tag_dest->toObject());
+            $nfe->tagenderDest($this->tag_ender_dest->toObject());
+            $nfe->tagpag($this->tag_pag->toObject());
+            $nfe->tagdetPag($this->tag_det_pag->toObject());
+            $nfe->tagobsCont($this->tag_obs_cont->toObject());
+            $nfe->tagobsFisco($this->tag_obs_fisco->toObject());
+            $nfe->taginfAdic($this->tag_inf_adic->toObject());
 
-        $this->requestBodies->each(function ($item, $key) use ($nfe) {
-            $itemNumber = $key + 1;
+            $this->requestBodies->each(function ($item, $key) use ($nfe) {
+                $itemNumber = $key + 1;
 
-            $nfe->tagprod($item->tag_prod->merge([
-                'item' => $itemNumber,
-                'CFOP' => $this->cfop,
-            ])->toObject());
+                $nfe->tagprod($item->tag_prod->merge([
+                    'item' => $itemNumber,
+                    'CFOP' => $this->cfop,
+                ])->toObject());
 
-            $nfe->tagimposto($item->tag_imposto->merge([
-                'item' => $itemNumber,
-            ])->toObject());
+                $nfe->tagimposto($item->tag_imposto->merge([
+                    'item' => $itemNumber,
+                ])->toObject());
 
-            $nfe->tagICMS($item->tag_icms->toObject());
-            // $nfe->tagICMSSN($item->tag_icms_sn->toObject());
-            // $nfe->tagPIS($item->tag_pis->toObject());
-            // $nfe->tagCOFINS($item->tag_cofins->toObject());
-            // $nfe->tagICMSUFDest($item->tag_icms_uf_dest->toObject());
-        });
+                $nfe->tagICMS($item->tag_icms->toObject());
+                // $nfe->tagICMSSN($item->tag_icms_sn->toObject());
+                // $nfe->tagPIS($item->tag_pis->toObject());
+                // $nfe->tagCOFINS($item->tag_cofins->toObject());
+                // $nfe->tagICMSUFDest($item->tag_icms_uf_dest->toObject());
+            });
+        }
 
         return Attribute::make(
-            get: fn () => $nfe,
+            get: fn () => $nfe ?? null,
         );
     }
 
@@ -302,7 +304,7 @@ trait RequestNfeTrait
     protected function cfop(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->id_dest.$this->requestType->natureOperationDefault->operation_type->operationType(),
+            get: fn () => $this->id_dest . $this->requestType->natureOperationDefault->operation_type->operationType(),
         );
     }
 
