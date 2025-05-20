@@ -4,21 +4,21 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Shop;
 
+use FalconERP\Skeleton\Models\BackOffice\Shop as BackOfficeShop;
+use FalconERP\Skeleton\Models\Erp\People\People;
+use FalconERP\Skeleton\Models\Erp\Service\Service;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use OwenIt\Auditing\Auditable;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use FalconERP\Skeleton\Models\Erp\Service\Service;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
-use FalconERP\Skeleton\Models\BackOffice\Shop as BackOfficeShop;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
@@ -46,13 +46,14 @@ class Shop extends BaseModel implements AuditableContract
     ];
 
     protected $casts = [
-        'printer_name'    => 'string',
-        'printer_ip'      => 'string',
-        'printer_port'    => 'string',
-        'printer_model'   => 'string',
-        'main_color'      => 'string',
-        'whatsapp_number' => 'string',
-        'instagram'       => 'string',
+        'printer_name'           => 'string',
+        'printer_ip'             => 'string',
+        'printer_port'           => 'string',
+        'printer_model'          => 'string',
+        'main_color'             => 'string',
+        'whatsapp_number'        => 'string',
+        'instagram'              => 'string',
+        'hasAutomaticallyFinish' => 'bool',
     ];
 
     protected $appends = [];
@@ -218,6 +219,13 @@ class Shop extends BaseModel implements AuditableContract
     {
         return Attribute::make(
             get: fn () => $this->segments->where('name', 'instagram')->first()?->value,
+        );
+    }
+
+    protected function hasAutomaticallyFinish(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->segments->where('name', 'automatically_finish')->first()?->value,
         );
     }
 }
