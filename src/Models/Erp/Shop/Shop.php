@@ -53,7 +53,7 @@ class Shop extends BaseModel implements AuditableContract
         'main_color'             => 'string',
         'whatsapp_number'        => 'string',
         'instagram'              => 'string',
-        'hasAutomaticallyFinish' => 'bool',
+        'has_automatically_finish' => 'bool',
     ];
 
     protected $appends = [];
@@ -225,7 +225,7 @@ class Shop extends BaseModel implements AuditableContract
     protected function hasAutomaticallyFinish(): Attribute
     {
         return Attribute::make(
-            get: fn () => (bool) $this->segments->where('name', 'automatically_finish')->first()?->value,
+            get: fn () => (bool) $this->segments->where('name', 'has_automatically_finish')->first()?->value,
         );
     }
 }

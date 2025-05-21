@@ -24,7 +24,7 @@ class ShopSegment extends BaseModel
         'main_color',
         'whatsapp_number',
         'instagram',
-        'hasAutomaticallyFinish',
+        'has_automatically_finish',
     ];
 
     /*
