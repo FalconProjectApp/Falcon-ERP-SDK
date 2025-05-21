@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
 use FalconERP\Skeleton\Models\Erp\Finance\PaymentMethod;
@@ -20,12 +22,12 @@ use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class RequestHeader extends BaseModel implements AuditableContract
 {
-    use HasFactory;
-    use SoftDeletes;
-    use SetSchemaTrait;
-    use Auditable;
     use ActionTrait;
+    use Auditable;
+    use HasFactory;
     use RequestNfeTrait;
+    use SetSchemaTrait;
+    use SoftDeletes;
 
     public const ATTRIBUTE_ID              = 'id';
     public const ATTRIBUTE_DESCRIPTION     = 'description';
@@ -35,6 +37,9 @@ class RequestHeader extends BaseModel implements AuditableContract
     public const ATTRIBUTE_RESPONSIBLE_ID  = 'responsible_id';
     public const ATTRIBUTE_THIRD_ID        = 'third_id';
     public const ATTRIBUTE_ALLOWER_ID      = 'allower_id';
+    public const ATTRIBUTE_FREIGHT_VALUE   = 'freight_value';
+    public const ATTRIBUTE_DISCOUNT_VALUE  = 'discount_value';
+    public const ATTRIBUTE_PAYMENT_METHOD  = 'payment_method_id';
 
     protected $fillable = [
         self::ATTRIBUTE_DESCRIPTION,
@@ -44,6 +49,9 @@ class RequestHeader extends BaseModel implements AuditableContract
         self::ATTRIBUTE_RESPONSIBLE_ID,
         self::ATTRIBUTE_THIRD_ID,
         self::ATTRIBUTE_ALLOWER_ID,
+        self::ATTRIBUTE_FREIGHT_VALUE,
+        self::ATTRIBUTE_DISCOUNT_VALUE,
+        self::ATTRIBUTE_PAYMENT_METHOD,
     ];
 
     /*
@@ -99,6 +107,11 @@ class RequestHeader extends BaseModel implements AuditableContract
             ->morphToMany(static::class, 'followable', PeopleFollow::class, 'follower_people_id', 'followable_id')
             ->withTimestamps()
             ->withTrashed();
+    }
+
+    public function canView(): bool
+    {
+        return true;
     }
 
     /*
@@ -164,11 +177,6 @@ class RequestHeader extends BaseModel implements AuditableContract
             'can_follow'   => $this->canFollow(),
             'can_unfollow' => $this->canUnfollow(),
         ];
-    }
-
-    public function canView(): bool
-    {
-        return true;
     }
 
     private function canRestore(): bool
