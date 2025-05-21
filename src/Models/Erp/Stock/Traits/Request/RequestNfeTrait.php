@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock\Traits\Request;
 
@@ -142,7 +142,7 @@ trait RequestNfeTrait
         return Attribute::make(
             get: fn () => new Data([
                 'indPag' => 0,
-                'tPag'   => $this->paymentMethod->description,
+                'tPag'   => $this->paymentMethod?->description,
                 'vPag'   => $this->itens_value_total_with_discount,
             ])
         );
@@ -304,7 +304,7 @@ trait RequestNfeTrait
     protected function cfop(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->id_dest.$this->requestType->natureOperationDefault->operation_type->operationType(),
+            get: fn () => $this->id_dest . $this->requestType->natureOperationDefault->operation_type->operationType(),
         );
     }
 
