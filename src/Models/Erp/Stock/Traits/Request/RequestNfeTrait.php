@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock\Traits\Request;
 
@@ -26,7 +26,7 @@ trait RequestNfeTrait
 
     protected function xml(): Attribute
     {
-        if (class_exists('Make')) {
+        if (class_exists(Make::class)) {
             $this->loadMissing('requestBodies.stock.product');
 
             $nfe = new Make();
@@ -304,7 +304,7 @@ trait RequestNfeTrait
     protected function cfop(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->id_dest . $this->requestType->natureOperationDefault->operation_type->operationType(),
+            get: fn () => $this->id_dest.$this->requestType->natureOperationDefault->operation_type->operationType(),
         );
     }
 
