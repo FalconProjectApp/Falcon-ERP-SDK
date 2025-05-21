@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\Shop;
 
@@ -61,5 +61,4 @@ class ShopSegment extends BaseModel
     | Here you may specify the attributes that should be cast to native types.
     |
     */
-
 }
