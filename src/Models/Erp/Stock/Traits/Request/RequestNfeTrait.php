@@ -26,10 +26,17 @@ trait RequestNfeTrait
 
     protected function xml(): Attribute
     {
-        if (class_exists(Make::class)) {
-            $this->loadMissing('requestBodies.stock.product');
+        $this->loadMissing('requestBodies.stock.product');
 
+        if (isset($this->attributeCastCache['xml'])) {
+            return Attribute::make(
+                get: fn () => $this->attributeCastCache['xml'],
+            );
+        }
+
+        if (class_exists(Make::class)) {
             $nfe = new Make();
+
             $nfe->taginfNFe($this->tag_inf_nfe->toObject());
             $nfe->tagide($this->tag_ide->toObject());
             $nfe->tagemit($this->tag_emit->toObject());
@@ -297,6 +304,96 @@ trait RequestNfeTrait
     | Here you may specify the attributes that should be cast to native types.
     |
     */
+
+    /**
+     * has_errors.
+     */
+    protected function hasErrors(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => count($this->errors) > 0,
+        );
+    }
+
+    /**
+     * errors.
+     */
+    protected function errors(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->xml->getErrors(),
+        );
+    }
+
+    /**
+     * is_nfce.
+     */
+    protected function isNfce(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => '65' === $this->requestType->natureOperationDefault->serie->model ?? false,
+        );
+    }
+
+    /**
+     * is_nfe.
+     */
+    protected function isNfe(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => '55' === $this->requestType->natureOperationDefault->serie->model ?? false,
+        );
+    }
+
+    /**
+     * is_cte.
+     */
+    protected function isCte(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => '57' === $this->requestType->natureOperationDefault->serie->model ?? false,
+        );
+    }
+
+    /**
+     * is_cte_os.
+     */
+    protected function isCteOs(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => '67' === $this->requestType->natureOperationDefault->serie->model ?? false,
+        );
+    }
+
+    /**
+     * is_cte_anu.
+     */
+    protected function isCteAnu(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => '59' === $this->requestType->natureOperationDefault->serie->model ?? false,
+        );
+    }
+
+    /**
+     * is_cte_os_anu.
+     */
+    protected function isCteOsAnu(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => '69' === $this->requestType->natureOperationDefault->serie->model ?? false,
+        );
+    }
+
+    /**
+     * is_nfse.
+     */
+    protected function isNfse(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => 'RPS' === $this->requestType->natureOperationDefault->serie->model ?? false,
+        );
+    }
 
     /**
      * cfop.

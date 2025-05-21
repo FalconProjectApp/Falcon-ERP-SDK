@@ -170,12 +170,13 @@ class RequestHeader extends BaseModel implements AuditableContract
     protected function setActions(): array
     {
         return [
-            'can_view'     => $this->canView(),
-            'can_restore'  => $this->canRestore(),
-            'can_update'   => $this->canUpdate(),
-            'can_delete'   => $this->canDelete(),
-            'can_follow'   => $this->canFollow(),
-            'can_unfollow' => $this->canUnfollow(),
+            'can_view'       => $this->canView(),
+            'can_restore'    => $this->canRestore(),
+            'can_update'     => $this->canUpdate(),
+            'can_delete'     => $this->canDelete(),
+            'can_follow'     => $this->canFollow(),
+            'can_unfollow'   => $this->canUnfollow(),
+            'can_issue_nfce' => $this->canIssueNfce(),
         ];
     }
 
@@ -206,5 +207,13 @@ class RequestHeader extends BaseModel implements AuditableContract
         return (!$this->trashed()
             && $this->followers()->where('follower_people_id', auth()->people()->id)->exists())
             ?? false;
+    }
+
+    private function canIssueNfce(): bool
+    {
+        return $this->is_nfce
+            && !$this->trashed()
+            && $this->requestBodies->count() > 0
+            && !$this->has_errors;
     }
 }
