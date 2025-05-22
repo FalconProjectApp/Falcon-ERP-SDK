@@ -37,17 +37,17 @@ trait RequestNfeTrait
         if (class_exists(Make::class)) {
             $nfe = new Make();
 
-            $nfe->taginfNFe($this->tag_inf_nfe->toObject());
-            $nfe->tagide($this->tag_ide->toObject());
-            $nfe->tagemit($this->tag_emit->toObject());
-            $nfe->tagenderEmit($this->tag_ender_emit->toObject());
-            $nfe->tagdest($this->tag_dest->toObject());
-            $nfe->tagenderDest($this->tag_ender_dest->toObject());
-            $nfe->tagpag($this->tag_pag->toObject());
-            $nfe->tagdetPag($this->tag_det_pag->toObject());
-            $nfe->tagobsCont($this->tag_obs_cont->toObject());
-            $nfe->tagobsFisco($this->tag_obs_fisco->toObject());
-            $nfe->taginfAdic($this->tag_inf_adic->toObject());
+            !blank($this->tag_inf_nfe) && $nfe->taginfNFe($this->tag_inf_nfe->toObject());
+            !blank($this->tag_ide) && $nfe->tagide($this->tag_ide->toObject());
+            !blank($this->tag_emit) && $nfe->tagemit($this->tag_emit->toObject());
+            !blank($this->tag_ender_emit) && $nfe->tagenderEmit($this->tag_ender_emit->toObject());
+            !blank($this->tag_dest) && $nfe->tagdest($this->tag_dest->toObject());
+            !blank($this->tag_ender_dest) && $nfe->tagenderDest($this->tag_ender_dest->toObject());
+            !blank($this->tag_pag) && $nfe->tagpag($this->tag_pag->toObject());
+            !blank($this->tag_det_pag) && $nfe->tagdetPag($this->tag_det_pag->toObject());
+            !blank($this->tag_obs_cont) && $nfe->tagobsCont($this->tag_obs_cont->toObject());
+            !blank($this->tag_obs_fisco) && $nfe->tagobsFisco($this->tag_obs_fisco->toObject());
+            !blank($this->tag_inf_adic) && $nfe->taginfAdic($this->tag_inf_adic->toObject());
 
             $this->requestBodies->each(function ($item, $key) use ($nfe) {
                 $itemNumber = $key + 1;
@@ -109,7 +109,7 @@ trait RequestNfeTrait
                 'cNF'      => $this->c_nf,
                 'natOp'    => $this->nat_op,
                 'indPag'   => 0,
-                'mod'      => $this->requestType->natureOperationDefault->serie->model,
+                'mod'      => $this->mod,
                 'serie'    => $this->serie,
                 'nNF'      => $this->id,
                 'dhEmi'    => $this->dh_emi,
@@ -146,6 +146,12 @@ trait RequestNfeTrait
      */
     protected function tagDetPag(): Attribute
     {
+        if (null === $this->paymentMethod) {
+            return Attribute::make(
+                get: fn () => null,
+            );
+        }
+
         return Attribute::make(
             get: fn () => new Data([
                 'indPag' => 0,
@@ -217,18 +223,26 @@ trait RequestNfeTrait
      */
     protected function tagEmit(): Attribute
     {
+        $emit = $this->responsible;
+
+        if (null === $emit) {
+            return Attribute::make(
+                get: fn () => null,
+            );
+        }
+
         return Attribute::make(
             get: fn () => new Data([
-                'xNome' => $this->responsible->name,
-                'xFant' => $this->responsible->fantasy_name,
-                'IE'    => $this->responsible->ie,
+                'xNome' => $emit->name,
+                'xFant' => $emit->fantasy_name,
+                'IE'    => $emit->ie,
                 'IEST'  => null,
-                'IM'    => $this->responsible->im,
+                'IM'    => $emit->im,
                 // TODO: o cnae utilizado para emitir a nota deveria estar na request
-                'CNAE' => $this->responsible->mainCnae,
-                'CRT'  => $this->responsible->crt,
-                'CNPJ' => $this->responsible->cnpj,
-                'CPF'  => $this->responsible->cnpj ?: $this->responsible->cpf,
+                'CNAE' => $emit->mainCnae,
+                'CRT'  => $emit->crt,
+                'CNPJ' => $emit->cnpj,
+                'CPF'  => $emit->cnpj ?: $emit->cpf,
             ])
         );
     }
@@ -238,16 +252,24 @@ trait RequestNfeTrait
      */
     protected function tagEnderEmit(): Attribute
     {
+        $enderEmit = $this->responsible->mainAddress ?? null;
+
+        if (null === $enderEmit) {
+            return Attribute::make(
+                get: fn () => null,
+            );
+        }
+
         return Attribute::make(
             get: fn () => new Data([
-                'xLgr'    => $this->responsible->mainAddress?->street,
-                'nro'     => $this->responsible->mainAddress?->number,
-                'xCpl'    => $this->responsible->mainAddress?->complement,
-                'xBairro' => $this->responsible->mainAddress?->neighborhood,
-                'cMun'    => $this->responsible->mainAddress?->city_ibge,
-                'xMun'    => $this->responsible->mainAddress?->city,
-                'UF'      => $this->responsible->mainAddress?->state,
-                'CEP'     => $this->responsible->mainAddress?->zip_code,
+                'xLgr'    => $enderEmit->street,
+                'nro'     => $enderEmit->number,
+                'xCpl'    => $enderEmit->complement,
+                'xBairro' => $enderEmit->neighborhood,
+                'cMun'    => $enderEmit->city_ibge,
+                'xMun'    => $enderEmit->city,
+                'UF'      => $enderEmit->state,
+                'CEP'     => $enderEmit->zip_code,
                 'cPais'   => 1058,
                 'xPais'   => 'Brasil',
             ])
@@ -259,17 +281,25 @@ trait RequestNfeTrait
      */
     protected function tagDest(): Attribute
     {
+        $dest = $this->third;
+
+        if (null === $dest) {
+            return Attribute::make(
+                get: fn () => null,
+            );
+        }
+
         return Attribute::make(
             get: fn () => new Data([
-                'xNome'         => $this->third->name,
-                'xFant'         => $this->third->fantasy_name,
+                'xNome'         => $dest->name,
+                'xFant'         => $dest->fantasy_name,
                 'indIEDest'     => 1,
-                'IE'            => $this->third->ie,
+                'IE'            => $dest->ie,
                 'ISUF'          => null,
-                'IM'            => $this->third->im,
-                'email'         => $this->third->email,
-                'CNPJ'          => $this->third->cnpj,
-                'CPF'           => $this->third->cnpj ?: $this->third->cpf,
+                'IM'            => $dest->im,
+                'email'         => $dest->email,
+                'CNPJ'          => $dest->cnpj,
+                'CPF'           => $dest->cnpj ?: $dest->cpf,
                 'idEstrangeiro' => null,
             ])
         );
@@ -280,16 +310,24 @@ trait RequestNfeTrait
      */
     protected function tagEnderDest(): Attribute
     {
+        $enderDest = $this->third->mainAddress ?? null;
+
+        if (null === $enderDest) {
+            return Attribute::make(
+                get: fn () => null,
+            );
+        }
+
         return Attribute::make(
             get: fn () => new Data([
-                'xLgr'    => $this->third->mainAddress?->street,
-                'nro'     => $this->third->mainAddress?->number,
-                'xCpl'    => $this->third->mainAddress?->complement,
-                'xBairro' => $this->third->mainAddress?->neighborhood,
-                'cMun'    => $this->third->mainAddress?->city_ibge,
-                'xMun'    => $this->third->mainAddress?->city,
-                'UF'      => $this->third->mainAddress?->state,
-                'CEP'     => $this->third->mainAddress?->zip_code,
+                'xLgr'    => $enderDest->street,
+                'nro'     => $enderDest->number,
+                'xCpl'    => $enderDest->complement,
+                'xBairro' => $enderDest->neighborhood,
+                'cMun'    => $this->c_mun_fg,
+                'xMun'    => $enderDest->city,
+                'UF'      => $enderDest->state,
+                'CEP'     => $enderDest->zip_code,
                 'cPais'   => 1058,
                 'xPais'   => 'Brasil',
             ])
@@ -392,6 +430,16 @@ trait RequestNfeTrait
     {
         return Attribute::make(
             get: fn () => 'RPS' === $this->requestType->natureOperationDefault->serie->model ?? false,
+        );
+    }
+
+    /**
+     * mod.
+     */
+    protected function mod(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->requestType->natureOperationDefault->serie->model,
         );
     }
 
@@ -583,6 +631,12 @@ trait RequestNfeTrait
      */
     protected function sameState(): Attribute
     {
+        if (blank($this->third)) {
+            return Attribute::make(
+                get: fn () => true,
+            );
+        }
+
         return Attribute::make(
             get: fn () => (bool) ($this->responsible->mainAddress?->state === $this->third->mainAddress?->state ?? false)
         );
@@ -593,6 +647,14 @@ trait RequestNfeTrait
      */
     protected function sameCountry(): Attribute
     {
+        dd($this->ender_dest);
+
+        if (blank($this->third)) {
+            return Attribute::make(
+                get: fn () => true,
+            );
+        }
+
         return Attribute::make(
             get: fn () => (bool) ($this->responsible->mainAddress?->country === $this->third->mainAddress?->country ?? false)
         );

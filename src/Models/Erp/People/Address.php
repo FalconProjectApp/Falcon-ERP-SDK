@@ -1,29 +1,37 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models\Erp\People;
 
+use FalconERP\Skeleton\Falcon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class Address extends BaseModel
 {
     use HasFactory;
-    use SoftDeletes;
     use SetSchemaTrait;
+    use SoftDeletes;
 
     protected $fillable = [
-        'cep',
+        'people_id',
         'country',
-        'cities_id',
         'district',
         'road',
         'number',
         'complement',
         'main',
-        'people_id',
+        'cep',
+        'city',
+        'state',
+        'city_ibge',
+        'state_ibge',
+
     ];
 
     protected $attributes = [
@@ -33,12 +41,15 @@ class Address extends BaseModel
     protected $casts = [
         'cep'        => 'string',
         'country'    => 'string',
-        'cities_id'  => 'integer',
         'district'   => 'string',
         'road'       => 'string',
         'number'     => 'string',
         'complement' => 'string',
         'main'       => 'boolean',
+        'city'       => 'string',
+        'state'      => 'string',
+        'city_ibge'  => 'string',
+        'state_ibge' => 'string',
     ];
 
     /*
@@ -49,6 +60,16 @@ class Address extends BaseModel
     | Here you may specify the attributes that should be cast to native types.
     |
     */
+
+    /**
+     * city_slug.
+     */
+    protected function citySlug(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => Str::slug($this->city),
+        );
+    }
 
     /**
      * neighborhood.
@@ -87,6 +108,30 @@ class Address extends BaseModel
     {
         return Attribute::make(
             get: fn () => $this->road,
+        );
+    }
+
+    protected function cityIbge(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if (blank($value) && !blank($this->city)) {
+                    $value = Falcon::bigDataService('city')
+                        ->get($this->city)
+                        ->data
+                        ->where('slug', $this->city_slug)
+                        ->first()
+                        ?->ibge;
+
+                    $this->city_ibge = $value;
+
+                    if ($this->isDirty('city_ibge')) {
+                        $this->save();
+                    }
+                }
+
+                return $value;
+            },
         );
     }
 

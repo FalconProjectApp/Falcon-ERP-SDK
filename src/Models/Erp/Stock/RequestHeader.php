@@ -8,6 +8,7 @@ use FalconERP\Skeleton\Models\Erp\Finance\PaymentMethod;
 use FalconERP\Skeleton\Models\Erp\People\People;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\RequestNfeTrait;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -159,6 +160,14 @@ class RequestHeader extends BaseModel implements AuditableContract
     |
     */
 
+    #[Scope]
+    protected function scopeByStatus($query): void
+    {
+        $query->when(request()->filter['status'] ?? false, function ($query, $status) {
+            $query->whereIn(self::ATTRIBUTE_STATUS, explode(',', $status));
+        });
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Actions
@@ -212,6 +221,8 @@ class RequestHeader extends BaseModel implements AuditableContract
     private function canIssueNfce(): bool
     {
         return $this->is_nfce
+            && !null === $this->tag_emit->crt
+            && !null === $this->tag_emit->ie
             && !$this->trashed()
             && $this->requestBodies->count() > 0
             && !$this->has_errors;

@@ -25,7 +25,7 @@ class AuthRepository
     {
         $this->urlApi = sprintf(
             '%s/auth/v1',
-            config('services.falcon.big_data.url_api')
+            config('falconservices.big_data.'.config('app.env').'.url_api')
         );
 
         // $this->email  = config('services.falcon.big_data.email');
