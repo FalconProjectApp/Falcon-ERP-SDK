@@ -1,118 +1,45 @@
 <?php
 
-declare(strict_types = 1);
-
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use FalconERP\Skeleton\Models\Erp\Finance\PaymentMethod;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\RequestNfeTrait;
-use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use OwenIt\Auditing\Auditable;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use Illuminate\Support\Str;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ValidateTrait\Data;
 
-class RequestHeader extends BaseModel implements AuditableContract
+class RequestBody extends BaseModel
 {
-    use ActionTrait;
-    use Auditable;
     use HasFactory;
-    use RequestNfeTrait;
-    use SetSchemaTrait;
     use SoftDeletes;
-
-    public const ATTRIBUTE_ID              = 'id';
-    public const ATTRIBUTE_DESCRIPTION     = 'description';
-    public const ATTRIBUTE_OBSERVATIONS    = 'observations';
-    public const ATTRIBUTE_STATUS          = 'status';
-    public const ATTRIBUTE_REQUEST_TYPE_ID = 'request_type_id';
-    public const ATTRIBUTE_RESPONSIBLE_ID  = 'responsible_id';
-    public const ATTRIBUTE_THIRD_ID        = 'third_id';
-    public const ATTRIBUTE_ALLOWER_ID      = 'allower_id';
-    public const ATTRIBUTE_FREIGHT_VALUE   = 'freight_value';
-    public const ATTRIBUTE_DISCOUNT_VALUE  = 'discount_value';
-    public const ATTRIBUTE_PAYMENT_METHOD  = 'payment_method_id';
+    use SetSchemaTrait;
 
     protected $fillable = [
-        self::ATTRIBUTE_DESCRIPTION,
-        self::ATTRIBUTE_OBSERVATIONS,
-        self::ATTRIBUTE_STATUS,
-        self::ATTRIBUTE_REQUEST_TYPE_ID,
-        self::ATTRIBUTE_RESPONSIBLE_ID,
-        self::ATTRIBUTE_THIRD_ID,
-        self::ATTRIBUTE_ALLOWER_ID,
-        self::ATTRIBUTE_FREIGHT_VALUE,
-        self::ATTRIBUTE_DISCOUNT_VALUE,
-        self::ATTRIBUTE_PAYMENT_METHOD,
+        'stock_id',
+        'value',
+        'discount',
+        'amount',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | Relationships
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify the relationships that the model should have with
-    |
-    */
+    protected $casts = [
+        'stock_id' => 'integer',
+        'value'    => 'integer',
+        'discount' => 'integer',
+        'amount'   => 'integer',
+    ];
 
-    public function requestBodies(): HasMany
+    public $allowedIncludes = [];
+
+    public function requestHeader()
     {
-        return $this->hasMany(RequestBody::class);
+        return $this->belongsTo(RequestHeader::class);
     }
 
-    public function responsible(): BelongsTo
+    public function stock()
     {
-        return $this->belongsTo(People::class, self::ATTRIBUTE_RESPONSIBLE_ID);
-    }
-
-    public function third(): BelongsTo
-    {
-        return $this->belongsTo(People::class, self::ATTRIBUTE_THIRD_ID);
-    }
-
-    public function allower(): BelongsTo
-    {
-        return $this->belongsTo(People::class, self::ATTRIBUTE_ALLOWER_ID);
-    }
-
-    public function paymentMethod(): BelongsTo
-    {
-        return $this->belongsTo(PaymentMethod::class);
-    }
-
-    public function requestType(): BelongsTo
-    {
-        return $this->belongsTo(RequestType::class);
-    }
-
-    public function followers(): MorphToMany
-    {
-        return $this
-            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')
-            ->withTimestamps()
-            ->withTrashed();
-    }
-
-    public function followings(): MorphToMany
-    {
-        return $this
-            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'follower_people_id', 'followable_id')
-            ->withTimestamps()
-            ->withTrashed();
-    }
-
-    public function canView(): bool
-    {
-        return true;
+        return $this->belongsTo(Stock::class);
     }
 
     /*
@@ -125,106 +52,259 @@ class RequestHeader extends BaseModel implements AuditableContract
     */
 
     /**
-     * ind_pres.
+     * x_prod.
      */
-    protected function indPres(): Attribute
+    protected function xProd(): Attribute
     {
         return Attribute::make(
-            get: fn () => (int) true, // Acrescentar este input no request
-        );
-    }
-
-    protected function itensValueTotal(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->requestBodies->sum('value_total'),
+            get: fn () => Str::limit($this->stock->product->description, 120),
         );
     }
 
     /**
-     * itens_value_total_with_discount.
+     * c_barra.
      */
-    protected function itensValueTotalWithDiscount(): Attribute
+    protected function cBarra(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->requestBodies->sum('value_total_with_discount'),
+            get: fn () => $this->stock->product->bar_code,
         );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Scopes
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify the scopes that the model should have with
-    |
-    */
-
-    #[Scope]
-    protected function scopeByStatus($query): void
+    /**
+     * c_prod.
+     */
+    protected function cProd(): Attribute
     {
-        $query->when(request()->filter['status'] ?? false, function ($query, $status) {
-            $query->whereIn(self::ATTRIBUTE_STATUS, explode(',', $status));
-        });
+        return Attribute::make(
+            get: fn () => $this->stock->product->id,
+        );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Actions
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify the actions that the model should have with
-    |
-    */
-    protected function setActions(): array
+    protected function cest(): Attribute
     {
-        return [
-            'can_view'       => $this->canView(),
-            'can_restore'    => $this->canRestore(),
-            'can_update'     => $this->canUpdate(),
-            'can_delete'     => $this->canDelete(),
-            'can_follow'     => $this->canFollow(),
-            'can_unfollow'   => $this->canUnfollow(),
-            'can_issue_nfce' => $this->canIssueNfce(),
-        ];
+        return Attribute::make(
+            get: fn () => $this->stock->product->cest,
+        );
     }
 
-    private function canRestore(): bool
+    protected function cfop(): Attribute
     {
-        return $this->trashed();
+        return Attribute::make(
+            get: fn () => $this->segments->where('name', 'bank')->first()?->value,
+        );
     }
 
-    private function canUpdate(): bool
+    /**
+     * u_com.
+     */
+    protected function uCom(): Attribute
     {
-        return !$this->trashed();
+        return Attribute::make(
+            get: fn () => $this->stock->product->volumeType->initials,
+        );
     }
 
-    private function canDelete(): bool
+    /**
+     * q_com.
+     */
+    protected function qCom(): Attribute
     {
-        return !$this->trashed();
+        return Attribute::make(
+            get: fn () => $this->amount,
+        );
     }
 
-    private function canFollow(): bool
+    /**
+     * v_un_com.
+     */
+    protected function vUnCom(): Attribute
     {
-        return (!$this->trashed()
-            && !$this->followers()->where('follower_people_id', auth()->people()->id)->exists())
-            ?? false;
+        return Attribute::make(
+            get: fn () => number_format(($this->value - $this->discount) / $this->amount / 100, 10, '.', ''),
+        );
     }
 
-    private function canUnfollow(): bool
+    /**
+     * v_prod.
+     */
+    protected function vProd(): Attribute
     {
-        return (!$this->trashed()
-            && $this->followers()->where('follower_people_id', auth()->people()->id)->exists())
-            ?? false;
+        return Attribute::make(
+            get: fn () => ($this->amount * $this->value) / 100,
+        );
     }
 
-    private function canIssueNfce(): bool
+    /**
+     * c_ean.
+     */
+    protected function cEAN(): Attribute
     {
+        return Attribute::make(
+            get: fn () => $this->stock->product->bar_code,
+        );
+    }
 
-        return $this->is_nfce
-            && null === $this->tag_emit->crt
-            && !$this->trashed()
-            && $this->requestBodies->count() > 0
-            && !$this->has_errors;
+    /**
+     * c_ean_trib.
+     */
+    protected function cEANTrib(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->stock->product->bar_code,
+        );
+    }
+
+    /**
+     * u_trib.
+     */
+    protected function uTrib(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->stock->product->volumeType->initials,
+        );
+    }
+
+    /**
+     * q_trib.
+     */
+    protected function qTrib(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->amount,
+        );
+    }
+
+    /**
+     * v_un_trib.
+     */
+    protected function vUnTrib(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => number_format($this->value / 100, 10, '.', ''),
+        );
+    }
+
+    protected function vFrete(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->segments->where('name', 'bank')->first()?->value,
+        );
+    }
+
+    protected function vSeg(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->segments->where('name', 'bank')->first()?->value,
+        );
+    }
+
+    protected function vDesc(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->segments->where('name', 'bank')->first()?->value,
+        );
+    }
+
+    protected function vOutro(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->segments->where('name', 'bank')->first()?->value,
+        );
+    }
+
+    /**
+     * x_ped.
+     */
+    protected function xPed(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => str_pad($this->id, 15, '0', STR_PAD_LEFT),
+        );
+    }
+
+    /**
+     * n_item_ped.
+     */
+    protected function nItemPed(): Attribute
+    {
+        $this->load('requestHeader');
+
+        return Attribute::make(
+            get: fn () => str_pad($this->requestHeader->requestBodies->search(fn ($item) => $item->id === $this->id) + 1, 5, '0', STR_PAD_LEFT),
+        );
+    }
+
+    /**
+     * ncm.
+     */
+    protected function ncm(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->stock->product->ncm,
+        );
+    }
+
+    /**
+     * tag_prod.
+     */
+    protected function tagProd(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'cProd'    => $this->c_prod,
+                'cEAN'     => $this->c_ean,
+                'cBarra'   => $this->c_barra,
+                'xProd'    => $this->x_prod,
+                'NCM'      => $this->ncm,
+                'uCom'     => $this->u_com,
+                'qCom'     => $this->q_com,
+                'vUnCom'   => $this->v_un_com,
+                'vProd'    => $this->v_prod,
+                'cEANTrib' => $this->c_ean_trib,
+                // TODO: Verificar a unidade tributavel e a comerciavel
+                'uTrib'    => $this->u_trib,
+                'qTrib'    => $this->q_trib,
+                'vUnTrib'  => $this->v_un_trib,
+                'indTot'   => 1,
+                'xPed'     => $this->x_ped,
+                'nItemPed' => $this->n_item_ped,
+            ]),
+        );
+    }
+
+    /**
+     * tag_Icms.
+     */
+    protected function tagIcms(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'orig'     => $this->stock->product->ncm->origin ?? 0,
+                'CST'      => $this->stock->product->ncm->cst ?? 0,
+                'modBC'    => 0,
+                'vBC'      => 0,
+                'pICMS'    => 0,
+                'vICMS'    => 0,
+                'modBCST'  => 0,
+                'pMVAST'   => 0,
+                'pRedBCST' => 0,
+                'vBCST'    => 0,
+                'pICMSST'  => 0,
+                'vICMSST'  => 0,
+            ]),
+        );
+    }
+
+    /**
+     * tag_imposto.
+     */
+    protected function tagImposto(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'vTotTrib' => 0,
+            ]),
+        );
     }
 }
