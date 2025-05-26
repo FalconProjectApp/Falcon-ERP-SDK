@@ -16,7 +16,7 @@ class Item extends BaseModel
     use SoftDeletes;
     use SetSchemaTrait;
 
-    protected $table = 'itens';
+    protected $table = 'request_bodies';
 
     protected $fillable = [
         'stock_id',
@@ -36,7 +36,7 @@ class Item extends BaseModel
 
     public function request()
     {
-        return $this->belongsTo(Request::class);
+        return $this->belongsTo(Request::class, 'request_header_id');
     }
 
     public function stock()

@@ -30,6 +30,8 @@ class Request extends BaseModel implements AuditableContract
     use SetSchemaTrait;
     use SoftDeletes;
 
+    protected $table = 'request_headers';
+
     public const ATTRIBUTE_ID              = 'id';
     public const ATTRIBUTE_DESCRIPTION     = 'description';
     public const ATTRIBUTE_OBSERVATIONS    = 'observations';
@@ -66,7 +68,7 @@ class Request extends BaseModel implements AuditableContract
 
     public function itens(): HasMany
     {
-        return $this->hasMany(itens::class);
+        return $this->hasMany(item::class, 'request_header_id');
     }
 
     public function responsible(): BelongsTo
