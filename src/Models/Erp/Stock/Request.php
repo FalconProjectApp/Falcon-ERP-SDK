@@ -21,7 +21,7 @@ use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
-class RequestHeader extends BaseModel implements AuditableContract
+class Request extends BaseModel implements AuditableContract
 {
     use ActionTrait;
     use Auditable;
@@ -66,7 +66,7 @@ class RequestHeader extends BaseModel implements AuditableContract
 
     public function itens(): HasMany
     {
-        return $this->hasMany(RequestBody::class);
+        return $this->hasMany(itens::class);
     }
 
     public function responsible(): BelongsTo
@@ -137,7 +137,7 @@ class RequestHeader extends BaseModel implements AuditableContract
     protected function itensValueTotal(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->requestBodies->sum('value_total'),
+            get: fn () => $this->itens->sum('value_total'),
         );
     }
 
@@ -147,7 +147,7 @@ class RequestHeader extends BaseModel implements AuditableContract
     protected function itensValueTotalWithDiscount(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->requestBodies->sum('value_total_with_discount'),
+            get: fn () => $this->itens->sum('value_total_with_discount'),
         );
     }
 
@@ -223,7 +223,7 @@ class RequestHeader extends BaseModel implements AuditableContract
             && !null === $this->tag_emit->crt
             && !null === $this->tag_emit->ie
             && !$this->trashed()
-            && $this->requestBodies->count() > 0
+            && $this->itens->count() > 0
             && !$this->has_errors;
     }
 }

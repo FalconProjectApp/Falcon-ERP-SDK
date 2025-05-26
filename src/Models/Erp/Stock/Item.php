@@ -10,11 +10,13 @@ use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ValidateTrait\Data;
 
-class RequestBody extends BaseModel
+class Item extends BaseModel
 {
     use HasFactory;
     use SoftDeletes;
     use SetSchemaTrait;
+
+    protected $table = 'itens';
 
     protected $fillable = [
         'stock_id',
@@ -32,9 +34,9 @@ class RequestBody extends BaseModel
 
     public $allowedIncludes = [];
 
-    public function requestHeader()
+    public function request()
     {
-        return $this->belongsTo(RequestHeader::class);
+        return $this->belongsTo(Request::class);
     }
 
     public function stock()
@@ -228,10 +230,10 @@ class RequestBody extends BaseModel
      */
     protected function nItemPed(): Attribute
     {
-        $this->load('requestHeader');
+        $this->load('request');
 
         return Attribute::make(
-            get: fn () => str_pad($this->requestHeader->requestBodies->search(fn ($item) => $item->id === $this->id) + 1, 5, '0', STR_PAD_LEFT),
+            get: fn () => str_pad($this->request->itens->search(fn ($item) => $item->id === $this->id) + 1, 5, '0', STR_PAD_LEFT),
         );
     }
 
