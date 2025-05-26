@@ -64,7 +64,7 @@ class RequestHeader extends BaseModel implements AuditableContract
     |
     */
 
-    public function requestBodies(): HasMany
+    public function itens(): HasMany
     {
         return $this->hasMany(RequestBody::class);
     }
@@ -160,7 +160,6 @@ class RequestHeader extends BaseModel implements AuditableContract
     |
     */
 
-    #[Scope]
     protected function scopeByStatus($query): void
     {
         $query->when(request()->filter['status'] ?? false, function ($query, $status) {
