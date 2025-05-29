@@ -3,6 +3,7 @@
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
 use OwenIt\Auditing\Auditable;
+use Illuminate\Database\Eloquent\Builder;
 use FalconERP\Skeleton\Models\Erp\Shop\Shop;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
@@ -83,6 +84,15 @@ class Group extends BaseModel implements AuditableContract
     | Here you may specify the scopes that the model should have with
     |
     */
+    public function scopeByShopIds(Builder $query, string | array $params = []): Builder
+    {
+        return $query
+            ->when($this->filtered($params, 'shop_ids'), function ($query, $params) {
+                $query->whereHas('shops', function ($query) use ($params) {
+                    $query->whereIn('shops.id', $params);
+                });
+            });
+    }
 
     /*
     |--------------------------------------------------------------------------
