@@ -4,13 +4,14 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton;
 
+use FalconERP\Skeleton\Repositories\Shop\ShopRepository;
+use FalconERP\Skeleton\Repositories\BigData\IpRepository;
+use FalconERP\Skeleton\Repositories\BigData\XmlRepository;
 use FalconERP\Skeleton\Repositories\BigData\AuthRepository;
 use FalconERP\Skeleton\Repositories\BigData\CityRepository;
-use FalconERP\Skeleton\Repositories\BigData\XmlRepository;
-use FalconERP\Skeleton\Repositories\Finance\AccountRepository;
 use FalconERP\Skeleton\Repositories\Finance\BillRepository;
 use FalconERP\Skeleton\Repositories\Fiscal\InvoiceRepository;
-use FalconERP\Skeleton\Repositories\Shop\ShopRepository;
+use FalconERP\Skeleton\Repositories\Finance\AccountRepository;
 
 class Falcon
 {
@@ -26,6 +27,7 @@ class Falcon
         return match ($module) {
             'xml'   => new XmlRepository(self::$auth),
             'city'  => new CityRepository(self::$auth),
+            'ip'   => new IpRepository(self::$auth),
             'auth'  => new AuthRepository(),
             default => false,
         };
