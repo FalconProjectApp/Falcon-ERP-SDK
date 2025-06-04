@@ -169,7 +169,7 @@ class Product extends BaseModel implements AuditableContract
             });
     }
 
-    public function scopeById(Builder $query, string | array $params = []): Builder
+    public function scopeByIds(Builder $query, string | array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'ids'), function ($query, $params) {
