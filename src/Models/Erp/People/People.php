@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use FalconERP\Skeleton\Observers\CacheObserver;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use FalconERP\Skeleton\Enums\People\PeopleCrtEnum;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -188,6 +189,14 @@ class People extends BaseModel implements AuditableContract
     public function scopeByCnpjCpf($query, $cnpjCpf)
     {
         return $query->where('cnpj_cpf', $cnpjCpf);
+    }
+
+    public function scopeByTypeIds(Builder $query, string | array $params = []): Builder
+    {
+        return $query
+            ->when($this->filtered($params, 'type_ids'), function ($query, $params) {
+                $query->whereIn('types_id', $params);
+            });
     }
 
     /*
