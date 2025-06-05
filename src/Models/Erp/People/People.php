@@ -1,30 +1,31 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\People;
 
-use OwenIt\Auditing\Auditable;
-use FalconERP\Skeleton\Models\User;
 use FalconERP\Skeleton\Enums\ArchiveEnum;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use FalconERP\Skeleton\Observers\CacheObserver;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use FalconERP\Skeleton\Enums\People\PeopleCrtEnum;
-use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use FalconERP\Skeleton\Enums\People\PeopleDocumentEnum;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
-use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
+use FalconERP\Skeleton\Models\Erp\People\Traits\People\PeopleSegmentTrait;
+use FalconERP\Skeleton\Models\User;
+use FalconERP\Skeleton\Observers\CacheObserver;
+use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
@@ -38,6 +39,7 @@ class People extends BaseModel implements AuditableContract
     use ArchiveModelTrait;
     use Auditable;
     use HasFactory;
+    use PeopleSegmentTrait;
     use SetSchemaTrait;
     use SoftDeletes;
 
@@ -275,216 +277,6 @@ class People extends BaseModel implements AuditableContract
     {
         return Attribute::make(
             get: fn () => '4789099',
-        );
-    }
-
-    protected function bank(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'bank')->first()?->value,
-        );
-    }
-
-    protected function agency(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'agency')->first()?->value,
-        );
-    }
-
-    protected function currentAccount(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'current_account')->first()?->value,
-        );
-    }
-
-    protected function birthDate(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'birth_date')->first()?->value,
-        );
-    }
-
-    protected function maritalStatus(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'marital_status')->first()?->value,
-        );
-    }
-
-    protected function educationLevel(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'education_level')->first()?->value,
-        );
-    }
-
-    protected function gender(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'gender')->first()?->value,
-        );
-    }
-
-    protected function skinColor(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'skin_color')->first()?->value,
-        );
-    }
-
-    protected function admissionDate(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'admission_date')->first()?->value,
-        );
-    }
-
-    protected function demissionDate(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'demission_date')->first()?->value,
-        );
-    }
-
-    protected function contractType(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'contract_type')->first()?->value,
-        );
-    }
-
-    protected function salaryType(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'salary_type')->first()?->value,
-        );
-    }
-
-    protected function salaryValue(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'salary_value')->first()?->value,
-        );
-    }
-
-    protected function paymentDay(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'payment_day')->first()?->value,
-        );
-    }
-
-    protected function paymentMethod(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'payment_method')->first()?->value,
-        );
-    }
-
-    protected function jobTitle(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'job_title')->first()?->value,
-        );
-    }
-
-    protected function exameAdmissionDate(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'exame_admission_date')->first()?->value,
-        );
-    }
-
-    protected function exameDemissionDate(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'exame_demission_date')->first()?->value,
-        );
-    }
-
-    protected function usesTransportationVoucher(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'uses_transportation_voucher')->first()?->value,
-        );
-    }
-
-    protected function transportationVoucherValue(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'transportation_voucher_value')->first()?->value,
-        );
-    }
-
-    protected function usesFoodVoucher(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'uses_food_voucher')->first()?->value,
-        );
-    }
-
-    protected function foodVoucherValue(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'food_voucher_value')->first()?->value,
-        );
-    }
-
-    protected function usesHealthPlan(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'uses_health_plan')->first()?->value,
-        );
-    }
-
-    protected function healthPlanValue(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'health_plan_value')->first()?->value,
-        );
-    }
-
-    protected function usesLifeInsurance(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'uses_life_insurance')->first()?->value,
-        );
-    }
-
-    protected function lifeInsuranceValue(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'life_insurance_value')->first()?->value,
-        );
-    }
-
-    protected function firstJob(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'first_job')->first()?->value,
-        );
-    }
-
-    protected function hasDisability(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'has_disability')->first()?->value,
-        );
-    }
-
-    protected function worksSimultaneouslyInAnotherCompany(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'works_simultaneously_in_another_company')->first()?->value,
-        );
-    }
-
-    protected function crt(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'crt')->first()?->value,
         );
     }
 
