@@ -8,6 +8,11 @@ use FalconERP\Skeleton\Models\Erp\Stock\Product;
 use FalconERP\Skeleton\Models\Erp\Stock\Stock;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @deprecated Descontinuado pois esta logica foi migrada para o pacote da quantum.
+ * @see QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver
+ * @since 1.7.21
+ */
 class CacheObserver
 {
     public function deleted(Model $model)
