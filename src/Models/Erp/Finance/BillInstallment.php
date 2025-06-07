@@ -1,26 +1,38 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
 use OwenIt\Auditing\Auditable;
+use App\Events\InstallmentCheck;
 use FalconERP\Skeleton\Enums\ArchiveEnum;
 use Illuminate\Database\Eloquent\Builder;
+use App\Observers\EventDispatcherObserver;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use QuantumTecnology\ServiceBasicsExtension\Models\Archive;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
 
+#[ObservedBy([
+    CacheObserver::class,
+    NotificationObserver::class,
+    EventDispatcherObserver::class,
+])]
 class BillInstallment extends BaseModel implements AuditableContract
 {
-    use HasFactory;
-    use SoftDeletes;
-    use SetSchemaTrait;
     use Auditable;
+    use HasFactory;
+    use SetSchemaTrait;
+    use SoftDeletes;
 
     protected $fillable = [
         'due_date',
@@ -34,6 +46,10 @@ class BillInstallment extends BaseModel implements AuditableContract
 
     protected $appends = [
         'valueTotal',
+    ];
+
+    public $events = [
+        InstallmentCheck::class,
     ];
 
     public function bill(): BelongsTo
