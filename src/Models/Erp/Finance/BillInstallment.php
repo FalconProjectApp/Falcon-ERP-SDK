@@ -8,7 +8,6 @@ use OwenIt\Auditing\Auditable;
 use App\Events\InstallmentCheck;
 use FalconERP\Skeleton\Enums\ArchiveEnum;
 use Illuminate\Database\Eloquent\Builder;
-use App\Observers\EventDispatcherObserver;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
@@ -21,6 +20,7 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
+use QuantumTecnology\ModelBasicsExtension\Observers\EventDispatcherObserver;
 
 #[ObservedBy([
     CacheObserver::class,
