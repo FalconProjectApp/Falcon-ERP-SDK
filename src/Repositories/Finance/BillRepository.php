@@ -10,7 +10,7 @@ use QuantumTecnology\ValidateTrait\Data;
 class BillRepository
 {
     private string $urlApi;
-    private string $authorization;
+    private ?string $authorization;
     public bool $success        = false;
     public int $http_code       = 0;
     public string $message      = 'not found';
@@ -18,6 +18,8 @@ class BillRepository
     public ?string $id          = null;
     public array|object $errors = [];
     public array|object $data   = [];
+
+    public int $timeout = config('falconservices.timeout', 30);
 
     public function __construct()
     {
@@ -31,6 +33,10 @@ class BillRepository
 
     public function index(): self
     {
+        if (blank($this->authorization)) {
+            return $this;
+        }
+
         $response = Http::withToken($this->authorization, null)
             ->retry(3, 2000, throw: false)
             ->acceptJson()
@@ -54,6 +60,10 @@ class BillRepository
     {
         if (!$this->id) {
             $this->id = $id;
+        }
+
+        if (blank($this->authorization)) {
+            return $this;
         }
 
         $response = Http::withToken($this->authorization, null)
@@ -111,6 +121,10 @@ class BillRepository
         $data->repetition           = $repetition;
         $data->installment_start    = $installment_start;
         $data->installments_amount  = $installments_amount;
+
+        if (blank($this->authorization)) {
+            return $this;
+        }
 
         abort_if(
             null === $data->people_id,

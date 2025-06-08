@@ -19,6 +19,8 @@ class AuthRepository
     public array | object $data   = [];
     private string $urlApi;
 
+    public int $timeout = config('falconservices.timeout', 30);
+
     public function __construct()
     {
         $this->urlApi = sprintf(

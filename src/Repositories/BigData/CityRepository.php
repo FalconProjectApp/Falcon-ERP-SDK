@@ -18,9 +18,9 @@ class CityRepository
     /**
      * Timeout in seconds.
      */
-    public int $timeout = 30;
+    public int $timeout = config('falconservices.timeout', 30);
     private string $urlApi;
-    private string $authorization;
+    private ?string $authorization;
 
     public function __construct($auth)
     {
@@ -34,6 +34,10 @@ class CityRepository
 
     public function get(?string $search = null)
     {
+        if (blank($this->authorization)) {
+            return $this;
+        }
+
         $response = Http::withToken($this->authorization)
             ->retry(3, 2000, throw: false)
             ->acceptJson()

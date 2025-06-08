@@ -17,7 +17,9 @@ class ShopRepository
     public array | object $errors = [];
     public array | object $data   = [];
     private string $urlApi;
-    private string $authorization;
+    private ?string $authorization;
+
+    public int $timeout = config('falconservices.timeout', 30);
 
     public function __construct(array $params = [])
     {
@@ -31,6 +33,10 @@ class ShopRepository
 
     public function index(): self
     {
+        if (blank($this->authorization)) {
+            return $this;
+        }
+
         $response = Http::withToken($this->authorization, null)
             ->retry(3, 2000, throw: false)
             ->acceptJson()
@@ -54,6 +60,10 @@ class ShopRepository
     {
         if (!$this->id) {
             $this->id = $id;
+        }
+
+        if (blank($this->authorization)) {
+            return $this;
         }
 
         $response = Http::withToken($this->authorization, null)
@@ -80,6 +90,10 @@ class ShopRepository
     {
         if (!$this->data) {
             $this->data = $data;
+        }
+
+        if (blank($this->authorization)) {
+            return $this;
         }
 
         $response = Http::withToken($this->authorization, null)

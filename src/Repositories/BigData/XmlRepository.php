@@ -8,7 +8,7 @@ use QuantumTecnology\ValidateTrait\Data;
 class XmlRepository
 {
     private string $urlApi;
-    private string $authorization;
+    private ?string $authorization;
     public bool $success        = false;
     public int $http_code       = 0;
     public string $message      = 'not found';
@@ -19,7 +19,7 @@ class XmlRepository
     /**
      * Timeout in seconds.
      */
-    public int $timeout = 30;
+    public int $timeout = config('falconservices.timeout', 30);
 
     public function __construct($auth)
     {
@@ -35,6 +35,10 @@ class XmlRepository
     {
         if (!$this->data) {
             $this->data = $data;
+        }
+
+        if (blank($this->authorization)) {
+            return $this;
         }
 
         $response = Http::withToken($this->authorization)
@@ -65,6 +69,10 @@ class XmlRepository
     {
         if (!$this->cnpj) {
             $this->cnpj = $cnpj;
+        }
+
+        if (blank($this->authorization)) {
+            return $this;
         }
 
         $response = Http::withToken($this->authorization)

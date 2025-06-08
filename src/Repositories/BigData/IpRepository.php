@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Repositories\BigData;
 
@@ -9,19 +9,19 @@ use QuantumTecnology\ValidateTrait\Data;
 
 class IpRepository
 {
-    public bool $success          = false;
-    public int $http_code         = 0;
-    public string $message        = 'not found';
-    public ?string $ip            = null;
-    public array | object $errors = [];
-    public array | object $data   = [];
+    public bool $success        = false;
+    public int $http_code       = 0;
+    public string $message      = 'not found';
+    public ?string $ip          = null;
+    public array|object $errors = [];
+    public array|object $data   = [];
 
     /**
      * Timeout in seconds.
      */
-    public int $timeout = 30;
+    public int $timeout = config('falconservices.timeout', 30);
     private string $urlApi;
-    private string $authorization;
+    private ?string $authorization;
 
     public function __construct($auth)
     {
@@ -37,6 +37,10 @@ class IpRepository
     {
         if (!$this->data) {
             $this->data = $data;
+        }
+
+        if (blank($this->authorization)) {
+            return $this;
         }
 
         $response = Http::withToken($this->authorization)
@@ -67,6 +71,10 @@ class IpRepository
     {
         if (!$this->ip) {
             $this->ip = $ip;
+        }
+
+        if (blank($this->authorization)) {
+            return $this;
         }
 
         $response = Http::withToken($this->authorization)
