@@ -18,8 +18,6 @@ class AuthRepository
     public array | object $errors = [];
     public array | object $data   = [];
     private string $urlApi;
-    private string $email  = '';
-    private string $secret = '';
 
     public function __construct()
     {
@@ -27,9 +25,6 @@ class AuthRepository
             '%s/auth/v1',
             config('falconservices.big_data.'.config('app.env').'.url_api')
         );
-
-        // $this->email  = config('services.falcon.big_data.email');
-        // $this->secret = config('services.falcon.big_data.secret');
     }
 
     public function login(?Data $data = null): self
@@ -69,7 +64,7 @@ class AuthRepository
         if (!$response->successful()) {
             $this->message = $response->object()->message ?? $this->message;
             $this->errors  = $response->object()->data ?? $this->errors;
-            $this->data    = collect();
+            $this->data    = new Data();
 
             return $this;
         }
@@ -97,7 +92,7 @@ class AuthRepository
         if (!$response->successful()) {
             $this->message = $response->object()->message ?? $this->message;
             $this->errors  = $response->object()->data ?? $this->errors;
-            $this->data    = collect();
+            $this->data    = new Data();
 
             return $this;
         }
