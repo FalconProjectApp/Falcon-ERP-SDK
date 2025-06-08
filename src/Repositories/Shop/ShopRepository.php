@@ -19,7 +19,7 @@ class ShopRepository
     private string $urlApi;
     private ?string $authorization;
 
-    public int $timeout = config('falconservices.timeout', 30);
+    public int $timeout = 30;
 
     public function __construct(array $params = [])
     {
@@ -29,6 +29,8 @@ class ShopRepository
         );
 
         $this->authorization = $params['authorization'] ?? request()->header('Authorization');
+
+        $this->timeout = config('falconservices.timeout', 30);
     }
 
     public function index(): self

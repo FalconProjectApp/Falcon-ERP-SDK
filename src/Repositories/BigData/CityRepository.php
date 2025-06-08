@@ -18,7 +18,7 @@ class CityRepository
     /**
      * Timeout in seconds.
      */
-    public int $timeout = config('falconservices.timeout', 30);
+    public int $timeout = 30;
     private string $urlApi;
     private ?string $authorization;
 
@@ -30,6 +30,8 @@ class CityRepository
         );
 
         $this->authorization = $auth->data->access_token;
+
+        $this->timeout = config('falconservices.timeout', 30);
     }
 
     public function get(?string $search = null)

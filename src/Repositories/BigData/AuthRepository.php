@@ -19,7 +19,7 @@ class AuthRepository
     public array | object $data   = [];
     private string $urlApi;
 
-    public int $timeout = config('falconservices.timeout', 30);
+    public int $timeout = 30;
 
     public function __construct()
     {
@@ -27,6 +27,8 @@ class AuthRepository
             '%s/auth/v1',
             config('falconservices.big_data.'.config('app.env').'.url_api')
         );
+
+        $this->timeout = config('falconservices.timeout', 30);
     }
 
     public function login(?Data $data = null): self

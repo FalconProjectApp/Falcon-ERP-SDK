@@ -19,7 +19,7 @@ class IpRepository
     /**
      * Timeout in seconds.
      */
-    public int $timeout = config('falconservices.timeout', 30);
+    public int $timeout = 30;
     private string $urlApi;
     private ?string $authorization;
 
@@ -31,6 +31,8 @@ class IpRepository
         );
 
         $this->authorization = $auth->data->access_token;
+
+        $this->timeout = config('falconservices.timeout', 30);
     }
 
     public function store(Data $data): self

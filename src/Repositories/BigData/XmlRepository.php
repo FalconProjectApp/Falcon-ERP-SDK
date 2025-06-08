@@ -19,7 +19,7 @@ class XmlRepository
     /**
      * Timeout in seconds.
      */
-    public int $timeout = config('falconservices.timeout', 30);
+    public int $timeout = 30;
 
     public function __construct($auth)
     {
@@ -29,6 +29,8 @@ class XmlRepository
         );
 
         $this->authorization = $auth->data->access_token;
+
+        $this->timeout = config('falconservices.timeout', 30);
     }
 
     public function store(Data $data): self

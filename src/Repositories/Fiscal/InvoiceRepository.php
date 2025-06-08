@@ -19,7 +19,7 @@ class InvoiceRepository
     public array|object $errors = [];
     public array|object $data   = [];
 
-    public int $timeout = config('falconservices.timeout', 30);
+    public int $timeout = 30;
 
     public function __construct()
     {
@@ -29,6 +29,8 @@ class InvoiceRepository
         );
 
         $this->authorization = request()->header('Authorization');
+
+        $this->timeout = config('falconservices.timeout', 30);
     }
 
     public function index(): self
