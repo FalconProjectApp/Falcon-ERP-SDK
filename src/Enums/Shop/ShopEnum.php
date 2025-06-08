@@ -20,5 +20,6 @@ abstract class ShopEnum extends BaseEnum
     public const TYPES_SYSTEM          = 'system';
     public const TYPES_MERCADO_LIVRE   = 'mercadolivre';
     public const TYPES_RECEITA_FEDERAL = 'receitafederal';
+    public const TYPES_HUB             = 'hub';
 
 }
