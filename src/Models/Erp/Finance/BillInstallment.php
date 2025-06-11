@@ -139,6 +139,8 @@ class BillInstallment extends BaseModel implements AuditableContract
 
     protected function setActions(): array
     {
+        $this->loadMissing('bill');
+
         return [
             'can_view'     => $this->canView(),
             'can_restore'  => $this->canRestore(),
