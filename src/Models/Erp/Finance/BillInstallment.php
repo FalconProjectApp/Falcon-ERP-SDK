@@ -5,10 +5,11 @@ declare(strict_types = 1);
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
 use OwenIt\Auditing\Auditable;
-use App\Events\InstallmentCheck;
 use FalconERP\Skeleton\Enums\ArchiveEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Enums\Finance\BillEnum;
+use FalconERP\Skeleton\Events\InstallmentCheck;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,8 +18,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use QuantumTecnology\ServiceBasicsExtension\Models\Archive;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
 use QuantumTecnology\ModelBasicsExtension\Observers\EventDispatcherObserver;
 
@@ -29,10 +32,16 @@ use QuantumTecnology\ModelBasicsExtension\Observers\EventDispatcherObserver;
 ])]
 class BillInstallment extends BaseModel implements AuditableContract
 {
+    use ActionTrait;
+    use ArchiveModelTrait;
     use Auditable;
     use HasFactory;
     use SetSchemaTrait;
     use SoftDeletes;
+
+    public $events = [
+        InstallmentCheck::class,
+    ];
 
     protected $fillable = [
         'due_date',
@@ -46,10 +55,6 @@ class BillInstallment extends BaseModel implements AuditableContract
 
     protected $appends = [
         'valueTotal',
-    ];
-
-    public $events = [
-        InstallmentCheck::class,
     ];
 
     public function bill(): BelongsTo
@@ -121,5 +126,97 @@ class BillInstallment extends BaseModel implements AuditableContract
             $this->filtered($bills, 'bill_ids'),
             fn ($query, $bills) => $query->whereIn('bill_id', $bills)
         );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Actions
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the actions that the model should have with
+    |
+    */
+
+    protected function setActions(): array
+    {
+        return [
+            'can_view'     => $this->canView(),
+            'can_restore'  => $this->canRestore(),
+            'can_update'   => $this->canUpdate(),
+            'can_delete'   => $this->canDelete(),
+            'can_follow'   => $this->canFollow(),
+            'can_unfollow' => $this->canUnfollow(),
+            'can_cancel'   => $this->canCancel(),
+            'can_pay'      => $this->canPay(),
+            'can_receive'  => $this->canReceive(),
+            'can_reversal' => $this->canReversal(),
+        ];
+    }
+
+    private function canView(): bool
+    {
+        return true;
+    }
+
+    private function canRestore(): bool
+    {
+        return $this->trashed();
+    }
+
+    private function canUpdate(): bool
+    {
+        return !$this->trashed();
+    }
+
+    private function canDelete(): bool
+    {
+        return !$this->trashed();
+    }
+
+    private function canFollow(): bool
+    {
+        return true;
+
+        /* return (!$this->trashed()
+            && !$this->is_public
+            && !$this->followers()->where('follower_people_id', auth()->people()?->id)->exists()
+            && $this->id !== auth()->people()?->id) ?? false; */
+    }
+
+    private function canUnfollow(): bool
+    {
+        return true;
+
+        /* return (!$this->trashed()
+            && !$this->is_public
+            && $this->followers()->where('follower_people_id', auth()->people()?->id)->exists()) ?? false; */
+    }
+
+    private function canCancel(): bool
+    {
+        return !$this->trashed() && BillEnum::STATUS_OPEN === $this->status;
+    }
+
+    private function canPay(): bool
+    {
+        return !$this->trashed()
+            && BillEnum::STATUS_OPEN === $this->status
+            && null !== $this->bill
+            && BillEnum::TYPE_PAY === $this->bill?->type;
+    }
+
+    private function canReceive(): bool
+    {
+        return !$this->trashed()
+            && BillEnum::STATUS_OPEN === $this->status
+            && null !== $this->bill
+            && BillEnum::TYPE_RECEIVE === $this->bill?->type;
+    }
+
+    private function canReversal(): bool
+    {
+        return !$this->trashed()
+            && BillEnum::STATUS_PAID === $this->status
+            && null !== $this->bill;
     }
 }

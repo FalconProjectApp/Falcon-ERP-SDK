@@ -2,15 +2,17 @@
 
 namespace FalconERP\Skeleton\Models\Erp\People;
 
-use FalconERP\Skeleton\Enums\ArchiveEnum;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
+use FalconERP\Skeleton\Enums\ArchiveEnum;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
 class Email extends BaseModel
 {
+    use ActionTrait;
     use HasFactory;
     use Notifiable;
     use SetSchemaTrait;
@@ -42,5 +44,44 @@ class Email extends BaseModel
                 'attachments',
             ]);
         });
+    }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Actions
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the actions that the model should have with
+    |
+    */
+
+    protected function setActions(): array
+    {
+        return [
+            'can_view'     => $this->canView(),
+            'can_restore'  => $this->canRestore(),
+            'can_update'   => $this->canUpdate(),
+            'can_delete'   => $this->canDelete(),
+        ];
+    }
+
+    private function canView(): bool
+    {
+        return true;
+    }
+
+    private function canRestore(): bool
+    {
+        return $this->trashed();
+    }
+
+    private function canUpdate(): bool
+    {
+        return !$this->trashed();
+    }
+
+    private function canDelete(): bool
+    {
+        return !$this->trashed();
     }
 }
