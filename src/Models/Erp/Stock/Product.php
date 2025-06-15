@@ -4,24 +4,24 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use FalconERP\Skeleton\Enums\ArchiveEnum;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use FalconERP\Skeleton\Observers\CacheObserver;
-use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use FalconERP\Skeleton\Enums\ArchiveEnum;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
+use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -62,7 +62,17 @@ class Product extends BaseModel implements AuditableContract
     ];
 
     protected $casts = [
-        'birth_date' => 'date',
+        self::ATTRIBUTE_ID              => 'integer',
+        self::ATTRIBUTE_GROUPS_ID       => 'integer',
+        self::ATTRIBUTE_VOLUME_TYPES_ID => 'integer',
+        self::ATTRIBUTE_STATUS          => 'string',
+        self::ATTRIBUTE_DESCRIPTION     => 'string',
+        self::ATTRIBUTE_BAR_CODE        => 'string',
+        self::ATTRIBUTE_LAST_BUY_VALUE  => 'integer',
+        self::ATTRIBUTE_LAST_SELL_VALUE => 'integer',
+        self::ATTRIBUTE_LAST_RENT_VALUE => 'integer',
+        self::ATTRIBUTE_PROVIDER_CODE   => 'string',
+        self::ATTRIBUTE_OBSERVATIONS    => 'string',
     ];
 
     /*
@@ -177,11 +187,6 @@ class Product extends BaseModel implements AuditableContract
             });
     }
 
-    public function canView(): bool
-    {
-        return true;
-    }
-
     /**
      * ProductImageUrl function.
      */
@@ -213,6 +218,34 @@ class Product extends BaseModel implements AuditableContract
         );
     }
 
+    protected function balanceTransitTotal(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->stocks->sum('balance_transit'),
+        );
+    }
+
+    protected function balanceStockTotal(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): int => $this->stocks->sum('balance_stock'),
+        );
+    }
+
+    protected function balanceTotal(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): int => $this->balance_stock_total + $this->balance_transit_total,
+        );
+    }
+
+    protected function valueTotal(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): int => $this->stocks->sum('value_total'),
+        );
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Actions
@@ -232,6 +265,11 @@ class Product extends BaseModel implements AuditableContract
             'can_follow'   => $this->canFollow(),
             'can_unfollow' => $this->canUnfollow(),
         ];
+    }
+
+    private function canView(): bool
+    {
+        return true;
     }
 
     private function canRestore(): bool

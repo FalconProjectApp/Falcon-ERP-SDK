@@ -4,12 +4,13 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\People;
 
-use FalconERP\Skeleton\Falcon;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use FalconERP\Skeleton\Falcon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class Address extends BaseModel
@@ -143,4 +144,12 @@ class Address extends BaseModel
     | Here you may specify the scopes that the model should have with
     |
     */
+
+    public function scopeByPeopleIds(Builder $query, string | array $params = []): Builder
+    {
+        return $query
+            ->when($this->filtered($params, 'people_ids'), function ($query, $params) {
+                $query->whereIn('people_id', $params);
+            });
+    }
 }

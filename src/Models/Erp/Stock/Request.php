@@ -4,23 +4,21 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use OwenIt\Auditing\Auditable;
-use FalconERP\Skeleton\Models\Erp\Stock\Item;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use FalconERP\Skeleton\Models\Erp\Finance\PaymentMethod;
+use FalconERP\Skeleton\Models\Erp\People\People;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\RequestNfeTrait;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\RequestNfeTrait;
 
 class Request extends BaseModel implements AuditableContract
 {
@@ -30,8 +28,6 @@ class Request extends BaseModel implements AuditableContract
     use RequestNfeTrait;
     use SetSchemaTrait;
     use SoftDeletes;
-
-    protected $table = 'request_headers';
 
     public const ATTRIBUTE_ID              = 'id';
     public const ATTRIBUTE_DESCRIPTION     = 'description';
@@ -45,6 +41,8 @@ class Request extends BaseModel implements AuditableContract
     public const ATTRIBUTE_DISCOUNT_VALUE  = 'discount_value';
     public const ATTRIBUTE_PAYMENT_METHOD  = 'payment_method_id';
 
+    protected $table = 'request_headers';
+
     protected $fillable = [
         self::ATTRIBUTE_DESCRIPTION,
         self::ATTRIBUTE_OBSERVATIONS,
@@ -56,6 +54,25 @@ class Request extends BaseModel implements AuditableContract
         self::ATTRIBUTE_FREIGHT_VALUE,
         self::ATTRIBUTE_DISCOUNT_VALUE,
         self::ATTRIBUTE_PAYMENT_METHOD,
+    ];
+
+    protected $casts = [
+        self::ATTRIBUTE_ID              => 'integer',
+        self::ATTRIBUTE_DESCRIPTION     => 'string',
+        self::ATTRIBUTE_OBSERVATIONS    => 'string',
+        self::ATTRIBUTE_STATUS          => 'string',
+        self::ATTRIBUTE_REQUEST_TYPE_ID => 'integer',
+        self::ATTRIBUTE_RESPONSIBLE_ID  => 'integer',
+        self::ATTRIBUTE_THIRD_ID        => 'integer',
+        self::ATTRIBUTE_ALLOWER_ID      => 'integer',
+        self::ATTRIBUTE_FREIGHT_VALUE   => 'integer',
+        self::ATTRIBUTE_DISCOUNT_VALUE  => 'integer',
+        self::ATTRIBUTE_PAYMENT_METHOD  => 'integer',
+    ];
+
+    protected $attributes = [
+        self::ATTRIBUTE_FREIGHT_VALUE  => 0,
+        self::ATTRIBUTE_DISCOUNT_VALUE => 0,
     ];
 
     /*

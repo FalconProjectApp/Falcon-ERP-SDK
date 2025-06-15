@@ -4,22 +4,23 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use FalconERP\Skeleton\Models\Erp\Shop\Shop;
-use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
-use FalconERP\Skeleton\Observers\CacheObserver;
-use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use Illuminate\Database\Eloquent\Builder;
+use FalconERP\Skeleton\Models\Erp\Shop\Shop;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -67,6 +68,10 @@ class Stock extends BaseModel implements AuditableContract
         self::ATTRIBUTE_OBS,
     ];
 
+    protected $casts = [
+        self::ATTRIBUTE_VALUE => 'integer',
+    ];
+
     /*
     |--------------------------------------------------------------------------
     | Relationships
@@ -111,15 +116,6 @@ class Stock extends BaseModel implements AuditableContract
 
     /*
     |--------------------------------------------------------------------------
-    | Attributes
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify the attributes that should be cast to native types.
-    |
-    */
-
-    /*
-    |--------------------------------------------------------------------------
     | Scopes
     |--------------------------------------------------------------------------
     |
@@ -156,6 +152,28 @@ class Stock extends BaseModel implements AuditableContract
     public function canView(): bool
     {
         return true;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Attributes
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the attributes that should be cast to native types.
+    |
+    */
+    protected function balance(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): int => $this->balance_transit + $this->balance_stock,
+        );
+    }
+
+    protected function valueTotal(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): int => $this->value * $this->balance,
+        );
     }
 
     /*
