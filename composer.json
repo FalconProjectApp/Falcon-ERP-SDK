@@ -30,6 +30,11 @@
       "Tests\\": "tests/"
     }
   },
+  "scripts": {
+    "db:test": [
+      "@php artisan migrate --database=testing --seed --force --env=testing"
+    ]
+  },
   "authors": [
     {
       "name": "Luis Gustavo Santarosa",
