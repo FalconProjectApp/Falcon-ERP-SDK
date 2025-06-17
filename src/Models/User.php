@@ -26,6 +26,9 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 
+/**
+ * TODO: extender extends Authenticatable
+ */
 class User extends BaseModel implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract
 {
     use Authenticatable;

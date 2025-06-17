@@ -20,7 +20,14 @@
       "src/Libs/Helpers.php"
     ],
     "psr-4": {
-      "FalconERP\\Skeleton\\": "src/"
+      "FalconERP\\Skeleton\\": "src/",
+      "FalconERP\\Skeleton\\Database\\Factories\\": "database/factories/",
+      "FalconERP\\Skeleton\\Database\\Seeders\\": "database/seeders/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
     }
   },
   "authors": [
