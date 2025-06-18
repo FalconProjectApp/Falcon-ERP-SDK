@@ -15,11 +15,12 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
-            'description'   => $this->faker->sentence(),
-            'bar_code'      => $this->faker->unique()->ean13(),
-            'provider_code' => $this->faker->unique()->ean13(),
-            'created_at'    => Carbon::now(),
-            'updated_at'    => Carbon::now(),
+            'description'    => $this->faker->sentence(),
+            'bar_code'       => $this->faker->unique()->ean13(),
+            'provider_code'  => $this->faker->unique()->ean13(),
+            'volume_type_id' => VolumeTypeFactory::new()->create()->id,
+            'created_at'     => Carbon::now(),
+            'updated_at'     => Carbon::now(),
         ];
     }
 }

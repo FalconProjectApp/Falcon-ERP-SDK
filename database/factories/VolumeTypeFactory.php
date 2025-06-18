@@ -15,8 +15,10 @@ class VolumeTypeFactory extends Factory
     public function definition(): array
     {
         return [
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
+            'description' => $this->faker->word(),
+            'initials'    => $this->faker->word(),
+            'created_at'  => Carbon::now(),
+            'updated_at'  => Carbon::now(),
         ];
     }
 }
