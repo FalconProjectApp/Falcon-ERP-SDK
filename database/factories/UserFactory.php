@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace FalconERP\Skeleton\Database\Factories;
+namespace Database\Factories\FalconERP\Skeleton;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
