@@ -37,12 +37,12 @@ class SkeletonProvider extends ServiceProvider
      */
     public function boot(Router $router)
     {
-        if (app()->environment(['testing'])) {
-            $this->loadMigrationsFrom(database_path('migrations/stock'));
+        if (app()->environment(['falcon_testing'])) {
+            $this->loadMigrationsFrom(realpath(__DIR__.'/../../database/migrations/stock'));
         }
 
         $this->publishes([
-            __DIR__.'/../Config/falconservices.php' => config_path('falconservices.php'),
+            realpath(__DIR__.'/../Config/falconservices.php') => config_path('falconservices.php'),
         ], 'config');
     }
 }

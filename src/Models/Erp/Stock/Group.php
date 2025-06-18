@@ -1,12 +1,16 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
 use OwenIt\Auditing\Auditable;
 use Illuminate\Database\Eloquent\Builder;
 use FalconERP\Skeleton\Models\Erp\Shop\Shop;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,16 +22,20 @@ use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class Group extends BaseModel implements AuditableContract
 {
-    use HasFactory;
-    use SoftDeletes;
-    use SetSchemaTrait;
     use ActionTrait;
     use Auditable;
+    use HasFactory;
+    use SetSchemaTrait;
+    use SoftDeletes;
 
     public const ATTRIBUTE_DESCRIPTION = 'description';
 
     protected $fillable = [
         self::ATTRIBUTE_DESCRIPTION,
+    ];
+
+    protected $casts = [
+        self::ATTRIBUTE_DESCRIPTION => 'string',
     ];
 
     /*
@@ -39,9 +47,14 @@ class Group extends BaseModel implements AuditableContract
     |
     */
 
-    /**
-     * ShopServices function.
-     */
+    public function products(): HasMany
+    {
+        return $this->hasMany(
+            related: Product::class,
+            foreignKey: Product::ATTRIBUTE_GROUPS_ID,
+        );
+    }
+
     public function shops(): BelongsToMany
     {
         return $this->morphToMany(
@@ -69,15 +82,6 @@ class Group extends BaseModel implements AuditableContract
 
     /*
     |--------------------------------------------------------------------------
-    | Attributes
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify the attributes that should be cast to native types.
-    |
-    */
-
-    /*
-    |--------------------------------------------------------------------------
     | Scopes
     |--------------------------------------------------------------------------
     |
@@ -92,6 +96,27 @@ class Group extends BaseModel implements AuditableContract
                     $query->whereIn('shops.id', $params);
                 });
             });
+    }
+
+    public function canView(): bool
+    {
+        return true;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Attributes
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the attributes that should be cast to native types.
+    |
+    */
+
+    protected function productTotal(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->products()->count(),
+        );
     }
 
     /*
@@ -112,11 +137,6 @@ class Group extends BaseModel implements AuditableContract
             'can_follow'   => $this->canFollow(),
             'can_unfollow' => $this->canUnfollow(),
         ];
-    }
-
-    public function canView(): bool
-    {
-        return true;
     }
 
     private function canRestore(): bool

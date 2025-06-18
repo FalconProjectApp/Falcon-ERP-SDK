@@ -37,7 +37,7 @@ class Product extends BaseModel implements AuditableContract
     use SoftDeletes;
 
     public const ATTRIBUTE_ID              = 'id';
-    public const ATTRIBUTE_GROUPS_ID       = 'groups_id';
+    public const ATTRIBUTE_GROUPS_ID       = 'group_id';
     public const ATTRIBUTE_VOLUME_TYPES_ID = 'volume_types_id';
     public const ATTRIBUTE_STATUS          = 'status';
     public const ATTRIBUTE_DESCRIPTION     = 'description';
