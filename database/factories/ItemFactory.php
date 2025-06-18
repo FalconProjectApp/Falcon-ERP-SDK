@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Database\Factories\FalconERP\Skeleton;
+namespace FalconERP\Skeleton\Database\Factories;
 
 use FalconERP\Skeleton\Models\Erp\Stock\Item;
 use Illuminate\Database\Eloquent\Factories\Factory;
