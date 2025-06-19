@@ -4,24 +4,24 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use OwenIt\Auditing\Auditable;
-use Illuminate\Database\Eloquent\Builder;
-use FalconERP\Skeleton\Models\Erp\Shop\Shop;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use FalconERP\Skeleton\Database\Factories\StockFactory;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use FalconERP\Skeleton\Models\Erp\Shop\Shop;
+use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
-use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
+use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -72,11 +72,6 @@ class Stock extends BaseModel implements AuditableContract
     protected $casts = [
         self::ATTRIBUTE_VALUE => 'integer',
     ];
-
-    protected static function newFactory()
-    {
-        return StockFactory::new();
-    }
 
     /*
     |--------------------------------------------------------------------------
@@ -160,6 +155,11 @@ class Stock extends BaseModel implements AuditableContract
         return true;
     }
 
+    protected static function newFactory()
+    {
+        return StockFactory::new();
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Attributes
@@ -219,15 +219,19 @@ class Stock extends BaseModel implements AuditableContract
 
     private function canFollow(): bool
     {
-        return (!$this->trashed()
-            && !$this->followers()->where('follower_people_id', auth()->people()->id)->exists())
-            ?? false;
+        return (
+            !$this->trashed()
+            && auth()->check()
+            && !$this->followers()->where('follower_people_id', auth()->people()?->id)->exists()
+        ) ?? false;
     }
 
     private function canUnfollow(): bool
     {
-        return (!$this->trashed()
-            && $this->followers()->where('follower_people_id', auth()->people()->id)->exists())
-            ?? false;
+        return (
+            !$this->trashed()
+            && auth()->check()
+            && $this->followers()->where('follower_people_id', auth()->people()?->id)->exists()
+        ) ?? false;
     }
 }

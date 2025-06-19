@@ -1,23 +1,23 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use Illuminate\Support\Str;
-use QuantumTecnology\ValidateTrait\Data;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Database\Factories\ItemFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ValidateTrait\Data;
 
 class Item extends BaseModel
 {
     use HasFactory;
-    use SoftDeletes;
     use SetSchemaTrait;
-
-    protected $table = 'request_bodies';
+    use SoftDeletes;
 
     protected $fillable = [
         'stock_id',
@@ -33,19 +33,19 @@ class Item extends BaseModel
         'amount'   => 'integer',
     ];
 
-    protected static function newFactory()
-    {
-        return ItemFactory::new();
-    }
-
     public function request()
     {
-        return $this->belongsTo(Request::class, 'request_header_id');
+        return $this->belongsTo(Request::class);
     }
 
     public function stock()
     {
         return $this->belongsTo(Stock::class);
+    }
+
+    protected static function newFactory()
+    {
+        return ItemFactory::new();
     }
 
     /*
@@ -225,7 +225,7 @@ class Item extends BaseModel
     protected function xPed(): Attribute
     {
         return Attribute::make(
-            get: fn () => str_pad($this->id, 15, '0', STR_PAD_LEFT),
+            get: fn () => mb_str_pad($this->id, 15, '0', STR_PAD_LEFT),
         );
     }
 
@@ -237,7 +237,7 @@ class Item extends BaseModel
         $this->load('request');
 
         return Attribute::make(
-            get: fn () => str_pad($this->request->itens->search(fn ($item) => $item->id === $this->id) + 1, 5, '0', STR_PAD_LEFT),
+            get: fn () => mb_str_pad($this->request->itens->search(fn ($item) => $item->id === $this->id) + 1, 5, '0', STR_PAD_LEFT),
         );
     }
 

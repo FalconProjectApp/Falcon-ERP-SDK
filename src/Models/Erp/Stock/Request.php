@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use FalconERP\Skeleton\Models\Erp\People\People;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use FalconERP\Skeleton\Models\Erp\Stock\RequestType;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
@@ -41,8 +42,6 @@ class Request extends BaseModel implements AuditableContract
     public const ATTRIBUTE_FREIGHT_VALUE   = 'freight_value';
     public const ATTRIBUTE_DISCOUNT_VALUE  = 'discount_value';
     public const ATTRIBUTE_PAYMENT_METHOD  = 'payment_method_id';
-
-    protected $table = 'request_headers';
 
     protected $fillable = [
         self::ATTRIBUTE_DESCRIPTION,
@@ -92,7 +91,7 @@ class Request extends BaseModel implements AuditableContract
 
     public function itens(): HasMany
     {
-        return $this->hasMany(Item::class, 'request_header_id');
+        return $this->hasMany(Item::$collectionClass);
     }
 
     public function responsible(): BelongsTo
@@ -231,16 +230,20 @@ class Request extends BaseModel implements AuditableContract
 
     private function canFollow(): bool
     {
-        return (!$this->trashed()
-            && !$this->followers()->where('follower_people_id', auth()->people()->id)->exists())
-            ?? false;
+        return (
+        !$this->trashed()
+            && auth()->check()
+            && !$this->followers()->where('follower_people_id', auth()->people()->id)->exists()
+            ) ?? false;
     }
 
     private function canUnfollow(): bool
     {
-        return (!$this->trashed()
-            && $this->followers()->where('follower_people_id', auth()->people()->id)->exists())
-            ?? false;
+        return (
+        !$this->trashed()
+            && auth()->check()
+            && $this->followers()->where('follower_people_id', auth()->people()->id)->exists()
+            ) ?? false;
     }
 
     private function canIssueNfce(): bool

@@ -27,7 +27,7 @@ class StockFactory extends Factory
             'balance_transit' => fake()->numberBetween(0, 10),
             'balance_stock'   => fake()->numberBetween(0, 10),
             'value'           => fake()->randomNumber(5),
-            'observation'     => fake()->text(100),
+            'observations'    => fake()->text(100),
             'status'          => fake()->boolean(90),
             'created_at'      => now(),
             'updated_at'      => now(),
