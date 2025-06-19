@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use Database\Seeders\Starter\Stock\RequestTypeSeeder;
+use Database\Seeders\Starter\Stock\VolumeTypeSeeder;
 use Illuminate\Database\Seeder;
-use Database\Seeders\Starter\MenuSeeder;
-use Database\Seeders\Starter\ParameterSeeder;
-use Database\Seeders\Starter\VolumeTypeSeeder;
-use Database\Seeders\Starter\RequestTypeSeeder;
 
 class StarterSeeder extends Seeder
 {
@@ -17,8 +15,6 @@ class StarterSeeder extends Seeder
         $this->call([
             VolumeTypeSeeder::class,
             RequestTypeSeeder::class,
-            // MenuSeeder::class,
-            // ParameterSeeder::class
         ]);
     }
 }

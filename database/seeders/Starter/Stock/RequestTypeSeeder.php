@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Database\Seeders\Starter;
+namespace Database\Seeders\Starter\Stock;
 
 use FalconERP\Skeleton\Enums\RequestEnum;
 use FalconERP\Skeleton\Models\Erp\Stock\RequestType;
