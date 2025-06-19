@@ -18,7 +18,7 @@ class ProductFactory extends Factory
         return [
             'group_id'        => Group::factory(),
             'volume_type_id'  => VolumeType::factory(),
-            'status'          => fake()->randomBoolean(),
+            'status'          => fake()->boolean(90),
             'description'     => fake()->sentence(),
             'bar_code'        => fake()->unique()->ean13(),
             'last_buy_value'  => fake()->randomNumber(6, true),

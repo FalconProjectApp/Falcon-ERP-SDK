@@ -17,7 +17,7 @@ class StockFactory extends Factory
         return [
             'product_id'      => Product::factory(),
             'color'           => fake()->colorName(),
-            'on_shop'         => fake()->randomBoolean(),
+            'on_shop'         => fake()->boolean(90),
             'measure'         => fake()->randomElement(['kg', 'g', 'l', 'ml', 'un']),
             'width'           => fake()->randomNumber(3),
             'weight'          => fake()->randomNumber(3),
@@ -28,7 +28,7 @@ class StockFactory extends Factory
             'balance_stock'   => fake()->numberBetween(0, 10),
             'value'           => fake()->randomNumber(5),
             'observation'     => fake()->text(100),
-            'status'          => fake()->randomBoolean(),
+            'status'          => fake()->boolean(90),
             'created_at'      => now(),
             'updated_at'      => now(),
         ];
