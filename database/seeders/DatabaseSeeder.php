@@ -1,11 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use FalconERP\Skeleton\Models\User;
+use Database\Seeders\Starter\Stock\RequestTypeSeeder;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Database\Seeders\Starter\Stock\VolumeTypeSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -15,11 +16,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        /* User::factory()->create([
-            'name'  => 'Test User',
-            'email' => 'test@example.com',
-        ]); */
+        $this->call([
+            VolumeTypeSeeder::class,
+            RequestTypeSeeder::class,
+        ]);
     }
 }
