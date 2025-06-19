@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Database\Seeders\Starter\Stock;
 
@@ -41,7 +41,7 @@ class RequestTypeSeeder extends Seeder
                 'description'  => $item[0],
                 'request_type' => $item[1],
                 'type'         => $item[2],
-                'active'       => $item[3],
+                'is_active'    => $item[3],
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ]);
