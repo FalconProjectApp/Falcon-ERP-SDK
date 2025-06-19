@@ -17,6 +17,8 @@ return new class extends Migration {
      */
     public function up()
     {
+        DB::statement('CREATE SCHEMA IF NOT EXISTS stock');
+
         Schema::create('stock.groups', function (Blueprint $table) {
             $table->id();
             $table->string('description');
