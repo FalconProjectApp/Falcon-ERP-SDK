@@ -15,7 +15,7 @@ class StockFactory extends Factory
     public function definition(): array
     {
         return [
-            'product_id'      => Product::factory()->create(),
+            'product_id'      => Product::factory(),
             'color'           => fake()->colorName(),
             'on_shop'         => fake()->randomBoolean(),
             'measure'         => fake()->randomElement(['kg', 'g', 'l', 'ml', 'un']),

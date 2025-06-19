@@ -16,7 +16,7 @@ class ProductSegmentFactory extends Factory
     public function definition(): array
     {
         return [
-            'product_id' => Product::factory()->create(),
+            'product_id' => Product::factory(),
             'name'       => fake()->randomElement(['Segment A', 'Segment B', 'Segment C']),
             'value'      => fake()->randomNumber(6, true),
             'created_at' => Carbon::now(),

@@ -16,8 +16,8 @@ class ItemFactory extends Factory
     public function definition(): array
     {
         return [
-            'request_id' => Request::factory()->create(),
-            'stock_id'   => Stock::factory()->create(),
+            'request_id' => Request::factory(),
+            'stock_id'   => Stock::factory(),
             'value'      => fake()->randomNumber(6, true),
             'discount'   => fake()->randomNumber(6, true),
             'amount'     => fake()->randomNumber(6, true),

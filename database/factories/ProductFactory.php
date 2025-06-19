@@ -16,8 +16,8 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
-            'group_id'        => Group::factory()->create(),
-            'volume_type_id'  => VolumeType::factory()->create(),
+            'group_id'        => Group::factory(),
+            'volume_type_id'  => VolumeType::factory(),
             'status'          => fake()->randomBoolean(),
             'description'     => fake()->sentence(),
             'bar_code'        => fake()->unique()->ean13(),

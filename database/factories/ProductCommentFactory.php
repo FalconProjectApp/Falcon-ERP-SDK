@@ -16,12 +16,12 @@ class ProductCommentFactory extends Factory
     public function definition(): array
     {
         return [
-            'product_id'         => Product::factory()->create(),
+            'product_id'         => Product::factory(),
             'product_comment_id' => fake()->boolean(30)
-                ? ProductComment::factory()->create()->id
+                ? ProductComment::factory()
                 : null,
             'people_id' => fake()->boolean(30)
-                ? People::factory()->create()->id
+                ? People::factory()
                 : null,
             'comment'    => fake()->text(200),
             'origin'     => fake()->sentence(),

@@ -18,11 +18,11 @@ class RequestFactory extends Factory
     {
         return [
             'description'       => fake()->sentence(),
-            'request_type_id'   => RequestType::factory()->create(),
-            'payment_method_id' => PaymentMethod::factory()->create(),
-            'responsible_id'    => People::factory()->create(),
-            'third_id'          => People::factory()->create(),
-            'allower_id'        => People::factory()->create(),
+            'request_type_id'   => RequestType::factory(),
+            'payment_method_id' => PaymentMethod::factory(),
+            'responsible_id'    => People::factory(),
+            'third_id'          => People::factory(),
+            'allower_id'        => People::factory(),
             'discount_value'    => fake()->randomNumber(6, true),
             'freight_value'     => fake()->randomNumber(6, true),
             'observations'      => fake()->text(200),
