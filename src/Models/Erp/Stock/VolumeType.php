@@ -2,13 +2,14 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
+use OwenIt\Auditing\Auditable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use OwenIt\Auditing\Auditable;
+use FalconERP\Skeleton\Database\Factories\VolumeTypeFactory;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
@@ -27,6 +28,11 @@ class VolumeType extends BaseModel implements AuditableContract
         self::ATTRIBUTE_DESCRIPTION,
         self::ATTRIBUTE_INITIALS,
     ];
+
+    protected static function newFactory()
+    {
+        return VolumeTypeFactory::new();
+    }
 
     /*
     |--------------------------------------------------------------------------

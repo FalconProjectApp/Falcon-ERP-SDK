@@ -2,13 +2,14 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ValidateTrait\Data;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use FalconERP\Skeleton\Database\Factories\ItemFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class Item extends BaseModel
 {
@@ -32,7 +33,10 @@ class Item extends BaseModel
         'amount'   => 'integer',
     ];
 
-    public $allowedIncludes = [];
+    protected static function newFactory()
+    {
+        return ItemFactory::new();
+    }
 
     public function request()
     {

@@ -16,6 +16,7 @@ use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use FalconERP\Skeleton\Database\Factories\ProductFactory;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
@@ -74,6 +75,11 @@ class Product extends BaseModel implements AuditableContract
         self::ATTRIBUTE_PROVIDER_CODE   => 'string',
         self::ATTRIBUTE_OBSERVATIONS    => 'string',
     ];
+
+    protected static function newFactory()
+    {
+        return ProductFactory::new();
+    }
 
     /*
     |--------------------------------------------------------------------------

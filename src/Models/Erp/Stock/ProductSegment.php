@@ -4,8 +4,9 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use FalconERP\Skeleton\Database\Factories\ProductSegmentFactory;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class ProductSegment extends BaseModel
@@ -21,6 +22,11 @@ class ProductSegment extends BaseModel
         'unit_abbreviation',
         'unit_description',
     ];
+
+    protected static function newFactory()
+    {
+        return ProductSegmentFactory::new();
+    }
 
     /*
     |--------------------------------------------------------------------------

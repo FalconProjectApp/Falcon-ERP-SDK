@@ -3,11 +3,12 @@
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
 use FalconERP\Skeleton\Enums\RequestEnum;
-use FalconERP\Skeleton\Models\Erp\Fiscal\NatureOperation;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use FalconERP\Skeleton\Models\Erp\Fiscal\NatureOperation;
+use FalconERP\Skeleton\Database\Factories\RequestTypeFactory;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class RequestType extends BaseModel
@@ -27,6 +28,11 @@ class RequestType extends BaseModel
         'active' => true,
         'type'   => RequestEnum::TYPE_CLIENT,
     ];
+
+    protected static function newFactory()
+    {
+        return RequestTypeFactory::new();
+    }
 
     /*
     |--------------------------------------------------------------------------

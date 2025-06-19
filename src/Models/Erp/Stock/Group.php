@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use FalconERP\Skeleton\Database\Factories\GroupFactory;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
@@ -37,6 +38,11 @@ class Group extends BaseModel implements AuditableContract
     protected $casts = [
         self::ATTRIBUTE_DESCRIPTION => 'string',
     ];
+
+    protected static function newFactory()
+    {
+        return GroupFactory::new();
+    }
 
     /*
     |--------------------------------------------------------------------------

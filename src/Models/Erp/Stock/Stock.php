@@ -13,6 +13,7 @@ use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use FalconERP\Skeleton\Database\Factories\StockFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -71,6 +72,11 @@ class Stock extends BaseModel implements AuditableContract
     protected $casts = [
         self::ATTRIBUTE_VALUE => 'integer',
     ];
+
+    protected static function newFactory()
+    {
+        return StockFactory::new();
+    }
 
     /*
     |--------------------------------------------------------------------------

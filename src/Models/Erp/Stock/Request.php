@@ -4,21 +4,22 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use FalconERP\Skeleton\Models\Erp\Finance\PaymentMethod;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\RequestNfeTrait;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Models\Erp\People\People;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use FalconERP\Skeleton\Models\Erp\Finance\PaymentMethod;
+use FalconERP\Skeleton\Database\Factories\RequestFactory;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\RequestNfeTrait;
 
 class Request extends BaseModel implements AuditableContract
 {
@@ -74,6 +75,11 @@ class Request extends BaseModel implements AuditableContract
         self::ATTRIBUTE_FREIGHT_VALUE  => 0,
         self::ATTRIBUTE_DISCOUNT_VALUE => 0,
     ];
+
+    protected static function newFactory()
+    {
+        return RequestFactory::new();
+    }
 
     /*
     |--------------------------------------------------------------------------
