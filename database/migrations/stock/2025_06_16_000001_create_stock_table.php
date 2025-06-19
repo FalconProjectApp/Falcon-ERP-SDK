@@ -32,37 +32,6 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
-        DB::table('stock.volume_types')->insert([
-            [
-                'id'          => 0,
-                'description' => 'Caixa com 12',
-                'initials'    => 'CX12',
-                'created_at'  => now()->format('Y-m-d H:i:s'),
-                'updated_at'  => now()->format('Y-m-d H:i:s'),
-            ],
-            [
-                'id'          => 1,
-                'description' => 'Caixa com 6',
-                'initials'    => 'CX6',
-                'created_at'  => now()->format('Y-m-d H:i:s'),
-                'updated_at'  => now()->format('Y-m-d H:i:s'),
-            ],
-            [
-                'id'          => 2,
-                'description' => 'Unidade',
-                'initials'    => 'UN',
-                'created_at'  => now()->format('Y-m-d H:i:s'),
-                'updated_at'  => now()->format('Y-m-d H:i:s'),
-            ],
-            [
-                'id'          => 3,
-                'description' => 'Litro',
-                'initials'    => 'LT',
-                'created_at'  => now()->format('Y-m-d H:i:s'),
-                'updated_at'  => now()->format('Y-m-d H:i:s'),
-            ],
-        ]);
-
         Schema::create('stock.products', function (Blueprint $table) {
             $table->id();
 
@@ -157,6 +126,10 @@ return new class extends Migration {
         Schema::create('stock.stocks', function (Blueprint $table) {
             $table->id();
 
+            $table->string('description')
+                ->comment('Representa a descrição do estoque')
+                ->nullable();
+
             $table->unsignedbiginteger('product_id');
             $table->foreign('product_id')
                 ->references('id')
@@ -204,10 +177,6 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
-        /* Artisan::call('db:seed', [
-            '--class' => 'Load_2024_04_29_00001_RequestsTypesSeeder',
-        ]); */
-
         Schema::create('stock.requests', function (Blueprint $table) {
             $table->id()
                 ->comment('Representa o identificador da requisição');
@@ -227,34 +196,15 @@ return new class extends Migration {
                 ->nullable()
                 ->comment('Representa o método de pagamento da requisição');
 
-            /*             $table->foreignId('payment_method_id')
-                            ->nullable()
-                            ->constrained('finance.payment_methods')
-                            ->onUpdate('cascade')
-                            ->onDelete('set null')
-                            ->comment('Representa o método de pagamento da requisição'); */
-
             $table->unsignedbiginteger('responsible_id')
                 ->comment('Representa o responsável pela requisição (usuário)');
-            /* $table->foreign('responsible_id')
-                ->references('id')
-                ->on('people.peoples')
-                ->onDelete('cascade'); */
 
             $table->unsignedbiginteger('third_id')
                 ->nullable()
                 ->comment('Representa o terceiro da requisição (fornecedor, cliente, etc)');
-            /* $table->foreign('third_id')
-                ->references('id')
-                ->on('people.peoples')
-                ->onDelete('cascade'); */
 
             $table->unsignedbiginteger('allower_id')
                 ->nullable();
-            /* $table->foreign('allower_id')
-                ->references('id')
-                ->on('people.peoples')
-                ->onDelete('cascade'); */
 
             $table->string('discount_value')
                 ->default(0)
