@@ -26,22 +26,22 @@ class RequestTypeSeeder extends Seeder
 
     public function run(): void
     {
-        collect($this->items)->each(function ($releaseType) {
-            $releaseTypeExists = RequestType::query()
-                ->where('description', $releaseType[0])
-                ->where('request_type', $releaseType[1])
-                ->where('type', $releaseType[2])
+        collect($this->items)->each(function ($item) {
+            $itemExists = RequestType::query()
+                ->where('description', $item[0])
+                ->where('request_type', $item[1])
+                ->where('type', $item[2])
                 ->exists();
 
-            if ($releaseTypeExists) {
+            if ($itemExists) {
                 return;
             }
 
             RequestType::query()->insert([
-                'description'  => $releaseType[0],
-                'request_type' => $releaseType[1],
-                'type'         => $releaseType[2],
-                'active'       => $releaseType[3],
+                'description'  => $item[0],
+                'request_type' => $item[1],
+                'type'         => $item[2],
+                'active'       => $item[3],
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ]);
