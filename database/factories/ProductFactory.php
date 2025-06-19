@@ -1,12 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Database\Factories;
 
+use FalconERP\Skeleton\Models\Erp\Stock\Group;
 use FalconERP\Skeleton\Models\Erp\Stock\Product;
+use FalconERP\Skeleton\Models\Erp\Stock\VolumeType;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Carbon;
 
 class ProductFactory extends Factory
 {
@@ -15,12 +16,18 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
-            'description'    => $this->faker->sentence(),
-            'bar_code'       => $this->faker->unique()->ean13(),
-            'provider_code'  => $this->faker->unique()->ean13(),
-            'volume_type_id' => VolumeTypeFactory::new()->create()->id,
-            'created_at'     => Carbon::now(),
-            'updated_at'     => Carbon::now(),
+            'group_id'        => Group::factory()->create(),
+            'volume_type_id'  => VolumeType::factory()->create(),
+            'status'          => fake()->randomBoolean(),
+            'description'     => fake()->sentence(),
+            'bar_code'        => fake()->unique()->ean13(),
+            'last_buy_value'  => fake()->randomNumber(6, true),
+            'last_sell_value' => fake()->randomNumber(6, true),
+            'last_rent_value' => fake()->randomNumber(6, true),
+            'provider_code'   => fake()->unique()->ean13(),
+            'observations'    => fake()->text(200),
+            'created_at'      => now(),
+            'updated_at'      => now(),
         ];
     }
 }

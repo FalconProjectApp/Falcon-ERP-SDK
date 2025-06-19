@@ -1,12 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Database\Factories;
 
+use FalconERP\Skeleton\Models\Erp\Stock\Product;
 use FalconERP\Skeleton\Models\Erp\Stock\Stock;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Carbon;
 
 class StockFactory extends Factory
 {
@@ -15,13 +15,22 @@ class StockFactory extends Factory
     public function definition(): array
     {
         return [
+            'product_id'      => Product::factory()->create(),
+            'color'           => fake()->colorName(),
+            'on_shop'         => fake()->randomBoolean(),
+            'measure'         => fake()->randomElement(['kg', 'g', 'l', 'ml', 'un']),
+            'width'           => fake()->randomNumber(3),
+            'weight'          => fake()->randomNumber(3),
+            'height'          => fake()->randomNumber(3),
+            'depth'           => fake()->randomNumber(3),
             'description'     => fake()->text(20),
             'balance_transit' => fake()->numberBetween(0, 10),
             'balance_stock'   => fake()->numberBetween(0, 10),
             'value'           => fake()->randomNumber(5),
             'observation'     => fake()->text(100),
-            'created_at'      => Carbon::now(),
-            'updated_at'      => Carbon::now(),
+            'status'          => fake()->randomBoolean(),
+            'created_at'      => now(),
+            'updated_at'      => now(),
         ];
     }
 }

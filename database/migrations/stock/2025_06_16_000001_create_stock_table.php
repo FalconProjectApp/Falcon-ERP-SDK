@@ -1,15 +1,15 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
+use FalconERP\Skeleton\Enums\RequestEnum;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Artisan;
-use FalconERP\Skeleton\Enums\RequestEnum;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Migrations\Migration;
 
-return new class() extends Migration {
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -143,10 +143,6 @@ return new class() extends Migration {
 
             $table->unsignedbiginteger('people_id')
                 ->nullable();
-            $table->foreign('people_id')
-                ->references('id')
-                ->on('people.peoples')
-                ->onDelete('cascade');
 
             $table->text('comment')
                 ->nullable();
@@ -186,7 +182,7 @@ return new class() extends Migration {
                 ->default(0);
             $table->integer('balance_stock')
                 ->default(0);
-            $table->decimal('value', 25, 10)
+            $table->string('value')
                 ->default(0);
             $table->text('observations')
                 ->nullable();
@@ -202,15 +198,15 @@ return new class() extends Migration {
             $table->string('description');
             $table->enum('request_type', RequestEnum::requestTypes()->toArray());
             $table->enum('type', RequestEnum::types()->toArray());
-            $table->boolean('active')
+            $table->boolean('is_active')
                 ->default(1);
             $table->timestamps();
             $table->softDeletes();
         });
 
-        Artisan::call('db:seed', [
+        /* Artisan::call('db:seed', [
             '--class' => 'Load_2024_04_29_00001_RequestsTypesSeeder',
-        ]);
+        ]); */
 
         Schema::create('stock.requests', function (Blueprint $table) {
             $table->id()
@@ -227,39 +223,43 @@ return new class() extends Migration {
                 ->on('stock.request_types')
                 ->onDelete('cascade');
 
-            $table->foreignId('payment_method_id')
+            $table->unsignedBigInteger('payment_method_id')
                 ->nullable()
-                ->constrained('finance.payment_methods')
-                ->onUpdate('cascade')
-                ->onDelete('set null')
                 ->comment('Representa o método de pagamento da requisição');
+
+            /*             $table->foreignId('payment_method_id')
+                            ->nullable()
+                            ->constrained('finance.payment_methods')
+                            ->onUpdate('cascade')
+                            ->onDelete('set null')
+                            ->comment('Representa o método de pagamento da requisição'); */
 
             $table->unsignedbiginteger('responsible_id')
                 ->comment('Representa o responsável pela requisição (usuário)');
-            $table->foreign('responsible_id')
+            /* $table->foreign('responsible_id')
                 ->references('id')
                 ->on('people.peoples')
-                ->onDelete('cascade');
+                ->onDelete('cascade'); */
 
             $table->unsignedbiginteger('third_id')
                 ->nullable()
                 ->comment('Representa o terceiro da requisição (fornecedor, cliente, etc)');
-            $table->foreign('third_id')
+            /* $table->foreign('third_id')
                 ->references('id')
                 ->on('people.peoples')
-                ->onDelete('cascade');
+                ->onDelete('cascade'); */
 
             $table->unsignedbiginteger('allower_id')
                 ->nullable();
-            $table->foreign('allower_id')
+            /* $table->foreign('allower_id')
                 ->references('id')
                 ->on('people.peoples')
-                ->onDelete('cascade');
+                ->onDelete('cascade'); */
 
-            $table->bigInteger('discount_value')
+            $table->string('discount_value')
                 ->default(0)
                 ->comment('Representa o valor do desconto aplicado na requisição');
-            $table->bigInteger('freight_value')
+            $table->string('freight_value')
                 ->default(0)
                 ->comment('Representa o valor do frete aplicado na requisição');
 
@@ -298,7 +298,7 @@ return new class() extends Migration {
                 ->default(0);
             $table->integer('discount')
                 ->default(0);
-            $table->decimal('amount', 9, 3)
+            $table->bigInteger('amount')
                 ->default(0);
 
             $table->timestamps();

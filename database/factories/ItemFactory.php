@@ -1,12 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Database\Factories;
 
 use FalconERP\Skeleton\Models\Erp\Stock\Item;
+use FalconERP\Skeleton\Models\Erp\Stock\Request;
+use FalconERP\Skeleton\Models\Erp\Stock\Stock;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Carbon;
 
 class ItemFactory extends Factory
 {
@@ -15,8 +16,13 @@ class ItemFactory extends Factory
     public function definition(): array
     {
         return [
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
+            'request_id' => Request::factory()->create(),
+            'stock_id'   => Stock::factory()->create(),
+            'value'      => fake()->randomNumber(6, true),
+            'discount'   => fake()->randomNumber(6, true),
+            'amount'     => fake()->randomNumber(6, true),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }
