@@ -7,6 +7,7 @@ namespace FalconERP\Skeleton\Models\Erp\Stock;
 use FalconERP\Skeleton\Database\Factories\ItemFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
@@ -33,14 +34,19 @@ class Item extends BaseModel
         'amount'   => 'integer',
     ];
 
-    public function request()
+    public function request(): BelongsTo
     {
         return $this->belongsTo(Request::class);
     }
 
-    public function stock()
+    public function stock(): BelongsTo
     {
         return $this->belongsTo(Stock::class);
+    }
+
+    public function load(): HasOne
+    {
+        return $this->hasOne(Load::class, 'id', 'stock_id');
     }
 
     protected static function newFactory()
