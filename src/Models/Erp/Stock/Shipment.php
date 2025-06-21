@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use FalconERP\Skeleton\Database\Factories\LoadFactory;
+use FalconERP\Skeleton\Database\Factories\ShipmentFactory;
 use FalconERP\Skeleton\Enums\ArchiveEnum;
 use FalconERP\Skeleton\Models\Erp\People\People;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
@@ -27,7 +27,7 @@ use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
     CacheObserver::class,
     NotificationObserver::class,
 ])]
-class Load extends BaseModel implements AuditableContract
+class Shipment extends BaseModel implements AuditableContract
 {
     use ActionTrait;
     use ArchiveModelTrait;
@@ -121,7 +121,7 @@ class Load extends BaseModel implements AuditableContract
 
     protected static function newFactory()
     {
-        return LoadFactory::new();
+        return ShipmentFactory::new();
     }
 
     /*

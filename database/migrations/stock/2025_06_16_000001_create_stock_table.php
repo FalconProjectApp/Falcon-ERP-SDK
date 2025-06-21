@@ -1,15 +1,15 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use FalconERP\Skeleton\Enums\RequestEnum;
-use FalconERP\Skeleton\Enums\Stock\Driver\DriverStatusEnum;
+use FalconERP\Skeleton\Enums\Stock\Shipment\ShipmentStatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class() extends Migration {
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -228,7 +228,7 @@ return new class() extends Migration {
             $table->softDeletes();
         });
 
-        Schema::create('stock.loads', function (Blueprint $table) {
+        Schema::create('stock.shipments', function (Blueprint $table) {
             $table->id()
                 ->comment('Representa o identificador do carregamento');
 
@@ -237,7 +237,7 @@ return new class() extends Migration {
                 ->comment('Representa o identificador do motorista responsável pelo carregamento');
 
             $table->string('status')
-                ->default(DriverStatusEnum::PENDING)
+                ->default(ShipmentStatusEnum::PENDING)
                 ->comment('Representa o status do carregamento');
 
             $table->timestamps();
@@ -262,12 +262,12 @@ return new class() extends Migration {
                 ->on('stock.stocks')
                 ->onDelete('cascade');
 
-            $table->unsignedbiginteger('load_id')
+            $table->unsignedbiginteger('shipment_id')
                 ->nullable()
-                ->comment('Representa o carregamento do item da requisição');
-            $table->foreign('load_id')
+                ->comment('Representa o identificador do carregamento associado ao item da requisição');
+            $table->foreign('shipment_id')
                 ->references('id')
-                ->on('stock.loads')
+                ->on('stock.shipments')
                 ->onDelete('cascade');
 
             $table->integer('value')
@@ -298,6 +298,6 @@ return new class() extends Migration {
         Schema::dropIfExists('stock.request_types');
         Schema::dropIfExists('stock.volume_types');
         Schema::dropIfExists('stock.groups');
-        Schema::dropIfExists('stock.loads');
+        Schema::dropIfExists('stock.shipments');
     }
 };
