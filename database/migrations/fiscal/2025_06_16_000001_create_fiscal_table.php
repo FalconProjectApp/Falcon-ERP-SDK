@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use FalconERP\Skeleton\Enums\Revenue\FiscalDocumentEnum;
+use FalconERP\Skeleton\Enums\Fiscal\SerieEnvironmentEnum;
 use FalconERP\Skeleton\Enums\Fiscal\NatureOperationTypeEnum;
 
 return new class() extends Migration {
@@ -32,18 +34,10 @@ return new class() extends Migration {
             $table->unsignedBigInteger('issuer_people_id')
                 ->nullable()
                 ->comment('Representa o emitente da importação');
-            $table->foreign('issuer_people_id')
-                ->references('id')
-                ->on('people.peoples')
-                ->onDelete('cascade');
 
             $table->unsignedBigInteger('recipient_people_id')
                 ->nullable()
                 ->comment('Representa o emitente da importação');
-            $table->foreign('recipient_people_id')
-                ->references('id')
-                ->on('people.peoples')
-                ->onDelete('cascade');
 
             $table->string('access_key')
                 ->comment('Representa a chave de acesso da importação');
@@ -57,10 +51,6 @@ return new class() extends Migration {
 
             $table->unsignedBigInteger('importer_people_id')
                 ->comment('Representa quem realizou a importação');
-            $table->foreign('importer_people_id')
-                ->references('id')
-                ->on('people.peoples')
-                ->onDelete('cascade');
 
             $table->enum('status', FiscalDocumentEnum::statuses()->toArray())
                 ->default(FiscalDocumentEnum::STATUS_PENDING)
@@ -101,10 +91,8 @@ return new class() extends Migration {
                 ->default('homologation')
                 ->comment('Representa o ambiente da série. Ex: produção, homologação');
 
-            $table->foreignId('people_issuer_id')
+            $table->unsignedBigInteger('people_issuer_id')
                 ->nullable()
-                ->constrained('people.peoples')
-                ->onDelete('cascade')
                 ->comment('Representa o identificador da empresa');
 
             $table->timestamps();
@@ -112,9 +100,9 @@ return new class() extends Migration {
                 ->comment('Representa a data de exclusão lógica da série');
         });
 
-        Artisan::call('db:seed', [
+        /* Artisan::call('db:seed', [
             '--class' => 'Load_2025_04_20_00001_FiscalSeriesSeeder',
-        ]);
+        ]); */
 
         Schema::create('fiscal.nature_operations', function (Blueprint $table) {
             $table->id()
@@ -137,9 +125,9 @@ return new class() extends Migration {
                 ->comment('Representa a data de exclusão lógica da série');
         });
 
-        Artisan::call('db:seed', [
+        /* Artisan::call('db:seed', [
             '--class' => 'Load_2025_04_20_00002_FiscalNatureOperationSeeder',
-        ]);
+        ]); */
 
         Schema::create('fiscal.batchs', function (Blueprint $table) {
             $table->id()
@@ -220,14 +208,10 @@ return new class() extends Migration {
                 ->onDelete('cascade')
                 ->comment('Representa o identificador da natureza de operação');
 
-            $table->foreignId('people_issuer_id')
-                ->constrained('people.peoples')
-                ->onDelete('cascade')
+            $table->unsignedBigInteger('people_issuer_id')
                 ->comment('Representa o identificador do emitente da nota fiscal');
 
-            $table->foreignId('people_recipient_id')
-                ->constrained('people.peoples')
-                ->onDelete('cascade')
+            $table->unsignedBigInteger('people_recipient_id')
                 ->comment('Representa o identificador do destinatário da nota fiscal');
 
             $table->string('type_environment')

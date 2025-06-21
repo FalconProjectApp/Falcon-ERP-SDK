@@ -14,8 +14,6 @@ return new class() extends Migration {
      */
     public function up()
     {
-        Schema::dropIfExists('people.settings');
-
         Schema::create('settings', function (Blueprint $table) {
             $table->id()
                 ->comment('Representa o identificador da configuração');

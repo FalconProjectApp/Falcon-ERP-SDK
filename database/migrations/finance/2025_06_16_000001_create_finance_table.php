@@ -135,7 +135,6 @@ return new class() extends Migration {
                 ->default('client');
 
             $table->enum('status', FinancialAccountEnum::statuses()->toArray())
-                ->after('people_id')
                 ->default(FinancialAccountEnum::STATUS_OPENED);
 
             $table->boolean('active')
@@ -180,6 +179,35 @@ return new class() extends Migration {
             $table->softDeletes();
         });
 
+        Schema::create('finance.payment_methods', function (Blueprint $table) {
+            $table->id()
+                ->comment('Representa o identificador do método de pagamento');
+
+            $table->string('description')
+                ->comment('Representa a descrição do método de pagamento');
+
+            $table->text('observations')
+                ->nullable()
+                ->comment('Representa as observações do método de pagamento');
+
+            $table->enum('method', PaymentEnum::methods()->toArray())
+                ->default(PaymentEnum::METHOD_A_VISTA)
+                ->comment('Representa o método de pagamento');
+
+            $table->enum('flag', PaymentEnum::flags()->toArray())
+                ->nullable()
+                ->comment('Representa a bandeira do método de pagamento (se houver)');
+
+            $table->enum('type', PaymentEnum::types()->toArray());
+
+            $table->enum('status', PaymentEnum::statuses()->toArray())
+                ->default(PaymentEnum::STATUS_ACTIVE)
+                ->comment('Representa o status do método de pagamento');
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
         Schema::create('finance.bills', function (Blueprint $table) {
             $table->id();
             $table->string('description')
@@ -187,10 +215,6 @@ return new class() extends Migration {
 
             $table->unsignedbiginteger('people_id')
                 ->comment('Pessoa da fatura');
-            $table->foreign('people_id')
-                ->references('id')
-                ->on('people.peoples')
-                ->onDelete('cascade');
 
             $table->unsignedbiginteger('financial_account_id')
                 ->nullable()
@@ -276,35 +300,6 @@ return new class() extends Migration {
             $table->timestamps();
             $table->softDeletes();
         });
-
-        Schema::create('finance.payment_methods', function (Blueprint $table) {
-            $table->id()
-                ->comment('Representa o identificador do método de pagamento');
-
-            $table->string('description')
-                ->comment('Representa a descrição do método de pagamento');
-
-            $table->text('observations')
-                ->nullable()
-                ->comment('Representa as observações do método de pagamento');
-
-            $table->enum('method', PaymentEnum::methods()->toArray())
-                ->default(PaymentEnum::METHOD_A_VISTA)
-                ->comment('Representa o método de pagamento');
-
-            $table->enum('flag', PaymentEnum::flags()->toArray())
-                ->nullable()
-                ->comment('Representa a bandeira do método de pagamento (se houver)');
-
-            $table->enum('type', PaymentEnum::types()->toArray());
-
-            $table->enum('status', PaymentEnum::statuses()->toArray())
-                ->default(PaymentEnum::STATUS_ACTIVE)
-                ->comment('Representa o status do método de pagamento');
-
-            $table->timestamps();
-            $table->softDeletes();
-        });
     }
 
     /**
@@ -314,9 +309,9 @@ return new class() extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('finance.payment_methods');
         Schema::dropIfExists('finance.bill_installments');
         Schema::dropIfExists('finance.bills');
+        Schema::dropIfExists('finance.payment_methods');
         Schema::dropIfExists('finance.financial_movements');
         Schema::dropIfExists('finance.releases_types');
         Schema::dropIfExists('finance.financial_accounts');
