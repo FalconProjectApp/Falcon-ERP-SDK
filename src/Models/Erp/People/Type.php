@@ -1,26 +1,34 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models\Erp\People;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use FalconERP\Skeleton\Database\Factories\People\TypeFactory;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class Type extends BaseModel implements AuditableContract
 {
+    use ActionTrait;
+    use Auditable;
     use HasFactory;
     use SetSchemaTrait;
-    use Auditable;
     use SoftDeletes;
-    use ActionTrait;
 
     protected $fillable = [
         'description',
     ];
+
+    protected static function newFactory()
+    {
+        return TypeFactory::new();
+    }
 
     /*
     |--------------------------------------------------------------------------

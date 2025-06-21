@@ -1,15 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 use FalconERP\Skeleton\Enums\RequestEnum;
+use FalconERP\Skeleton\Enums\Stock\Driver\DriverStatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class() extends Migration {
     /**
      * Run the migrations.
      *
@@ -228,6 +228,22 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
+        Schema::create('stock.loads', function (Blueprint $table) {
+            $table->id()
+                ->comment('Representa o identificador do carregamento');
+
+            $table->unsignedBigInteger('driver_id')
+                ->nullable()
+                ->comment('Representa o identificador do motorista responsável pelo carregamento');
+
+            $table->string('status')
+                ->default(DriverStatusEnum::PENDING)
+                ->comment('Representa o status do carregamento');
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
         Schema::create('stock.itens', function (Blueprint $table) {
             $table->id()
                 ->comment('Representa o identificador do item da requisição');
@@ -244,6 +260,14 @@ return new class extends Migration {
             $table->foreign('stock_id')
                 ->references('id')
                 ->on('stock.stocks')
+                ->onDelete('cascade');
+
+            $table->unsignedbiginteger('load_id')
+                ->nullable()
+                ->comment('Representa o carregamento do item da requisição');
+            $table->foreign('load_id')
+                ->references('id')
+                ->on('stock.loads')
                 ->onDelete('cascade');
 
             $table->integer('value')
@@ -274,5 +298,6 @@ return new class extends Migration {
         Schema::dropIfExists('stock.request_types');
         Schema::dropIfExists('stock.volume_types');
         Schema::dropIfExists('stock.groups');
+        Schema::dropIfExists('stock.loads');
     }
 };
