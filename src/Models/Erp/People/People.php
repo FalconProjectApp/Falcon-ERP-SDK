@@ -4,31 +4,32 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\People;
 
-use OwenIt\Auditing\Auditable;
-use FalconERP\Skeleton\Models\User;
+use FalconERP\Skeleton\Database\Factories\People\PersonFactory;
 use FalconERP\Skeleton\Enums\ArchiveEnum;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use FalconERP\Skeleton\Enums\People\PeopleCrtEnum;
-use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use FalconERP\Skeleton\Enums\People\PeopleDocumentEnum;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
-use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
-use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
-use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
 use FalconERP\Skeleton\Models\Erp\People\Traits\People\PeopleSegmentTrait;
+use FalconERP\Skeleton\Models\User;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ModelBasicsExtension\Observers\EventDispatcherObserver;
+use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
+use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -201,6 +202,11 @@ class People extends BaseModel implements AuditableContract
             ->when($this->filtered($params, 'type_ids'), function ($query, $params) {
                 $query->whereIn('types_id', $params);
             });
+    }
+
+    protected static function newFactory()
+    {
+        return PersonFactory::new();
     }
 
     /*

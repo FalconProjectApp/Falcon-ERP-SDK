@@ -43,8 +43,13 @@ class SkeletonProvider extends ServiceProvider
     public function boot(Router $router)
     {
         if (app()->environment(['falcon_testing'])) {
+            $this->loadMigrationsFrom(realpath(__DIR__.'/../../database/migrations/finance'));
+            $this->loadMigrationsFrom(realpath(__DIR__.'/../../database/migrations/fiscal'));
+            $this->loadMigrationsFrom(realpath(__DIR__.'/../../database/migrations/people'));
+            $this->loadMigrationsFrom(realpath(__DIR__.'/../../database/migrations/service'));
+            $this->loadMigrationsFrom(realpath(__DIR__.'/../../database/migrations/shop'));
             $this->loadMigrationsFrom(realpath(__DIR__.'/../../database/migrations/stock'));
-           // $this->loadFactoriesFrom(realpath(__DIR__.'/../../database/factories/stock'));
+            $this->loadMigrationsFrom(realpath(__DIR__.'/../../database/migrations'));
         }
 
         $this->publishes([
