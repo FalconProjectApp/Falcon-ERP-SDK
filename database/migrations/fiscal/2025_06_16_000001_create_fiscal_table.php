@@ -231,9 +231,7 @@ return new class() extends Migration {
                 ->onDelete('cascade')
                 ->comment('Representa o identificador da nota fiscal');
 
-            $table->foreignId('stock_id')
-                ->constrained('stock.stocks')
-                ->onDelete('cascade')
+            $table->unsignedBigInteger('stock_id')
                 ->comment('Representa o identificador do estoque');
 
             $table->integer('quantity')
@@ -259,9 +257,7 @@ return new class() extends Migration {
                 ->onDelete('cascade')
                 ->comment('Representa o identificador da nota fiscal');
 
-            $table->foreignId('payment_method_id')
-                ->constrained('finance.payment_methods')
-                ->onDelete('cascade')
+            $table->unsignedBigInteger('payment_method_id')
                 ->comment('Representa o identificador do método de pagamento');
 
             $table->integer('value')
