@@ -244,7 +244,7 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
-        Schema::create('stock.itens', function (Blueprint $table) {
+        Schema::create('stock.items', function (Blueprint $table) {
             $table->id()
                 ->comment('Representa o identificador do item da requisição');
 
@@ -293,7 +293,7 @@ return new class extends Migration {
         Schema::dropIfExists('stock.product_comments');
         Schema::dropIfExists('stock.product_segments');
         Schema::dropIfExists('stock.products');
-        Schema::dropIfExists('stock.itens');
+        Schema::dropIfExists('stock.items');
         Schema::dropIfExists('stock.requests');
         Schema::dropIfExists('stock.request_types');
         Schema::dropIfExists('stock.volume_types');
