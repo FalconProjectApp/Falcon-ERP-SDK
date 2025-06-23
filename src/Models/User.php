@@ -5,26 +5,27 @@ declare(strict_types = 1);
 namespace FalconERP\Skeleton\Models;
 
 use Carbon\Carbon;
-use FalconERP\Skeleton\Models\BackOffice\CreditCard;
-use FalconERP\Skeleton\Models\BackOffice\DataBase\Database;
-use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
-use FalconERP\Skeleton\Models\BackOffice\GiftCode;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\MustVerifyEmail;
-use Illuminate\Auth\Passwords\CanResetPassword;
-use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use FalconERP\Skeleton\Models\BackOffice\GiftCode;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\Access\Authorizable;
+use FalconERP\Skeleton\Models\BackOffice\CreditCard;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use FalconERP\Skeleton\Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use FalconERP\Skeleton\Models\BackOffice\DataBase\Database;
+use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
 /**
  * TODO: extender extends Authenticatable
@@ -69,6 +70,11 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    protected static function newFactory()
+    {
+        return UserFactory::new();
+    }
 
     /**
      * UserSessions function.

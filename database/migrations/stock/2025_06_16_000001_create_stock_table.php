@@ -244,6 +244,46 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
+        Schema::create('stock.shipment_routes', function (Blueprint $table) {
+            $table->id()
+                ->comment('Representa o identificador da rota do carregamento');
+
+            $table->unsignedBigInteger('shipment_id')
+                ->comment('Representa o identificador do carregamento');
+
+            $table->foreign('shipment_id')
+                ->references('id')
+                ->on('stock.shipments')
+                ->onDelete('cascade');
+
+            $table->geography('route')
+                ->comment('Representa a rota do carregamento, armazenada como um polígono geográfico');
+
+            $table->integer('priority')
+                ->default(0)
+                ->comment('Representa a prioridade da rota, onde 0 é a mais alta prioridade');
+
+            $table->dateTime('departured_at')
+                ->nullable()
+                ->comment('Representa a data e hora de partida do carregamento');
+            $table->dateTime('arrived_at')
+                ->nullable()
+                ->comment('Representa a data e hora de chegada do carregamento');
+            $table->dateTime('estimated_arrival_at')
+                ->nullable()
+                ->comment('Representa a data e hora estimada de chegada do carregamento');
+            $table->dateTime('estimated_departure_at')
+                ->nullable()
+                ->comment('Representa a data e hora estimada de partida do carregamento');
+
+            $table->string('status')
+                ->default(ShipmentStatusEnum::PENDING)
+                ->comment('Representa o status da rota do carregamento');
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
         Schema::create('stock.items', function (Blueprint $table) {
             $table->id()
                 ->comment('Representa o identificador do item da requisição');
@@ -298,6 +338,7 @@ return new class extends Migration {
         Schema::dropIfExists('stock.request_types');
         Schema::dropIfExists('stock.volume_types');
         Schema::dropIfExists('stock.groups');
+        Schema::dropIfExists('stock.shipment_routes');
         Schema::dropIfExists('stock.shipments');
     }
 };

@@ -4,30 +4,31 @@ declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use FalconERP\Skeleton\Database\Factories\ShipmentFactory;
-use FalconERP\Skeleton\Enums\ArchiveEnum;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use FalconERP\Skeleton\Enums\ArchiveEnum;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Models\Erp\People\People;
+use FalconERP\Skeleton\Models\Erp\Stock\Shipment;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
-use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use FalconERP\Skeleton\Database\Factories\ShipmentFactory;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
+use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
 
 #[ObservedBy([
     CacheObserver::class,
     NotificationObserver::class,
 ])]
-class Shipment extends BaseModel implements AuditableContract
+class ShipmentRoute extends BaseModel implements AuditableContract
 {
     use ActionTrait;
     use ArchiveModelTrait;
@@ -59,40 +60,9 @@ class Shipment extends BaseModel implements AuditableContract
     |
     */
 
-    public function driver(): BelongsTo
+    public function shipment(): BelongsTo
     {
-        return $this->belongsTo(People::class);
-    }
-
-    public function items(): HasMany
-    {
-        return $this->hasMany(Item::class);
-    }
-
-    public function shipmentRoutes(): HasMany
-    {
-        return $this->hasMany(ShipmentRoute::class);
-    }
-
-    public function followers(): MorphToMany
-    {
-        return $this
-            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')
-            ->withTimestamps()
-            ->withTrashed();
-    }
-
-    public function followings(): MorphToMany
-    {
-        return $this
-            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'follower_people_id', 'followable_id')
-            ->withTimestamps()
-            ->withTrashed();
-    }
-
-    public function segments(): HasMany
-    {
-        return $this->hasMany(ProductSegment::class);
+        return $this->belongsTo(Shipment::class);
     }
 
     /*
