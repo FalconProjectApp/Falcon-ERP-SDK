@@ -178,60 +178,60 @@ class Shop extends BaseModel implements AuditableContract
     protected function printerName(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->segments->where('name', 'printer_name')->first()?->value,
+            get: fn () => $this->segments()->where('name', 'printer_name')->first()?->value,
         );
     }
 
     protected function printerIp(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->segments->where('name', 'printer_ip')->first()?->value,
+            get: fn () => $this->segments()->where('name', 'printer_ip')->first()?->value,
         );
     }
 
     protected function printerPort(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->segments->where('name', 'printer_port')->first()?->value,
+            get: fn () => $this->segments()->where('name', 'printer_port')->first()?->value,
         );
     }
 
     protected function printerModel(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->segments->where('name', 'printer_model')->first()?->value,
+            get: fn () => $this->segments()->where('name', 'printer_model')->first()?->value,
         );
     }
 
     protected function mainColor(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->segments->where('name', 'main_color')->first()?->value,
+            get: fn () => $this->segments()->where('name', 'main_color')->first()?->value,
         );
     }
 
     protected function whatsappNumber(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->segments->where('name', 'whatsapp_number')->first()?->value,
+            get: fn () => $this->segments()->where('name', 'whatsapp_number')->first()?->value,
         );
     }
 
     protected function instagram(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->segments->where('name', 'instagram')->first()?->value,
+            get: fn () => $this->segments()->where('name', 'instagram')->first()?->value,
         );
     }
 
     protected function hasAutomaticallyFinish(): Attribute
     {
         return Attribute::make(
-            get: fn () => (bool) $this->segments->where('name', 'has_automatically_finish')->first()?->value,
+            get: fn () => (bool) $this->segments()->where('name', 'has_automatically_finish')->first()?->value,
         );
     }
 
-        /*
+    /*
     |--------------------------------------------------------------------------
     | Actions
     |--------------------------------------------------------------------------
