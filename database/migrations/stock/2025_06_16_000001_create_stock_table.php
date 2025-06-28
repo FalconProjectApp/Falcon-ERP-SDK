@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 use FalconERP\Skeleton\Enums\RequestEnum;
 use FalconERP\Skeleton\Enums\Stock\Shipment\ShipmentStatusEnum;
@@ -9,7 +9,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class() extends Migration {
     /**
      * Run the migrations.
      *
@@ -17,7 +17,12 @@ return new class extends Migration {
      */
     public function up()
     {
-        DB::statement('CREATE SCHEMA IF NOT EXISTS stock');
+        if (in_array(
+            config('database.connections.' . config('database.default') . '.driver'),
+            ['pgsql']
+        )) {
+            DB::statement('CREATE SCHEMA IF NOT EXISTS stock');
+        }
 
         Schema::create('stock.groups', function (Blueprint $table) {
             $table->id();
@@ -256,7 +261,7 @@ return new class extends Migration {
                 ->on('stock.shipments')
                 ->onDelete('cascade');
 
-            $table->geography('route')
+            $table->string('route')
                 ->comment('Representa a rota do carregamento, armazenada como um polígono geográfico');
 
             $table->integer('priority')

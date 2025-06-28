@@ -4,25 +4,25 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use OwenIt\Auditing\Auditable;
-use FalconERP\Skeleton\Enums\ArchiveEnum;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use FalconERP\Skeleton\Database\Factories\ProductFactory;
+use FalconERP\Skeleton\Enums\ArchiveEnum;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
-use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -75,11 +75,6 @@ class Product extends BaseModel implements AuditableContract
         self::ATTRIBUTE_PROVIDER_CODE   => 'string',
         self::ATTRIBUTE_OBSERVATIONS    => 'string',
     ];
-
-    protected static function newFactory()
-    {
-        return ProductFactory::new();
-    }
 
     /*
     |--------------------------------------------------------------------------
@@ -193,6 +188,11 @@ class Product extends BaseModel implements AuditableContract
             });
     }
 
+    protected static function newFactory()
+    {
+        return ProductFactory::new();
+    }
+
     /**
      * ProductImageUrl function.
      */
@@ -220,21 +220,25 @@ class Product extends BaseModel implements AuditableContract
     protected function unitDescription(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->segments->where('name', 'unit_description')->first()?->value,
+            get: fn () => $this->segments()->where('name', 'unit_description')->first()?->value,
         );
     }
 
     protected function balanceTransitTotal(): Attribute
     {
+        $this->loadMissing('stocks');
+
         return Attribute::make(
-            get: fn () => $this->stocks->sum('balance_transit'),
+            get: fn () => $this->stocks()->sum('balance_transit'),
         );
     }
 
     protected function balanceStockTotal(): Attribute
     {
+        $this->loadMissing('stocks');
+
         return Attribute::make(
-            get: fn (): int => $this->stocks->sum('balance_stock'),
+            get: fn (): int => $this->stocks()->sum('balance_stock'),
         );
     }
 
@@ -247,6 +251,8 @@ class Product extends BaseModel implements AuditableContract
 
     protected function valueTotal(): Attribute
     {
+        $this->loadMissing('stocks');
+
         return Attribute::make(
             get: fn (): int => $this->stocks->sum('value_total'),
         );

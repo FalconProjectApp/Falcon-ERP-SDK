@@ -175,6 +175,9 @@ class Stock extends BaseModel implements AuditableContract
         );
     }
 
+    /**
+     * value_total.
+     */
     protected function valueTotal(): Attribute
     {
         return Attribute::make(
