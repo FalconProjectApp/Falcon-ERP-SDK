@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Database\Seeders;
+namespace FalconERP\Skeleton\Database\Seeders;
 
 use Database\Seeders\Starter\Stock\RequestTypeSeeder;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;

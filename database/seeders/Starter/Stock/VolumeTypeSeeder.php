@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Database\Seeders\Starter\Stock;
+namespace FalconERP\Skeleton\Database\Seeders\Starter\Stock;
 
 use FalconERP\Skeleton\Models\Erp\Stock\VolumeType;
 use Illuminate\Database\Seeder;
