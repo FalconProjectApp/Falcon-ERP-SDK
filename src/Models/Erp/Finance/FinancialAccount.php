@@ -1,26 +1,29 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
-use OwenIt\Auditing\Auditable;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use FalconERP\Skeleton\Enums\Finance\FinancialAccountEnum;
 use FalconERP\Skeleton\Enums\FinancialAccountsTypeEnum;
+use FalconERP\Skeleton\Models\Erp\People\People;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class FinancialAccount extends BaseModel implements AuditableContract
 {
     use ActionTrait;
-    use HasFactory;
-    use SoftDeletes;
-    use SetSchemaTrait;
     use Auditable;
+    use HasFactory;
+    use SetSchemaTrait;
+    use SoftDeletes;
 
     protected $fillable = [
         'description',
@@ -31,7 +34,9 @@ class FinancialAccount extends BaseModel implements AuditableContract
     ];
 
     protected $attributes = [
-        'type' => FinancialAccountsTypeEnum::CLIENT_TYPE,
+        'type'   => FinancialAccountsTypeEnum::CLIENT_TYPE,
+        'status' => FinancialAccountEnum::STATUS_OPENED,
+        'active' => true,
     ];
 
     public function people(): BelongsTo
@@ -42,6 +47,11 @@ class FinancialAccount extends BaseModel implements AuditableContract
     public function financialMovement(): HasMany
     {
         return $this->hasMany(FinancialMovement::class, 'financial_accounts_id');
+    }
+
+    public function scopeByPeopleIds($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'people_ids'), fn ($query, $params) => $query->whereIn('people_id', $params));
     }
 
     /*
