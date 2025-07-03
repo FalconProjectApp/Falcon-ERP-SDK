@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use FalconERP\Skeleton\Enums\RequestEnum;
 use FalconERP\Skeleton\Enums\Stock\Shipment\ShipmentStatusEnum;
@@ -9,7 +9,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class() extends Migration {
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -18,7 +18,7 @@ return new class() extends Migration {
     public function up()
     {
         if (in_array(
-            config('database.connections.' . config('database.default') . '.driver'),
+            config('database.connections.'.config('database.default').'.driver'),
             ['pgsql']
         )) {
             DB::statement('CREATE SCHEMA IF NOT EXISTS stock');
@@ -26,15 +26,32 @@ return new class() extends Migration {
 
         Schema::create('stock.groups', function (Blueprint $table) {
             $table->id();
-            $table->string('description');
+            $table->string('description')
+                ->comment('Representa a descrição do grupo de produtos, por exemplo, Eletrônicos, Roupas, etc.');
+
+            $table->unsignedBigInteger('parent_id')
+                ->nullable()
+                ->comment('Representa o grupo pai, caso este grupo seja um subgrupo');
+            $table->foreign('parent_id')
+                ->references('id')
+                ->on('stock.groups')
+                ->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
         });
 
         Schema::create('stock.volume_types', function (Blueprint $table) {
-            $table->id();
-            $table->string('description');
-            $table->string('initials');
+            $table->id()
+                ->comment('Representa o identificador do tipo de volume');
+            $table->string('description')
+                ->comment('Representa a descrição do tipo de volume, por exemplo, Unidade, Caixa com 12 unidades, etc.');
+            $table->string('initials')
+                ->comment('Representa as iniciais do tipo de volume, por exemplo, unidade, caixac12, etc.')
+                ->unique()
+                ->index();
+            $table->integer('multiple')
+                ->default(1)
+                ->comment('Representa o múltiplo do volume, por exemplo, 1 para unidade, 12 para caixa com 12 unidades');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -47,13 +64,6 @@ return new class() extends Migration {
             $table->foreign('group_id')
                 ->references('id')
                 ->on('stock.groups')
-                ->onDelete('cascade');
-
-            // Unidade, caixac12
-            $table->unsignedbiginteger('volume_type_id');
-            $table->foreign('volume_type_id')
-                ->references('id')
-                ->on('stock.volume_types')
                 ->onDelete('cascade');
 
             $table->boolean('status')
@@ -137,10 +147,18 @@ return new class() extends Migration {
                 ->comment('Representa a descrição do estoque')
                 ->nullable();
 
-            $table->unsignedbiginteger('product_id');
+            $table->unsignedbiginteger('product_id')
+                ->comment('Representa o produto associado ao estoque');
             $table->foreign('product_id')
                 ->references('id')
                 ->on('stock.products')
+                ->onDelete('cascade');
+
+            $table->unsignedbiginteger('volume_type_id')
+                ->comment('Representa o tipo de volume do estoque, por exemplo, Unidade, Caixa com 12 unidades, etc.');
+            $table->foreign('volume_type_id')
+                ->references('id')
+                ->on('stock.volume_types')
                 ->onDelete('cascade');
 
             $table->string('color')
@@ -148,20 +166,27 @@ return new class() extends Migration {
             $table->boolean('on_shop')
                 ->default(0);
             $table->string('measure')
-                ->nullable();
+                ->nullable()
+                ->comment('Representa a medida do estoque, por exemplo, kg, m³, etc.');
             $table->string('weight')
-                ->nullable();
+                ->nullable()
+                ->comment('Representa o peso do estoque, por exemplo, 1.5 kg, 2.0 m³, etc.');
             $table->string('height')
-                ->nullable();
+                ->nullable()
+                ->comment('Representa a altura do estoque, por exemplo, 1.5 m, 2.0 m³, etc.');
             $table->string('width')
-                ->nullable();
+                ->nullable()
+                ->comment('Representa a largura do estoque, por exemplo, 1.5 m, 2.0 m³, etc.');
             $table->string('depth')
-                ->nullable();
+                ->nullable()
+                ->comment('Representa a profundidade do estoque, por exemplo, 1.5 m, 2.0 m³, etc.');
 
             $table->integer('balance_transit')
-                ->default(0);
+                ->default(0)
+                ->comment('Representa a quantidade de itens em trânsito no estoque, ou seja, que estão sendo movimentados mas ainda não foram recebidos ou entregues');
             $table->integer('balance_stock')
-                ->default(0);
+                ->default(0)
+                ->comment('Representa a quantidade de itens disponíveis no estoque, ou seja, que estão prontos para venda ou uso');
             $table->string('value')
                 ->default(0);
             $table->text('observations')
@@ -171,6 +196,27 @@ return new class() extends Migration {
 
             $table->timestamps();
             $table->softDeletes();
+        });
+
+        Schema::create('stock.stock_segments', function (Blueprint $table) {
+            $table->id()
+                ->comment('Representa o identificador do segmento');
+
+            $table->foreignId('stock_id');
+            $table->foreign('stock_id')
+                ->references('id')
+                ->on('stock.stocks')
+                ->onDelete('cascade')
+                ->comment('Representa o identificador do estoque');
+
+            $table->string('name')
+                ->comment('Representa o nome do segmento');
+            $table->string('value')
+                ->comment('Representa o valor do segmento');
+
+            $table->timestamps();
+            $table->softDeletes()
+                ->comment('Representa a data de exclusão lógica do segmento');
         });
 
         Schema::create('stock.request_types', function (Blueprint $table) {
@@ -334,6 +380,7 @@ return new class() extends Migration {
      */
     public function down()
     {
+        Schema::dropIfExists('stock.stock_segments');
         Schema::dropIfExists('stock.stocks');
         Schema::dropIfExists('stock.product_comments');
         Schema::dropIfExists('stock.product_segments');

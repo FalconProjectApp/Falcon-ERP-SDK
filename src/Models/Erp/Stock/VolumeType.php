@@ -1,38 +1,44 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use OwenIt\Auditing\Auditable;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use FalconERP\Skeleton\Database\Factories\VolumeTypeFactory;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use FalconERP\Skeleton\Database\Factories\VolumeTypeFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class VolumeType extends BaseModel implements AuditableContract
 {
-    use HasFactory;
-    use SoftDeletes;
-    use SetSchemaTrait;
     use ActionTrait;
     use Auditable;
+    use HasFactory;
+    use SetSchemaTrait;
+    use SoftDeletes;
 
     public const ATTRIBUTE_DESCRIPTION = 'description';
     public const ATTRIBUTE_INITIALS    = 'initials';
+    public const ATTRIBUTE_MULTIPLE    = 'multiple';
 
     protected $fillable = [
         self::ATTRIBUTE_DESCRIPTION,
         self::ATTRIBUTE_INITIALS,
+        self::ATTRIBUTE_MULTIPLE,
     ];
 
-    protected static function newFactory()
-    {
-        return VolumeTypeFactory::new();
-    }
+    protected $casts = [
+        self::ATTRIBUTE_DESCRIPTION => 'string',
+        self::ATTRIBUTE_INITIALS    => 'string',
+        self::ATTRIBUTE_MULTIPLE    => 'integer',
+    ];
 
     /*
     |--------------------------------------------------------------------------
@@ -42,6 +48,11 @@ class VolumeType extends BaseModel implements AuditableContract
     | Here you may specify the relationships that the model should have with
     |
     */
+
+    public function stocks(): HasMany
+    {
+        return $this->hasMany(Stock::class);
+    }
 
     public function followers(): MorphToMany
     {
@@ -57,6 +68,16 @@ class VolumeType extends BaseModel implements AuditableContract
             ->morphToMany(static::class, 'followable', PeopleFollow::class, 'follower_people_id', 'followable_id')
             ->withTimestamps()
             ->withTrashed();
+    }
+
+    public function canView(): bool
+    {
+        return true;
+    }
+
+    protected static function newFactory()
+    {
+        return VolumeTypeFactory::new();
     }
 
     /*
@@ -95,11 +116,6 @@ class VolumeType extends BaseModel implements AuditableContract
             'can_follow'   => $this->canFollow(),
             'can_unfollow' => $this->canUnfollow(),
         ];
-    }
-
-    public function canView(): bool
-    {
-        return true;
     }
 
     private function canRestore(): bool

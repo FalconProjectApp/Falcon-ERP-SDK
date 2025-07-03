@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -37,6 +38,7 @@ class Stock extends BaseModel implements AuditableContract
 
     public const ATTRIBUTE_ID              = 'id';
     public const ATTRIBUTE_PRODUCT_ID      = 'product_id';
+    public const ATTRIBUTE_VOLUME_TYPE_ID  = 'volume_type_id';
     public const ATTRIBUTE_DESCRIPTION     = 'description';
     public const ATTRIBUTE_BALANCE_TRANSIT = 'balance_transit';
     public const ATTRIBUTE_BALANCE_STOCK   = 'balance_stock';
@@ -54,6 +56,7 @@ class Stock extends BaseModel implements AuditableContract
     protected $fillable = [
         self::ATTRIBUTE_ID,
         self::ATTRIBUTE_PRODUCT_ID,
+        self::ATTRIBUTE_VOLUME_TYPE_ID,
         self::ATTRIBUTE_DESCRIPTION,
         self::ATTRIBUTE_BALANCE_TRANSIT,
         self::ATTRIBUTE_BALANCE_STOCK,
@@ -70,7 +73,9 @@ class Stock extends BaseModel implements AuditableContract
     ];
 
     protected $casts = [
-        self::ATTRIBUTE_VALUE => 'integer',
+        self::ATTRIBUTE_PRODUCT_ID     => 'integer',
+        self::ATTRIBUTE_VOLUME_TYPE_ID => 'integer',
+        self::ATTRIBUTE_VALUE          => 'integer',
     ];
 
     /*
@@ -82,9 +87,14 @@ class Stock extends BaseModel implements AuditableContract
     |
     */
 
-    public function product()
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'product_id')->withTrashed();
+    }
+
+    public function volumeType(): BelongsTo
+    {
+        return $this->belongsTo(VolumeType::class, self::ATTRIBUTE_VOLUME_TYPE_ID)->withTrashed();
     }
 
     /**
@@ -137,6 +147,14 @@ class Stock extends BaseModel implements AuditableContract
         return $query
             ->when($this->filtered($params, 'product_ids'), function ($query, $params) {
                 $query->whereIn(self::ATTRIBUTE_PRODUCT_ID, $params);
+            });
+    }
+
+    public function scopeByVolumeTypeIds(Builder $query, string | array $params = []): Builder
+    {
+        return $query
+            ->when($this->filtered($params, 'volume_type_ids'), function ($query, $params) {
+                $query->whereIn(self::ATTRIBUTE_VOLUME_TYPE_ID, $params);
             });
     }
 

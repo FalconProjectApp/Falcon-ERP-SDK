@@ -39,7 +39,6 @@ class Product extends BaseModel implements AuditableContract
 
     public const ATTRIBUTE_ID              = 'id';
     public const ATTRIBUTE_GROUPS_ID       = 'group_id';
-    public const ATTRIBUTE_VOLUME_TYPES_ID = 'volume_types_id';
     public const ATTRIBUTE_STATUS          = 'status';
     public const ATTRIBUTE_DESCRIPTION     = 'description';
     public const ATTRIBUTE_BAR_CODE        = 'bar_code';
@@ -51,7 +50,6 @@ class Product extends BaseModel implements AuditableContract
 
     protected $fillable = [
         self::ATTRIBUTE_GROUPS_ID,
-        self::ATTRIBUTE_VOLUME_TYPES_ID,
         self::ATTRIBUTE_STATUS,
         self::ATTRIBUTE_DESCRIPTION,
         self::ATTRIBUTE_BAR_CODE,
@@ -65,7 +63,6 @@ class Product extends BaseModel implements AuditableContract
     protected $casts = [
         self::ATTRIBUTE_ID              => 'integer',
         self::ATTRIBUTE_GROUPS_ID       => 'integer',
-        self::ATTRIBUTE_VOLUME_TYPES_ID => 'integer',
         self::ATTRIBUTE_STATUS          => 'string',
         self::ATTRIBUTE_DESCRIPTION     => 'string',
         self::ATTRIBUTE_BAR_CODE        => 'string',
@@ -93,11 +90,6 @@ class Product extends BaseModel implements AuditableContract
     public function productComments(): HasMany
     {
         return $this->hasMany(ProductComment::class);
-    }
-
-    public function volumeType(): BelongsTo
-    {
-        return $this->belongsTo(VolumeType::class, self::ATTRIBUTE_VOLUME_TYPES_ID)->withTrashed();
     }
 
     public function group(): BelongsTo
@@ -169,14 +161,6 @@ class Product extends BaseModel implements AuditableContract
         return $query
             ->when($this->filtered($params, 'group_ids'), function ($query, $params) {
                 $query->whereIn(self::ATTRIBUTE_GROUPS_ID, $params);
-            });
-    }
-
-    public function scopeByVolumeTypeIds(Builder $query, string | array $params = []): Builder
-    {
-        return $query
-            ->when($this->filtered($params, 'volume_type_ids'), function ($query, $params) {
-                $query->whereIn(self::ATTRIBUTE_VOLUME_TYPES_ID, $params);
             });
     }
 
