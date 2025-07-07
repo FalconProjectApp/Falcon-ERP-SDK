@@ -73,11 +73,6 @@ return new class extends Migration {
             $table->string('ncm')
                 ->nullable()
                 ->comment('Representa o código NCM do produto');
-
-            $table->string('bar_code')
-                ->nullable();
-            $table->string('provider_code')
-                ->nullable();
             $table->text('observations')
                 ->nullable();
             $table->integer('last_buy_value')
