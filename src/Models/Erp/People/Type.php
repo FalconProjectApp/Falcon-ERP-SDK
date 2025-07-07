@@ -6,6 +6,7 @@ namespace FalconERP\Skeleton\Models\Erp\People;
 
 use OwenIt\Auditing\Auditable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Enums\People\Type\TypesEnum;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use FalconERP\Skeleton\Database\Factories\People\TypeFactory;
@@ -23,6 +24,13 @@ class Type extends BaseModel implements AuditableContract
 
     protected $fillable = [
         'description',
+        'type'
+    ];
+
+    protected $casts = [
+        'id'          => 'integer',
+        'description' => 'string',
+        'type'        => TypesEnum::class,
     ];
 
     protected static function newFactory()

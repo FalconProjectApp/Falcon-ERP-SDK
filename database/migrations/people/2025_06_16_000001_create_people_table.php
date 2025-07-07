@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use FalconERP\Skeleton\Enums\People\EmailEnum;
+use FalconERP\Skeleton\Enums\People\Type\TypesEnum;
 use FalconERP\Skeleton\Enums\People\PeopleContactEnum;
 use FalconERP\Skeleton\Enums\People\PeopleDocumentEnum;
 
@@ -23,6 +24,9 @@ return new class() extends Migration {
         Schema::create('people.types', function (Blueprint $table) {
             $table->id();
             $table->string('description');
+            $table->enum('type', TypesEnum::cases())
+                ->default(TypesEnum::TYPE_INDIVIDUAL)
+                ->comment('Define se o tipo é pessoa física ou jurídica');
             $table->timestamps();
             $table->softDeletes();
         });
