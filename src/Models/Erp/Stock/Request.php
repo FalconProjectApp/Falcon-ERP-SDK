@@ -248,6 +248,10 @@ class Request extends BaseModel implements AuditableContract
 
     private function canIssueNfce(): bool
     {
+        $this->loadMissing(
+            'requestType',
+        );
+
         return $this->is_nfce
             && !null === $this->tag_emit->crt
             && !null === $this->tag_emit->ie

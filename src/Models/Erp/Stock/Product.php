@@ -189,6 +189,8 @@ class Product extends BaseModel implements AuditableContract
 
     protected function ncm(): Attribute
     {
+        $this->loadMissing('segments');
+
         return Attribute::make(
             get: fn () => $this->segments->where('name', 'ncm')->first()?->value,
         );
@@ -196,6 +198,8 @@ class Product extends BaseModel implements AuditableContract
 
     protected function unitAbbreviation(): Attribute
     {
+        $this->loadMissing('segments');
+
         return Attribute::make(
             get: fn () => $this->segments->where('name', 'unit_abbreviation')->first()?->value,
         );
@@ -203,6 +207,8 @@ class Product extends BaseModel implements AuditableContract
 
     protected function unitDescription(): Attribute
     {
+        $this->loadMissing('segments');
+
         return Attribute::make(
             get: fn () => $this->segments()->where('name', 'unit_description')->first()?->value,
         );

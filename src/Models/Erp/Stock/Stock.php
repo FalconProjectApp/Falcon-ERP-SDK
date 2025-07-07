@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
@@ -8,12 +8,14 @@ use FalconERP\Skeleton\Database\Factories\StockFactory;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use FalconERP\Skeleton\Models\Erp\Shop\Shop;
 use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\StockSegmentTrait;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
@@ -35,6 +37,7 @@ class Stock extends BaseModel implements AuditableContract
     use HasFactory;
     use SetSchemaTrait;
     use SoftDeletes;
+    use StockSegmentTrait;
 
     public const ATTRIBUTE_ID              = 'id';
     public const ATTRIBUTE_PRODUCT_ID      = 'product_id';
@@ -125,6 +128,11 @@ class Stock extends BaseModel implements AuditableContract
             ->withTrashed();
     }
 
+    public function segments(): HasMany
+    {
+        return $this->hasMany(StockSegment::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Scopes
@@ -134,7 +142,7 @@ class Stock extends BaseModel implements AuditableContract
     |
     */
 
-    public function scopeByStockIds(Builder $query, string | array $params = []): Builder
+    public function scopeByStockIds(Builder $query, string|array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'stock_ids'), function ($query, $params) {
@@ -142,7 +150,7 @@ class Stock extends BaseModel implements AuditableContract
             });
     }
 
-    public function scopeByProductIds(Builder $query, string | array $params = []): Builder
+    public function scopeByProductIds(Builder $query, string|array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'product_ids'), function ($query, $params) {
@@ -150,7 +158,7 @@ class Stock extends BaseModel implements AuditableContract
             });
     }
 
-    public function scopeByVolumeTypeIds(Builder $query, string | array $params = []): Builder
+    public function scopeByVolumeTypeIds(Builder $query, string|array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'volume_type_ids'), function ($query, $params) {
@@ -158,7 +166,7 @@ class Stock extends BaseModel implements AuditableContract
             });
     }
 
-    public function scopeByShopIds(Builder $query, string | array $params = []): Builder
+    public function scopeByShopIds(Builder $query, string|array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'shop_ids'), function ($query, $params) {
