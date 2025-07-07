@@ -46,11 +46,9 @@ class Product extends BaseModel implements AuditableContract
         self::ATTRIBUTE_STATUS,
         self::ATTRIBUTE_DESCRIPTION,
         self::ATTRIBUTE_EAN,
-        self::ATTRIBUTE_BAR_CODE,
         self::ATTRIBUTE_LAST_BUY_VALUE,
         self::ATTRIBUTE_LAST_SELL_VALUE,
         self::ATTRIBUTE_LAST_RENT_VALUE,
-        self::ATTRIBUTE_PROVIDER_CODE,
         self::ATTRIBUTE_OBSERVATIONS,
     ];
 
@@ -60,11 +58,9 @@ class Product extends BaseModel implements AuditableContract
         self::ATTRIBUTE_STATUS          => 'string',
         self::ATTRIBUTE_DESCRIPTION     => 'string',
         self::ATTRIBUTE_EAN             => 'string',
-        self::ATTRIBUTE_BAR_CODE        => 'string',
         self::ATTRIBUTE_LAST_BUY_VALUE  => 'integer',
         self::ATTRIBUTE_LAST_SELL_VALUE => 'integer',
         self::ATTRIBUTE_LAST_RENT_VALUE => 'integer',
-        self::ATTRIBUTE_PROVIDER_CODE   => 'string',
         self::ATTRIBUTE_OBSERVATIONS    => 'string',
     ];
 
