@@ -1,12 +1,14 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
 use FalconERP\Skeleton\Database\Factories\ProductFactory;
 use FalconERP\Skeleton\Enums\ArchiveEnum;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\ProductCollunsTrait;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\ProductSegmentTrait;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -36,22 +38,14 @@ class Product extends BaseModel implements AuditableContract
     use HasFactory;
     use SetSchemaTrait;
     use SoftDeletes;
-
-    public const ATTRIBUTE_ID              = 'id';
-    public const ATTRIBUTE_GROUPS_ID       = 'group_id';
-    public const ATTRIBUTE_STATUS          = 'status';
-    public const ATTRIBUTE_DESCRIPTION     = 'description';
-    public const ATTRIBUTE_BAR_CODE        = 'bar_code';
-    public const ATTRIBUTE_LAST_BUY_VALUE  = 'last_buy_value';
-    public const ATTRIBUTE_LAST_SELL_VALUE = 'last_sell_value';
-    public const ATTRIBUTE_LAST_RENT_VALUE = 'last_rent_value';
-    public const ATTRIBUTE_PROVIDER_CODE   = 'provider_code';
-    public const ATTRIBUTE_OBSERVATIONS    = 'observations';
+    use ProductSegmentTrait;
+    use ProductCollunsTrait;
 
     protected $fillable = [
         self::ATTRIBUTE_GROUPS_ID,
         self::ATTRIBUTE_STATUS,
         self::ATTRIBUTE_DESCRIPTION,
+        self::ATTRIBUTE_EAN,
         self::ATTRIBUTE_BAR_CODE,
         self::ATTRIBUTE_LAST_BUY_VALUE,
         self::ATTRIBUTE_LAST_SELL_VALUE,
@@ -65,6 +59,7 @@ class Product extends BaseModel implements AuditableContract
         self::ATTRIBUTE_GROUPS_ID       => 'integer',
         self::ATTRIBUTE_STATUS          => 'string',
         self::ATTRIBUTE_DESCRIPTION     => 'string',
+        self::ATTRIBUTE_EAN             => 'string',
         self::ATTRIBUTE_BAR_CODE        => 'string',
         self::ATTRIBUTE_LAST_BUY_VALUE  => 'integer',
         self::ATTRIBUTE_LAST_SELL_VALUE => 'integer',
@@ -156,7 +151,7 @@ class Product extends BaseModel implements AuditableContract
     |
     */
 
-    public function scopeByGroupIds(Builder $query, string | array $params = []): Builder
+    public function scopeByGroupIds(Builder $query, string|array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'group_ids'), function ($query, $params) {
@@ -164,7 +159,7 @@ class Product extends BaseModel implements AuditableContract
             });
     }
 
-    public function scopeByIds(Builder $query, string | array $params = []): Builder
+    public function scopeByIds(Builder $query, string|array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'ids'), function ($query, $params) {
@@ -184,33 +179,6 @@ class Product extends BaseModel implements AuditableContract
     {
         return new Attribute(
             get: fn () => $this->lastArchiveByName(ArchiveEnum::NAME_PRODUCT_IMAGE)->url ?? null,
-        );
-    }
-
-    protected function ncm(): Attribute
-    {
-        $this->loadMissing('segments');
-
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'ncm')->first()?->value,
-        );
-    }
-
-    protected function unitAbbreviation(): Attribute
-    {
-        $this->loadMissing('segments');
-
-        return Attribute::make(
-            get: fn () => $this->segments->where('name', 'unit_abbreviation')->first()?->value,
-        );
-    }
-
-    protected function unitDescription(): Attribute
-    {
-        $this->loadMissing('segments');
-
-        return Attribute::make(
-            get: fn () => $this->segments()->where('name', 'unit_description')->first()?->value,
         );
     }
 

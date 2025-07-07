@@ -18,6 +18,7 @@ class ProductSegment extends BaseModel
         'people_id',
         'name',
         'value',
+        'ean',
         'ncm',
         'unit_abbreviation',
         'unit_description',
