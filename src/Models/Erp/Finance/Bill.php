@@ -137,12 +137,12 @@ class Bill extends BaseModel implements AuditableContract
         );
     }
 
-    public function scopeByPeople($query, array $params = [])
+    public function scopeByPeopleIds($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'people_ids'), fn ($query, $params) => $query->whereIn('people_id', $params));
     }
 
-    public function scopeByFinancialAccount($query, array $params = [])
+    public function scopeByFinancialAccountIds($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'financial_account_ids'), fn ($query, $params) => $query->whereIn('financial_account_id', $params));
     }
