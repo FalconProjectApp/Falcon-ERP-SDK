@@ -120,7 +120,7 @@ class BillInstallment extends BaseModel implements AuditableContract
         );
     }
 
-    protected function scopeByBillsIds(Builder $query, array $bills = []): Builder
+    protected function scopeByBillIds(Builder $query, array $bills = []): Builder
     {
         return $query->when(
             $this->filtered($bills, 'bill_ids'),
