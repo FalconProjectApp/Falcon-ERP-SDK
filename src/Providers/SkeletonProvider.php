@@ -16,7 +16,11 @@ class SkeletonProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->register(AuthServiceProvider::class);
+        /**
+         * TODO: Ele esta sendo executado antes de tudo, e acaba dando erro, pois o sanctum nao foi iniciado
+         * precisa ver uma forma de registrar o AuthServiceProvider depois que o Sanctum for iniciado
+         */
+        //app()->register(AuthServiceProvider::class);
 
         /* Factory::guessFactoryNamesUsing(function (string $modelName) {
             return '\\JobMetric\\Setting\\Factories\\'.class_basename($modelName).'Factory';
