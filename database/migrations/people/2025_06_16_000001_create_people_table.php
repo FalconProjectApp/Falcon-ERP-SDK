@@ -25,7 +25,7 @@ return new class() extends Migration {
             $table->id();
             $table->string('description');
             $table->enum('type', TypesEnum::cases())
-                ->default(TypesEnum::TYPE_INDIVIDUAL)
+                ->default(TypesEnum::TYPE_INDIVIDUAL->value)
                 ->comment('Define se o tipo é pessoa física ou jurídica');
             $table->timestamps();
             $table->softDeletes();

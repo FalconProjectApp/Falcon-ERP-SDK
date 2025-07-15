@@ -2,9 +2,10 @@
 
 namespace FalconERP\Skeleton\Providers;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use FalconERP\Skeleton\Providers\AuthServiceProvider;
 
 class SkeletonProvider extends ServiceProvider
 {
@@ -15,6 +16,8 @@ class SkeletonProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->register(AuthServiceProvider::class);
+
         /* Factory::guessFactoryNamesUsing(function (string $modelName) {
             return '\\JobMetric\\Setting\\Factories\\'.class_basename($modelName).'Factory';
         }); */
