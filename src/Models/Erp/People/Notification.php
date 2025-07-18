@@ -48,7 +48,7 @@ class Notification extends BaseModel
     protected function content(): Attribute
     {
         return new Attribute(
-            get: fn () => json_decode($this->content),
+            get: fn ($value) => json_decode($value, true),
             set: fn ($value) => json_encode($value),
         );
     }
