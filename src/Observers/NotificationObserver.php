@@ -43,12 +43,13 @@ class NotificationObserver
 
         $model->followers()->chunk(20, function ($followers) use ($model, $event, $titles, $contents) {
             foreach ($followers as $follower) {
+
                 if ($follower->id === people()->id) {
                     continue;
                 }
 
                 Notification::create([
-                    'responsible_people_id' => people()->id,
+                    'responsible_people_id' => $follower->id,
                     'notifiable_type'       => $model->getTable() . "_{$event}",
                     'notifiable_id'         => $follower->id,
                     'title'                 => $titles[$event] ?? 'Notificação',
