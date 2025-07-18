@@ -4,6 +4,7 @@ namespace FalconERP\Skeleton\Models\Erp\People;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
@@ -18,6 +19,8 @@ class Notification extends BaseModel
     protected $fillable = [
         'title',
         'content',
+        'notifiable_type',
+        'notifiable_id',
         'responsible_people_id',
     ];
 
