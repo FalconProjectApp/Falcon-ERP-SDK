@@ -27,7 +27,7 @@ class IpRepository
     {
         $this->urlApi = sprintf(
             '%s/private/v1/ip',
-            config('services.falcon.big_data.url_api')
+            config('falconservices.big_data.'.config('app.env').'.url_api')
         );
 
         $this->authorization = $auth->data->access_token;

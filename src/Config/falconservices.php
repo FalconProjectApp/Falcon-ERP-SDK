@@ -14,6 +14,14 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
+    'auth' => [
+        'production' => [
+            'url_api' => env('FALCON_AUTH_URL', 'https://nve3lgblkk.execute-api.us-east-1.amazonaws.com'),
+        ],
+        'local' => [
+            'url_api' => env('FALCON_AUTH_URL', 'http://localhost:8000'),
+        ],
+    ],
     'big_data' => [
         'production' => [
             'url_api' => env('FALCON_BIGDATA_URL', 'https://dmy48yjy7i.execute-api.us-east-1.amazonaws.com'),
