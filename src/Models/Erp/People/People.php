@@ -26,7 +26,7 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ModelBasicsExtension\Observers\EventDispatcherObserver;
-use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
+use FalconERP\Skeleton\Observers\NotificationObserver;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;

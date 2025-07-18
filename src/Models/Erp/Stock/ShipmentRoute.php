@@ -22,7 +22,7 @@ use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
-use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
+use FalconERP\Skeleton\Observers\NotificationObserver;
 
 #[ObservedBy([
     CacheObserver::class,
