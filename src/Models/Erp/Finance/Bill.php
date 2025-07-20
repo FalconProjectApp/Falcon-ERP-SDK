@@ -1,22 +1,27 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
 use FalconERP\Skeleton\Events\InstallmentCheck;
 use FalconERP\Skeleton\Models\Erp\People\People;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ModelBasicsExtension\Observers\EventDispatcherObserver;
-use FalconERP\Skeleton\Observers\NotificationObserver;
+use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
@@ -28,10 +33,10 @@ use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 class Bill extends BaseModel implements AuditableContract
 {
     use ActionTrait;
-    use HasFactory;
-    use SoftDeletes;
-    use SetSchemaTrait;
     use Auditable;
+    use HasFactory;
+    use SetSchemaTrait;
+    use SoftDeletes;
 
     public $events = [
         InstallmentCheck::class,
@@ -61,6 +66,24 @@ class Bill extends BaseModel implements AuditableContract
         'installment_total',
     ];
 
+    public static function booting(): void
+    {
+        static::addGlobalScope('withRelations', function ($query) {
+            $query->with([
+                'billInstallments',
+            ]);
+        });
+    }
+
+    public static function boot(): void
+    {
+        parent::boot();
+
+        static::deleting(function ($bill) {
+            $bill->billInstallments()->delete();
+        });
+    }
+
     public function people(): BelongsTo
     {
         return $this->belongsTo(People::class);
@@ -79,6 +102,58 @@ class Bill extends BaseModel implements AuditableContract
     public function paymentMethod(): HasOne
     {
         return $this->hasOne(PaymentMethod::class);
+    }
+
+    public function followers(): MorphToMany
+    {
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')
+            ->withTimestamps()
+            ->withTrashed();
+    }
+
+    public function followings(): MorphToMany
+    {
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'follower_people_id', 'followable_id')
+            ->withTimestamps()
+            ->withTrashed();
+    }
+
+    #[Scope]
+    public function byPeopleIds($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'people_ids'), fn ($query, $params) => $query->whereIn('people_id', $params));
+    }
+
+    #[Scope]
+    public function byFinancialAccountIds($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'financial_account_ids'), fn ($query, $params) => $query->whereIn('financial_account_id', $params));
+    }
+
+    #[Scope]
+    public function byType($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'type'), fn ($query, $params) => $query->whereIn('type', $params));
+    }
+
+    #[Scope]
+    public function byRepetition($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'repetition'), fn ($query, $params) => $query->whereIn('repetition', $params));
+    }
+
+    #[Scope]
+    public function byPeriodicity($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'periodicity'), fn ($query, $params) => $query->whereIn('periodicity', $params));
+    }
+
+    #[Scope]
+    public function byStatus($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'status'), fn ($query, $params) => $query->whereIn('status', $params));
     }
 
     protected function isInstallment(): Attribute
@@ -137,54 +212,6 @@ class Bill extends BaseModel implements AuditableContract
         );
     }
 
-    public function scopeByPeopleIds($query, array $params = [])
-    {
-        return $query->when($this->filtered($params, 'people_ids'), fn ($query, $params) => $query->whereIn('people_id', $params));
-    }
-
-    public function scopeByFinancialAccountIds($query, array $params = [])
-    {
-        return $query->when($this->filtered($params, 'financial_account_ids'), fn ($query, $params) => $query->whereIn('financial_account_id', $params));
-    }
-
-    public function scopeByType($query, array $params = [])
-    {
-        return $query->when($this->filtered($params, 'type'), fn ($query, $params) => $query->whereIn('type', $params));
-    }
-
-    public function scopeByRepetition($query, array $params = [])
-    {
-        return $query->when($this->filtered($params, 'repetition'), fn ($query, $params) => $query->whereIn('repetition', $params));
-    }
-
-    public function scopeByPeriodicity($query, array $params = [])
-    {
-        return $query->when($this->filtered($params, 'periodicity'), fn ($query, $params) => $query->whereIn('periodicity', $params));
-    }
-
-    public function scopeByStatus($query, array $params = [])
-    {
-        return $query->when($this->filtered($params, 'status'), fn ($query, $params) => $query->whereIn('status', $params));
-    }
-
-    public static function booting(): void
-    {
-        static::addGlobalScope('withRelations', function ($query) {
-            $query->with([
-                'billInstallments',
-            ]);
-        });
-    }
-
-    public static function boot(): void
-    {
-        parent::boot();
-
-        static::deleting(function ($bill) {
-            $bill->billInstallments()->delete();
-        });
-    }
-
     /*
     |--------------------------------------------------------------------------
     | Actions
@@ -228,20 +255,16 @@ class Bill extends BaseModel implements AuditableContract
 
     private function canFollow(): bool
     {
-        return true;
-
-        /* return (!$this->trashed()
+        return (!$this->trashed()
             && !$this->is_public
-            && !$this->followers()->where('follower_people_id', auth()->people()?->id)->exists()
-            && $this->id !== auth()->people()?->id) ?? false; */
+            && !$this->followers()->where('follower_people_id', people()?->id)->exists()
+            && $this->id !== people()?->id) ?? false;
     }
 
     private function canUnfollow(): bool
     {
-        return true;
-
-        /* return (!$this->trashed()
+        return (!$this->trashed()
             && !$this->is_public
-            && $this->followers()->where('follower_people_id', auth()->people()?->id)->exists()) ?? false; */
+            && $this->followers()->where('follower_people_id', people()?->id)->exists()) ?? false;
     }
 }

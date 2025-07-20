@@ -11,18 +11,21 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use FalconERP\Skeleton\Enums\Finance\BillEnum;
 use FalconERP\Skeleton\Events\InstallmentCheck;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use QuantumTecnology\ServiceBasicsExtension\Models\Archive;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
-use FalconERP\Skeleton\Observers\NotificationObserver;
+use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
 use QuantumTecnology\ModelBasicsExtension\Observers\EventDispatcherObserver;
 
 #[ObservedBy([
@@ -120,7 +123,25 @@ class BillInstallment extends BaseModel implements AuditableContract
         );
     }
 
-    protected function scopeByBillIds(Builder $query, array $bills = []): Builder
+    public function followers(): MorphToMany
+    {
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')
+            ->withTimestamps()
+            ->withTrashed();
+    }
+
+    public function followings(): MorphToMany
+    {
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'follower_people_id', 'followable_id')
+            ->withTimestamps()
+            ->withTrashed();
+    }
+
+
+    #[Scope]
+    protected function byBillIds(Builder $query, array $bills = []): Builder
     {
         return $query->when(
             $this->filtered($bills, 'bill_ids'),
@@ -177,21 +198,17 @@ class BillInstallment extends BaseModel implements AuditableContract
 
     private function canFollow(): bool
     {
-        return true;
-
-        /* return (!$this->trashed()
+        return (!$this->trashed()
             && !$this->is_public
-            && !$this->followers()->where('follower_people_id', auth()->people()?->id)->exists()
-            && $this->id !== auth()->people()?->id) ?? false; */
+            && !$this->followers()->where('follower_people_id', people()?->id)->exists()
+            && $this->id !== people()?->id) ?? false;
     }
 
     private function canUnfollow(): bool
     {
-        return true;
-
-        /* return (!$this->trashed()
+        return (!$this->trashed()
             && !$this->is_public
-            && $this->followers()->where('follower_people_id', auth()->people()?->id)->exists()) ?? false; */
+            && $this->followers()->where('follower_people_id', people()?->id)->exists()) ?? false;
     }
 
     private function canCancel(): bool

@@ -4,16 +4,19 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
-use FalconERP\Skeleton\Enums\Finance\FinancialAccountEnum;
-use FalconERP\Skeleton\Enums\FinancialAccountsTypeEnum;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Models\Erp\People\People;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use FalconERP\Skeleton\Enums\FinancialAccountsTypeEnum;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use FalconERP\Skeleton\Enums\Finance\FinancialAccountEnum;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
@@ -49,7 +52,24 @@ class FinancialAccount extends BaseModel implements AuditableContract
         return $this->hasMany(FinancialMovement::class, 'financial_accounts_id');
     }
 
-    public function scopeByPeopleIds($query, array $params = [])
+    public function followers(): MorphToMany
+    {
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')
+            ->withTimestamps()
+            ->withTrashed();
+    }
+
+    public function followings(): MorphToMany
+    {
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id', inverse: true)
+            ->withTimestamps()
+            ->withTrashed();
+    }
+
+    #[Scope]
+    public function byPeopleIds($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'people_ids'), fn ($query, $params) => $query->whereIn('people_id', $params));
     }
@@ -97,20 +117,16 @@ class FinancialAccount extends BaseModel implements AuditableContract
 
     private function canFollow(): bool
     {
-        return true;
-
-        /* return (!$this->trashed()
+        return (!$this->trashed()
             && !$this->is_public
-            && !$this->followers()->where('follower_people_id', auth()->people()?->id)->exists()
-            && $this->id !== auth()->people()?->id) ?? false; */
+            && !$this->followers()->where('follower_people_id', people()?->id)->exists()
+            && $this->id !== people()?->id) ?? false;
     }
 
     private function canUnfollow(): bool
     {
-        return true;
-
-        /* return (!$this->trashed()
+        return (!$this->trashed()
             && !$this->is_public
-            && $this->followers()->where('follower_people_id', auth()->people()?->id)->exists()) ?? false; */
+            && $this->followers()->where('follower_people_id', people()?->id)->exists()) ?? false;
     }
 }
