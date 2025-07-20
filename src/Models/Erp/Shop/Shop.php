@@ -4,22 +4,24 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Shop;
 
+use FalconERP\Skeleton\Models\BackOffice\Shop as BackOfficeShop;
+use FalconERP\Skeleton\Models\Erp\People\People;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use FalconERP\Skeleton\Models\Erp\Service\Service;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use OwenIt\Auditing\Auditable;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use FalconERP\Skeleton\Models\Erp\Service\Service;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
-use FalconERP\Skeleton\Models\BackOffice\Shop as BackOfficeShop;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
@@ -48,13 +50,13 @@ class Shop extends BaseModel implements AuditableContract
     ];
 
     protected $casts = [
-        'printer_name'           => 'string',
-        'printer_ip'             => 'string',
-        'printer_port'           => 'string',
-        'printer_model'          => 'string',
-        'main_color'             => 'string',
-        'whatsapp_number'        => 'string',
-        'instagram'              => 'string',
+        'printer_name'             => 'string',
+        'printer_ip'               => 'string',
+        'printer_port'             => 'string',
+        'printer_model'            => 'string',
+        'main_color'               => 'string',
+        'whatsapp_number'          => 'string',
+        'instagram'                => 'string',
         'has_automatically_finish' => 'bool',
     ];
 
@@ -112,6 +114,22 @@ class Shop extends BaseModel implements AuditableContract
             foreignKey: 'responsible_people_id',
             ownerKey: 'id',
         );
+    }
+
+    public function followers(): MorphToMany
+    {
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')
+            ->withTimestamps()
+            ->withTrashed();
+    }
+
+    public function followings(): MorphToMany
+    {
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'follower_people_id', 'followable_id')
+            ->withTimestamps()
+            ->withTrashed();
     }
 
     /*
@@ -274,20 +292,16 @@ class Shop extends BaseModel implements AuditableContract
 
     private function canFollow(): bool
     {
-        return true;
-
-        /* return (!$this->trashed()
+        return (!$this->trashed()
             && !$this->is_public
             && !$this->followers()->where('follower_people_id', auth()->people()?->id)->exists()
-            && $this->id !== auth()->people()?->id) ?? false; */
+            && $this->id !== auth()->people()?->id) ?? false;
     }
 
     private function canUnfollow(): bool
     {
-        return true;
-
-        /* return (!$this->trashed()
+        return (!$this->trashed()
             && !$this->is_public
-            && $this->followers()->where('follower_people_id', auth()->people()?->id)->exists()) ?? false; */
+            && $this->followers()->where('follower_people_id', auth()->people()?->id)->exists()) ?? false;
     }
 }
