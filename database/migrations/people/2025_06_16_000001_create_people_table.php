@@ -24,7 +24,7 @@ return new class() extends Migration {
         Schema::create('people.types', function (Blueprint $table) {
             $table->id();
             $table->string('description');
-            $table->enum('type', TypesEnum::cases())
+            $table->enum('type', array_map(fn($case) => $case->value, TypesEnum::cases()))
                 ->default(TypesEnum::TYPE_INDIVIDUAL->value)
                 ->comment('Define se o tipo é pessoa física ou jurídica');
             $table->timestamps();

@@ -19,8 +19,8 @@ class ProductSegmentFactory extends Factory
             'product_id' => Product::factory(),
             'name'       => fake()->randomElement(['Segment A', 'Segment B', 'Segment C']),
             'value'      => fake()->randomNumber(6, true),
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

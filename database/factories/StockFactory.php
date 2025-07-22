@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Database\Factories;
 
-use FalconERP\Skeleton\Models\Erp\Stock\Product;
 use FalconERP\Skeleton\Models\Erp\Stock\Stock;
+use FalconERP\Skeleton\Models\Erp\Stock\Product;
+use FalconERP\Skeleton\Models\Erp\Stock\VolumeType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class StockFactory extends Factory
@@ -16,6 +17,7 @@ class StockFactory extends Factory
     {
         return [
             'product_id'      => Product::factory(),
+            'volume_type_id'  => VolumeType::factory(),
             'color'           => fake()->colorName(),
             'on_shop'         => fake()->boolean(90),
             'measure'         => fake()->randomElement(['kg', 'g', 'l', 'ml', 'un']),
