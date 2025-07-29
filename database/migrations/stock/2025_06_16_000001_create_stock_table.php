@@ -182,8 +182,9 @@ return new class extends Migration {
             $table->integer('balance_stock')
                 ->default(0)
                 ->comment('Representa a quantidade de itens disponíveis no estoque, ou seja, que estão prontos para venda ou uso');
-            $table->string('value')
-                ->default(0);
+            $table->bigInteger('value')
+                ->default(0)
+                ->comment('Representa o valor do estoque em centavos, por exemplo, 1500 para R$ 15,00');
             $table->text('observations')
                 ->nullable();
             $table->boolean('status')
