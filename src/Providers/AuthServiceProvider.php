@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Providers;
 
@@ -33,12 +33,17 @@ class AuthServiceProvider extends ServiceProvider
             Database $database,
         ): void {
             Config::set([
-                'database.connections.pgsql_bases.host'     => $database->group->host,
-                'database.connections.pgsql_bases.port'     => $database->group->port,
-                'database.connections.pgsql_bases.username' => $database->group->user,
-                'database.connections.pgsql_bases.password' => Crypt::decryptString($database->group->secret),
-                'database.connections.pgsql_bases.database' => sprintf('bc_%s', $database->base),
-                'database.default'                          => 'pgsql_bases',
+                'database.connections.tenant.driver'         => 'pgsql',
+                'database.connections.tenant.host'           => app()->isLocal() ? config('database.connections.tenant.host') : $database->group->host,
+                'database.connections.tenant.port'           => app()->isLocal() ? config('database.connections.tenant.port') : $database->group->port,
+                'database.connections.tenant.username'       => $database->group->user,
+                'database.connections.tenant.password'       => Crypt::decryptString($database->group->secret),
+                'database.connections.tenant.database'       => sprintf('bc_%s', $database->base),
+                'database.connections.tenant.charset'        => 'utf8',
+                'database.connections.tenant.prefix_indexes' => true,
+                'database.connections.tenant.schema'         => 'public',
+                'database.connections.tenant.sslmode'        => 'prefer',
+                'database.default'                           => 'tenant',
             ]);
 
             request()->merge([
