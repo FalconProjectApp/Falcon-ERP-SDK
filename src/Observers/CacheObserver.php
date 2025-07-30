@@ -47,7 +47,7 @@ class CacheObserver
     private function deleteCache(array $keys): void
     {
         foreach ($keys as $key) {
-            cache()->delete(config('database.connections.pgsql_bases.database').'_'.$key);
+            cache()->delete(config('database.connections.tenant.database').'_'.$key);
         }
     }
 

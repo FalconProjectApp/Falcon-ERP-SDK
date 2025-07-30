@@ -33,7 +33,7 @@ if (!function_exists('rememberForever')) {
         string $key,
         callable $callback,
     ) {
-        return cache()->rememberForever(config('database.connections.pgsql_bases.database').'_'.$key, $callback);
+        return cache()->rememberForever(config('database.connections.tenant.database').'_'.$key, $callback);
     }
 }
 
@@ -42,7 +42,7 @@ if (!function_exists('deleteCache')) {
         array $keys,
     ): void {
         foreach ($keys as $key) {
-            cache()->delete(config('database.connections.pgsql_bases.database').'_'.$key);
+            cache()->delete(config('database.connections.tenant.database').'_'.$key);
         }
     }
 }

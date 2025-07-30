@@ -39,11 +39,11 @@ class DatabasesUsersAccess extends BaseModel
     public function people(): BelongsTo
     {
         Config::set(
-            'database.connections.pgsql_bases.database',
+            'database.connections.tenant.database',
             'bc_'.request()->database->base
         );
 
-        $this->setConnection('pgsql_bases');
+        $this->setConnection('tenant');
 
         $people = $this->belongsTo(People::class, 'base_people_id');
 
