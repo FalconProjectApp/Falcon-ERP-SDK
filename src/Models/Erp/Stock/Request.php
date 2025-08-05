@@ -89,9 +89,9 @@ class Request extends BaseModel implements AuditableContract
     |
     */
 
-    public function itens(): HasMany
+    public function items(): HasMany
     {
-        return $this->hasMany(Item::$collectionClass);
+        return $this->hasMany(Item::class);
     }
 
     public function responsible(): BelongsTo
@@ -162,7 +162,7 @@ class Request extends BaseModel implements AuditableContract
     protected function itensValueTotal(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->itens->sum('value_total'),
+            get: fn () => $this->items->sum('value_total'),
         );
     }
 
@@ -172,7 +172,7 @@ class Request extends BaseModel implements AuditableContract
     protected function itensValueTotalWithDiscount(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->itens->sum('value_total_with_discount'),
+            get: fn () => $this->items->sum('value_total_with_discount'),
         );
     }
 
@@ -256,7 +256,7 @@ class Request extends BaseModel implements AuditableContract
             && !null === $this->tag_emit->crt
             && !null === $this->tag_emit->ie
             && !$this->trashed()
-            && $this->itens->count() > 0
+            && $this->items->count() > 0
             && !$this->has_errors;
     }
 }
