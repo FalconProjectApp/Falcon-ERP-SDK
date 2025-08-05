@@ -22,11 +22,11 @@ trait RequestNfeTrait
 
     abstract public function requestType(): BelongsTo;
 
-    abstract public function itens(): HasMany;
+    abstract public function items(): HasMany;
 
     protected function xml(): Attribute
     {
-        $this->loadMissing('itens.stock.product');
+        $this->loadMissing('items.stock.product');
 
         if (isset($this->attributeCastCache['xml'])) {
             return Attribute::make(
@@ -49,7 +49,7 @@ trait RequestNfeTrait
             !blank($this->tag_obs_fisco) && $nfe->tagobsFisco($this->tag_obs_fisco->toObject());
             !blank($this->tag_inf_adic) && $nfe->taginfAdic($this->tag_inf_adic->toObject());
 
-            $this->itens->each(function ($item, $key) use ($nfe) {
+            $this->items->each(function ($item, $key) use ($nfe) {
                 $itemNumber = $key + 1;
 
                 $nfe->tagprod($item->tag_prod->merge([
@@ -210,7 +210,7 @@ trait RequestNfeTrait
     protected function tagProds(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->itens->map(fn ($item, $key) => new Data([
+            get: fn () => $this->items->map(fn ($item, $key) => new Data([
                 'item'    => $key + 1,
                 'prod'    => $item->tag_prod->toObject(),
                 'imposto' => $item->tag_imposto->toObject(),
