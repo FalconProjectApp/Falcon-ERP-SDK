@@ -4,24 +4,25 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use FalconERP\Skeleton\Database\Factories\RequestFactory;
-use FalconERP\Skeleton\Enums\RequestEnum;
-use FalconERP\Skeleton\Models\Erp\Finance\PaymentMethod;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\RequestNfeTrait;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use FalconERP\Skeleton\Enums\RequestEnum;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Models\Erp\People\People;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use FalconERP\Skeleton\Models\Erp\Finance\PaymentMethod;
+use FalconERP\Skeleton\Database\Factories\RequestFactory;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\RequestNfeTrait;
 
 class Request extends BaseModel implements AuditableContract
 {
@@ -180,6 +181,7 @@ class Request extends BaseModel implements AuditableContract
     | Here you may specify the scopes that the model should have with
     |
     */
+
     #[Scope]
     protected function byStatus($query): void
     {
@@ -187,6 +189,55 @@ class Request extends BaseModel implements AuditableContract
             $query->whereIn(self::ATTRIBUTE_STATUS, explode(',', $status));
         });
     }
+
+    #[Scope]
+    protected function byResponsibleIds(Builder $query, string | array $params = []): void
+    {
+        $query->when($this->filtered($params, 'responsible_ids'), function ($query, $params) {
+            $query->whereIn(self::ATTRIBUTE_RESPONSIBLE_ID, $params);
+        });
+    }
+
+    #[Scope]
+    protected function byThirdIds(Builder $query, string | array $params = []): void
+    {
+        $query->when($this->filtered($params, 'third_ids'), function ($query, $params) {
+            $query->whereIn(self::ATTRIBUTE_THIRD_ID, $params);
+        });
+    }
+    #[Scope]
+    protected function byAllowerIds(Builder $query, string | array $params = []): void
+    {
+        $query->when($this->filtered($params, 'allower_ids'), function ($query, $params) {
+            $query->whereIn(self::ATTRIBUTE_ALLOWER_ID, $params);
+        });
+    }
+
+    #[Scope]
+    protected function byRequestTypeIds(Builder $query, string | array $params = []): void
+    {
+        $query->when($this->filtered($params, 'request_type_ids'), function ($query, $params) {
+            $query->whereIn(self::ATTRIBUTE_REQUEST_TYPE_ID, $params);
+        });
+    }
+
+    #[Scope]
+    protected function byCreatedAtStart(Builder $query, string | array $params = []): void
+    {
+        $query->when($this->filtered($params, 'created_at_start'), function ($query, $params) {
+            $query->whereDate('created_at', '>=', $params);
+        });
+    }
+
+    #[Scope]
+    protected function byCreatedAtEnd(Builder $query, string | array $params = []): void
+    {
+        $query->when($this->filtered($params, 'created_at_end'), function ($query, $params) {
+            $query->whereDate('created_at', '<=', $params);
+        });
+    }
+
+
 
     /*
     |--------------------------------------------------------------------------
@@ -367,6 +418,6 @@ class Request extends BaseModel implements AuditableContract
         return
             !$this->trashed()
             && RequestEnum::REQUEST_STATUS_OPEN === $this->status
-            && $this->items()->count() === 0;
+            && 0 === $this->items()->count();
     }
 }
