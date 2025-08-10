@@ -1,31 +1,32 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use OwenIt\Auditing\Auditable;
-use Illuminate\Database\Eloquent\Builder;
-use FalconERP\Skeleton\Models\Erp\Shop\Shop;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
 use FalconERP\Skeleton\Database\Factories\StockFactory;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use FalconERP\Skeleton\Models\Erp\Shop\Shop;
+use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\StockSegmentTrait;
+use FalconERP\Skeleton\Observers\NotificationObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
-use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\StockSegmentTrait;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -56,6 +57,10 @@ class Stock extends BaseModel implements AuditableContract
     public const ATTRIBUTE_DEPTH           = 'depth';
     public const ATTRIBUTE_STATUS          = 'status';
     public const ATTRIBUTE_OBS             = 'obs';
+    public const V_ATTRIBUTE_IDLE_DAYS     = 'idle_days';
+    public const V_ATTRIBUTE_BALANCE       = 'balance';
+    public const V_ATTRIBUTE_VALUE_TOTAL   = 'value_total';
+    public const V_ATTRIBUTE_ACTIONS       = 'actions';
 
     protected $fillable = [
         self::ATTRIBUTE_ID,
@@ -80,6 +85,11 @@ class Stock extends BaseModel implements AuditableContract
         self::ATTRIBUTE_PRODUCT_ID     => 'integer',
         self::ATTRIBUTE_VOLUME_TYPE_ID => 'integer',
         self::ATTRIBUTE_VALUE          => 'integer',
+
+        self::V_ATTRIBUTE_IDLE_DAYS   => 'integer',
+        self::V_ATTRIBUTE_BALANCE     => 'integer',
+        self::V_ATTRIBUTE_VALUE_TOTAL => 'integer',
+        self::V_ATTRIBUTE_ACTIONS     => 'array',
     ];
 
     /*
@@ -144,7 +154,7 @@ class Stock extends BaseModel implements AuditableContract
     */
 
     #[Scope]
-    public function byStockIds(Builder $query, string|array $params = []): Builder
+    public function byStockIds(Builder $query, string | array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'stock_ids'), function ($query, $params) {
@@ -153,7 +163,7 @@ class Stock extends BaseModel implements AuditableContract
     }
 
     #[Scope]
-    public function byProductIds(Builder $query, string|array $params = []): Builder
+    public function byProductIds(Builder $query, string | array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'product_ids'), function ($query, $params) {
@@ -162,7 +172,7 @@ class Stock extends BaseModel implements AuditableContract
     }
 
     #[Scope]
-    public function byVolumeTypeIds(Builder $query, string|array $params = []): Builder
+    public function byVolumeTypeIds(Builder $query, string | array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'volume_type_ids'), function ($query, $params) {
@@ -171,7 +181,7 @@ class Stock extends BaseModel implements AuditableContract
     }
 
     #[Scope]
-    public function byShopIds(Builder $query, string|array $params = []): Builder
+    public function byShopIds(Builder $query, string | array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'shop_ids'), function ($query, $params) {
@@ -213,6 +223,22 @@ class Stock extends BaseModel implements AuditableContract
     {
         return Attribute::make(
             get: fn (): int => $this->value * $this->balance,
+        );
+    }
+
+    /**
+     * idle_days: Quantos dias o estoque está sem movimentação (ocioso).
+     */
+    protected function idleDays(): Attribute
+    {
+        return Attribute::make(
+            get: function (): int {
+                $lastMovement = 99; // $this->movements()->latest('created_at')->first();
+
+                $lastDate = $lastMovement?->created_at ?? $this->created_at;
+
+                return (int) Carbon::parse($lastDate)->diffInDays(Carbon::now(), false);
+            }
         );
     }
 

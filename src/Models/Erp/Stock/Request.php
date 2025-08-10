@@ -4,25 +4,26 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use OwenIt\Auditing\Auditable;
-use FalconERP\Skeleton\Enums\RequestEnum;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use FalconERP\Skeleton\Models\Erp\Finance\PaymentMethod;
+use Carbon\Carbon;
 use FalconERP\Skeleton\Database\Factories\RequestFactory;
+use FalconERP\Skeleton\Enums\RequestEnum;
+use FalconERP\Skeleton\Models\Erp\Finance\PaymentMethod;
+use FalconERP\Skeleton\Models\Erp\People\People;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\RequestNfeTrait;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\RequestNfeTrait;
 
 class Request extends BaseModel implements AuditableContract
 {
@@ -33,17 +34,18 @@ class Request extends BaseModel implements AuditableContract
     use SetSchemaTrait;
     use SoftDeletes;
 
-    public const ATTRIBUTE_ID              = 'id';
-    public const ATTRIBUTE_DESCRIPTION     = 'description';
-    public const ATTRIBUTE_OBSERVATIONS    = 'observations';
-    public const ATTRIBUTE_STATUS          = 'status';
-    public const ATTRIBUTE_REQUEST_TYPE_ID = 'request_type_id';
-    public const ATTRIBUTE_RESPONSIBLE_ID  = 'responsible_id';
-    public const ATTRIBUTE_THIRD_ID        = 'third_id';
-    public const ATTRIBUTE_ALLOWER_ID      = 'allower_id';
-    public const ATTRIBUTE_FREIGHT_VALUE   = 'freight_value';
-    public const ATTRIBUTE_DISCOUNT_VALUE  = 'discount_value';
-    public const ATTRIBUTE_PAYMENT_METHOD  = 'payment_method_id';
+    public const ATTRIBUTE_ID                = 'id';
+    public const ATTRIBUTE_DESCRIPTION       = 'description';
+    public const ATTRIBUTE_OBSERVATIONS      = 'observations';
+    public const ATTRIBUTE_STATUS            = 'status';
+    public const ATTRIBUTE_REQUEST_TYPE_ID   = 'request_type_id';
+    public const ATTRIBUTE_RESPONSIBLE_ID    = 'responsible_id';
+    public const ATTRIBUTE_THIRD_ID          = 'third_id';
+    public const ATTRIBUTE_ALLOWER_ID        = 'allower_id';
+    public const ATTRIBUTE_FREIGHT_VALUE     = 'freight_value';
+    public const ATTRIBUTE_DISCOUNT_VALUE    = 'discount_value';
+    public const ATTRIBUTE_PAYMENT_METHOD    = 'payment_method_id';
+    public const V_ATTRIBUTE_CONTINUOUS_DAYS = 'continuous_days';
 
     protected $fillable = [
         self::ATTRIBUTE_DESCRIPTION,
@@ -59,22 +61,24 @@ class Request extends BaseModel implements AuditableContract
     ];
 
     protected $casts = [
-        self::ATTRIBUTE_ID              => 'integer',
-        self::ATTRIBUTE_DESCRIPTION     => 'string',
-        self::ATTRIBUTE_OBSERVATIONS    => 'string',
-        self::ATTRIBUTE_STATUS          => 'string',
-        self::ATTRIBUTE_REQUEST_TYPE_ID => 'integer',
-        self::ATTRIBUTE_RESPONSIBLE_ID  => 'integer',
-        self::ATTRIBUTE_THIRD_ID        => 'integer',
-        self::ATTRIBUTE_ALLOWER_ID      => 'integer',
-        self::ATTRIBUTE_FREIGHT_VALUE   => 'integer',
-        self::ATTRIBUTE_DISCOUNT_VALUE  => 'integer',
-        self::ATTRIBUTE_PAYMENT_METHOD  => 'integer',
+        self::ATTRIBUTE_ID                => 'integer',
+        self::ATTRIBUTE_DESCRIPTION       => 'string',
+        self::ATTRIBUTE_OBSERVATIONS      => 'string',
+        self::ATTRIBUTE_STATUS            => 'string',
+        self::ATTRIBUTE_REQUEST_TYPE_ID   => 'integer',
+        self::ATTRIBUTE_RESPONSIBLE_ID    => 'integer',
+        self::ATTRIBUTE_THIRD_ID          => 'integer',
+        self::ATTRIBUTE_ALLOWER_ID        => 'integer',
+        self::ATTRIBUTE_FREIGHT_VALUE     => 'integer',
+        self::ATTRIBUTE_DISCOUNT_VALUE    => 'integer',
+        self::ATTRIBUTE_PAYMENT_METHOD    => 'integer',
+        self::V_ATTRIBUTE_CONTINUOUS_DAYS => 'integer',
     ];
 
     protected $attributes = [
-        self::ATTRIBUTE_FREIGHT_VALUE  => 0,
-        self::ATTRIBUTE_DISCOUNT_VALUE => 0,
+        self::ATTRIBUTE_FREIGHT_VALUE     => 0,
+        self::ATTRIBUTE_DISCOUNT_VALUE    => 0,
+        self::V_ATTRIBUTE_CONTINUOUS_DAYS => 0,
     ];
 
     /*
@@ -173,6 +177,17 @@ class Request extends BaseModel implements AuditableContract
         );
     }
 
+    /**
+     * continuous_days.
+     */
+    protected function continuousDays(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): int => (int) Carbon::parse($this->attributes['created_at'])
+                ->diffInDays(Carbon::now(), false) + 1,
+        );
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Scopes
@@ -205,6 +220,7 @@ class Request extends BaseModel implements AuditableContract
             $query->whereIn(self::ATTRIBUTE_THIRD_ID, $params);
         });
     }
+
     #[Scope]
     protected function byAllowerIds(Builder $query, string | array $params = []): void
     {
@@ -236,8 +252,6 @@ class Request extends BaseModel implements AuditableContract
             $query->whereDate('created_at', '<=', $params);
         });
     }
-
-
 
     /*
     |--------------------------------------------------------------------------

@@ -2,14 +2,14 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use FalconERP\Skeleton\Observers\CacheObserver;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 #[ObservedBy([
@@ -72,7 +72,7 @@ class Import extends BaseModel
         );
     }
 
-        /**
+    /**
      * Get the data.
      */
     protected function data(): Attribute

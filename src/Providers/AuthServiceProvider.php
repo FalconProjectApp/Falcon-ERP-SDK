@@ -59,9 +59,9 @@ class AuthServiceProvider extends ServiceProvider
              * Se o usuário estiver logado, então ele tem acesso a um ou mais bancos de dados.
              */
             if (static::check()) {
-                $database = Database::byActiveAndUser($active, static::user())->get();
+                $database = Database::query()->byActiveAndUser($active, static::user())->get();
 
-                if (0 === $database->count() && $database = Database::byActiveAndUser(!$active, static::user())->get()) {
+                if (0 === $database->count() && $database = Database::query()->byActiveAndUser(!$active, static::user())->get()) {
                     $databasesUsersAccess            = $database->first()->databasesUsersAccess->first();
                     $databasesUsersAccess->is_active = true;
                     $databasesUsersAccess->save();
