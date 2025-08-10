@@ -4,23 +4,24 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use OwenIt\Auditing\Auditable;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use FalconERP\Skeleton\Models\Erp\Stock\RequestType;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use FalconERP\Skeleton\Models\Erp\Finance\PaymentMethod;
 use FalconERP\Skeleton\Database\Factories\RequestFactory;
+use FalconERP\Skeleton\Enums\RequestEnum;
+use FalconERP\Skeleton\Models\Erp\Finance\PaymentMethod;
+use FalconERP\Skeleton\Models\Erp\People\People;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\RequestNfeTrait;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\RequestNfeTrait;
 
 class Request extends BaseModel implements AuditableContract
 {
@@ -74,11 +75,6 @@ class Request extends BaseModel implements AuditableContract
         self::ATTRIBUTE_FREIGHT_VALUE  => 0,
         self::ATTRIBUTE_DISCOUNT_VALUE => 0,
     ];
-
-    protected static function newFactory()
-    {
-        return RequestFactory::new();
-    }
 
     /*
     |--------------------------------------------------------------------------
@@ -135,9 +131,9 @@ class Request extends BaseModel implements AuditableContract
             ->withTrashed();
     }
 
-    public function canView(): bool
+    protected static function newFactory()
     {
-        return true;
+        return RequestFactory::new();
     }
 
     /*
@@ -184,8 +180,8 @@ class Request extends BaseModel implements AuditableContract
     | Here you may specify the scopes that the model should have with
     |
     */
-
-    protected function scopeByStatus($query): void
+    #[Scope]
+    protected function byStatus($query): void
     {
         $query->when(request()->filter['status'] ?? false, function ($query, $status) {
             $query->whereIn(self::ATTRIBUTE_STATUS, explode(',', $status));
@@ -203,14 +199,30 @@ class Request extends BaseModel implements AuditableContract
     protected function setActions(): array
     {
         return [
-            'can_view'       => $this->canView(),
-            'can_restore'    => $this->canRestore(),
-            'can_update'     => $this->canUpdate(),
-            'can_delete'     => $this->canDelete(),
-            'can_follow'     => $this->canFollow(),
-            'can_unfollow'   => $this->canUnfollow(),
-            'can_issue_nfce' => $this->canIssueNfce(),
+            'can_view'              => $this->canView(),
+            'can_restore'           => $this->canRestore(),
+            'can_update'            => $this->canUpdate(),
+            'can_delete'            => $this->canDelete(),
+            'can_follow'            => $this->canFollow(),
+            'can_unfollow'          => $this->canUnfollow(),
+            'can_issue_nfce'        => $this->canIssueNfce(),
+            'can_edit_responsible'  => $this->canEditResponsible(),
+            'can_edit_third'        => $this->canEditThird(),
+            'can_edit_allower'      => $this->canEditAllower(),
+            'can_finish'            => $this->canFinish(),
+            'can_authorize'         => $this->canAuthorize(),
+            'can_deny'              => $this->canDeny(),
+            'can_cancel'            => $this->canCancel(),
+            'can_edit_delivery'     => $this->canEditDelivery(),
+            'can_edit_payment'      => $this->canEditPayment(),
+            'can_edit_request_type' => $this->canEditRequestType(),
+            'can_edit_items'        => $this->canEditItems(),
         ];
+    }
+
+    private function canView(): bool
+    {
+        return true;
     }
 
     private function canRestore(): bool
@@ -231,19 +243,19 @@ class Request extends BaseModel implements AuditableContract
     private function canFollow(): bool
     {
         return (
-        !$this->trashed()
-            && auth()->check()
-            && !$this->followers()->where('follower_people_id', auth()->people()->id)->exists()
-            ) ?? false;
+            !$this->trashed()
+                && auth()->check()
+                && !$this->followers()->where('follower_people_id', auth()->people()->id)->exists()
+        ) ?? false;
     }
 
     private function canUnfollow(): bool
     {
         return (
-        !$this->trashed()
-            && auth()->check()
-            && $this->followers()->where('follower_people_id', auth()->people()->id)->exists()
-            ) ?? false;
+            !$this->trashed()
+                && auth()->check()
+                && $this->followers()->where('follower_people_id', auth()->people()->id)->exists()
+        ) ?? false;
     }
 
     private function canIssueNfce(): bool
@@ -258,5 +270,103 @@ class Request extends BaseModel implements AuditableContract
             && !$this->trashed()
             && $this->items->count() > 0
             && !$this->has_errors;
+    }
+
+    private function canEditResponsible(): bool
+    {
+        return
+            !$this->trashed()
+            && RequestEnum::REQUEST_STATUS_OPEN === $this->status
+            && RequestEnum::REQUEST_STATUS_CANCELED !== $this->status
+            && RequestEnum::REQUEST_STATUS_DENIED !== $this->status;
+    }
+
+    private function canEditThird(): bool
+    {
+        return
+            !$this->trashed()
+            && RequestEnum::REQUEST_STATUS_OPEN === $this->status
+            && RequestEnum::REQUEST_STATUS_CANCELED !== $this->status
+            && RequestEnum::REQUEST_STATUS_DENIED !== $this->status;
+    }
+
+    private function canEditAllower(): bool
+    {
+        return false;
+    }
+
+    private function canFinish(): bool
+    {
+        return
+            !$this->trashed()
+            && RequestEnum::REQUEST_STATUS_OPEN === $this->status
+            && $this->items()->count() > 0
+            && !$this->has_errors
+            && RequestEnum::REQUEST_STATUS_CANCELED !== $this->status
+            && RequestEnum::REQUEST_STATUS_DENIED !== $this->status
+            && RequestEnum::REQUEST_STATUS_FINISHED !== $this->status
+            && RequestEnum::REQUEST_STATUS_REJECTED !== $this->status;
+    }
+
+    private function canAuthorize(): bool
+    {
+        return
+            !$this->trashed()
+            && RequestEnum::REQUEST_STATUS_OPEN === $this->status
+            && RequestEnum::REQUEST_STATUS_CANCELED !== $this->status
+            && RequestEnum::REQUEST_STATUS_DENIED !== $this->status
+            && RequestEnum::REQUEST_STATUS_FINISHED !== $this->status
+            && RequestEnum::REQUEST_STATUS_REJECTED !== $this->status
+            && $this->items()->count() > 0;
+    }
+
+    private function canDeny(): bool
+    {
+        return
+            !$this->trashed()
+            && RequestEnum::REQUEST_STATUS_OPEN === $this->status
+            && RequestEnum::REQUEST_STATUS_CANCELED !== $this->status
+            && RequestEnum::REQUEST_STATUS_DENIED !== $this->status
+            && $this->items()->count() > 0;
+    }
+
+    private function canCancel(): bool
+    {
+        return
+            !$this->trashed()
+            && RequestEnum::REQUEST_STATUS_OPEN === $this->status
+            && RequestEnum::REQUEST_STATUS_CANCELED !== $this->status
+            && RequestEnum::REQUEST_STATUS_DENIED !== $this->status
+            && RequestEnum::REQUEST_STATUS_FINISHED !== $this->status
+            && $this->items()->count() > 0;
+    }
+
+    private function canEditDelivery(): bool
+    {
+        return
+            !$this->trashed()
+            && RequestEnum::REQUEST_STATUS_OPEN === $this->status;
+    }
+
+    private function canEditPayment(): bool
+    {
+        return
+            !$this->trashed()
+            && RequestEnum::REQUEST_STATUS_OPEN === $this->status;
+    }
+
+    private function canEditRequestType(): bool
+    {
+        return
+            !$this->trashed()
+            && RequestEnum::REQUEST_STATUS_OPEN === $this->status;
+    }
+
+    private function canEditItems(): bool
+    {
+        return
+            !$this->trashed()
+            && RequestEnum::REQUEST_STATUS_OPEN === $this->status
+            && $this->items()->count() === 0;
     }
 }

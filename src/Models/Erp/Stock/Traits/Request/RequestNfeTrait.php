@@ -146,6 +146,8 @@ trait RequestNfeTrait
      */
     protected function tagDetPag(): Attribute
     {
+        $this->loadMissing('paymentMethod');
+
         if (null === $this->paymentMethod) {
             return Attribute::make(
                 get: fn () => null,
@@ -209,6 +211,8 @@ trait RequestNfeTrait
      */
     protected function tagProds(): Attribute
     {
+        $this->loadMissing('items');
+
         return Attribute::make(
             get: fn () => $this->items->map(fn ($item, $key) => new Data([
                 'item'    => $key + 1,
@@ -223,6 +227,8 @@ trait RequestNfeTrait
      */
     protected function tagEmit(): Attribute
     {
+        $this->loadMissing('responsible');
+
         $emit = $this->responsible;
 
         if (null === $emit) {
@@ -252,6 +258,8 @@ trait RequestNfeTrait
      */
     protected function tagEnderEmit(): Attribute
     {
+        $this->loadMissing('responsible');
+
         $enderEmit = $this->responsible->mainAddress ?? null;
 
         if (null === $enderEmit) {
@@ -281,6 +289,8 @@ trait RequestNfeTrait
      */
     protected function tagDest(): Attribute
     {
+        $this->loadMissing('third');
+
         $dest = $this->third;
 
         if (null === $dest) {
@@ -310,6 +320,8 @@ trait RequestNfeTrait
      */
     protected function tagEnderDest(): Attribute
     {
+        $this->loadMissing('third');
+
         $enderDest = $this->third->mainAddress ?? null;
 
         if (null === $enderDest) {
@@ -504,6 +516,8 @@ trait RequestNfeTrait
      */
     protected function cUf(): Attribute
     {
+        $this->loadMissing('responsible');
+
         return Attribute::make(
             get: fn () => $this->responsible->main_address?->state_ibge,
         );
@@ -631,6 +645,8 @@ trait RequestNfeTrait
      */
     protected function sameState(): Attribute
     {
+        $this->loadMissing('third');
+
         if (blank($this->third)) {
             return Attribute::make(
                 get: fn () => true,
