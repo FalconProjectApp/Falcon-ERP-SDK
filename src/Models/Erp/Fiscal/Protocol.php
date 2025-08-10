@@ -4,6 +4,7 @@ namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 use FalconERP\Skeleton\Observers\CacheObserver;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Observers\NotificationObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -62,27 +63,38 @@ class Protocol extends BaseModel
     |
     */
 
-    public function scopeByBatchId($query, array $params = [])
+    #[Scope]
+    public function byBatchId($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'batch_id'), fn ($query, $params) => $query->whereIn('batch_id', $params));
     }
-    public function scopeByTypeEnvironment($query, array $params = [])
+
+    #[Scope]
+    public function byTypeEnvironment($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'type_environment'), fn ($query, $params) => $query->whereIn('type_environment', $params));
     }
-    public function scopeByCodeStatus($query, array $params = [])
+
+    #[Scope]
+    public function byCodeStatus($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'code_status'), fn ($query, $params) => $query->whereIn('code_status', $params));
     }
-    public function scopeByReceiptDate($query, array $params = [])
+
+    #[Scope]
+    public function byReceiptDate($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'receipt_date'), fn ($query, $params) => $query->whereIn('receipt_date', $params));
     }
-    public function scopeByMotiveStatus($query, array $params = [])
+
+    #[Scope]
+    public function byMotiveStatus($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'motive_status'), fn ($query, $params) => $query->whereIn('motive_status', $params));
     }
-    public function scopeByNumberProtocol($query, array $params = [])
+
+    #[Scope]
+    public function byNumberProtocol($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'number_protocol'), fn ($query, $params) => $query->whereIn('number_protocol', $params));
     }

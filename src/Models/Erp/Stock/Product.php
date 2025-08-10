@@ -4,27 +4,28 @@ declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use FalconERP\Skeleton\Database\Factories\ProductFactory;
-use FalconERP\Skeleton\Enums\ArchiveEnum;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\ProductCollunsTrait;
-use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\ProductSegmentTrait;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use FalconERP\Skeleton\Enums\ArchiveEnum;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use FalconERP\Skeleton\Database\Factories\ProductFactory;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\ProductCollunsTrait;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\ProductSegmentTrait;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -147,7 +148,8 @@ class Product extends BaseModel implements AuditableContract
     |
     */
 
-    public function scopeByGroupIds(Builder $query, string|array $params = []): Builder
+    #[Scope]
+    public function byGroupIds(Builder $query, string|array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'group_ids'), function ($query, $params) {
@@ -155,7 +157,8 @@ class Product extends BaseModel implements AuditableContract
             });
     }
 
-    public function scopeByIds(Builder $query, string|array $params = []): Builder
+    #[Scope]
+    public function byIds(Builder $query, string|array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'ids'), function ($query, $params) {

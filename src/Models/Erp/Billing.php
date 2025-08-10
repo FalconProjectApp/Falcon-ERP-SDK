@@ -2,10 +2,11 @@
 
 namespace FalconERP\Skeleton\Models\Erp;
 
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Billing extends BaseModel
 {
@@ -23,7 +24,8 @@ class Billing extends BaseModel
     /**
      * byPortfolioID function.
      */
-    public function scopeByBetweenAndRule(Builder $query, string $ruleConfig, string $date): Builder
+    #[Scope]
+    public function byBetweenAndRule(Builder $query, string $ruleConfig, string $date): Builder
     {
         return $query->where('rule', $ruleConfig)
             ->whereDate('effective_start_date', '<=', $date)

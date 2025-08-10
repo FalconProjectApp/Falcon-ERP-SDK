@@ -4,27 +4,28 @@ declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use FalconERP\Skeleton\Database\Factories\StockFactory;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use FalconERP\Skeleton\Models\Erp\Shop\Shop;
-use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
-use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\StockSegmentTrait;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use Illuminate\Database\Eloquent\Builder;
+use FalconERP\Skeleton\Models\Erp\Shop\Shop;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use FalconERP\Skeleton\Database\Factories\StockFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\StockSegmentTrait;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -142,7 +143,8 @@ class Stock extends BaseModel implements AuditableContract
     |
     */
 
-    public function scopeByStockIds(Builder $query, string|array $params = []): Builder
+    #[Scope]
+    public function byStockIds(Builder $query, string|array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'stock_ids'), function ($query, $params) {
@@ -150,7 +152,8 @@ class Stock extends BaseModel implements AuditableContract
             });
     }
 
-    public function scopeByProductIds(Builder $query, string|array $params = []): Builder
+    #[Scope]
+    public function byProductIds(Builder $query, string|array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'product_ids'), function ($query, $params) {
@@ -158,7 +161,8 @@ class Stock extends BaseModel implements AuditableContract
             });
     }
 
-    public function scopeByVolumeTypeIds(Builder $query, string|array $params = []): Builder
+    #[Scope]
+    public function byVolumeTypeIds(Builder $query, string|array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'volume_type_ids'), function ($query, $params) {
@@ -166,7 +170,8 @@ class Stock extends BaseModel implements AuditableContract
             });
     }
 
-    public function scopeByShopIds(Builder $query, string|array $params = []): Builder
+    #[Scope]
+    public function byShopIds(Builder $query, string|array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'shop_ids'), function ($query, $params) {

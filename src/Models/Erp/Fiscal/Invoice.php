@@ -5,6 +5,7 @@ namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use FalconERP\Skeleton\Observers\CacheObserver;
 use FalconERP\Skeleton\Models\Erp\People\People;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Observers\NotificationObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -74,23 +75,32 @@ class Invoice extends BaseModel
     |
     */
 
-    public function scopeByBatchId($query, array $params = [])
+    #[Scope]
+    public function byBatchId($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'batch_id'), fn ($query, $params) => $query->whereIn('batch_id', $params));
     }
-    public function scopeByNatureOperationId($query, array $params = [])
+
+    #[Scope]
+    public function byNatureOperationId($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'nature_operation_id'), fn ($query, $params) => $query->whereIn('nature_operation_id', $params));
     }
-    public function scopeByPeopleIssuerId($query, array $params = [])
+
+    #[Scope]
+    public function byPeopleIssuerId($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'people_issuer_id'), fn ($query, $params) => $query->whereIn('people_issuer_id', $params));
     }
-    public function scopeByPeopleRecipientId($query, array $params = [])
+
+    #[Scope]
+    public function byPeopleRecipientId($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'people_recipient_id'), fn ($query, $params) => $query->whereIn('people_recipient_id', $params));
     }
-    public function scopeByTypeEnvironment($query, array $params = [])
+
+    #[Scope]
+    public function byTypeEnvironment($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'type_environment'), fn ($query, $params) => $query->whereIn('type_environment', $params));
     }

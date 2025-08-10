@@ -4,6 +4,7 @@ namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 use FalconERP\Skeleton\Observers\CacheObserver;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Observers\NotificationObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -68,7 +69,8 @@ class Batch extends BaseModel
     |
     */
 
-    public function scopeBySerieId($query, array $params = [])
+    #[Scope]
+    public function bySerieId($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'serie_id'), fn ($query, $params) => $query->whereIn('serie_id', $params));
     }

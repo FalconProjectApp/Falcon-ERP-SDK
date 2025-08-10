@@ -3,12 +3,13 @@
 namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
 use App\Models\Erp\Finance\PaymentMethod;
-use FalconERP\Skeleton\Observers\CacheObserver;
-use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Observers\CacheObserver;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 #[ObservedBy([
@@ -60,12 +61,14 @@ class InvoicePayment extends BaseModel
     |
     */
 
-    public function scopeByInvoiceId($query, array $params = [])
+    #[Scope]
+    public function byInvoiceId($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'invoice_id'), fn ($query, $params) => $query->whereIn('invoice_id', $params));
     }
 
-    public function scopeByPaymentMethodId($query, array $params = [])
+    #[Scope]
+    public function byPaymentMethodId($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'payment_method_id'), fn ($query, $params) => $query->whereIn('payment_method_id', $params));
     }

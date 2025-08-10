@@ -6,6 +6,7 @@ use OwenIt\Auditing\Auditable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -171,7 +172,8 @@ class Action extends BaseModel implements AuditableContract
     /**
      * byDescription function.
      */
-    public function scopeByDescription(Builder $query, string $description, string $operation = '='): Builder
+    #[Scope]
+    public function byDescription(Builder $query, string $description, string $operation = '='): Builder
     {
         return $query->where('description', $operation, $description);
     }
@@ -179,7 +181,8 @@ class Action extends BaseModel implements AuditableContract
     /**
      * byPortfolioID function.
      */
-    public function scopeByPortfolioID(Builder $query, int $portfolioId, string $operation = '='): Builder
+    #[Scope]
+    public function byPortfolioID(Builder $query, int $portfolioId, string $operation = '='): Builder
     {
         return $query->where('portfolio_id', $operation, $portfolioId);
     }

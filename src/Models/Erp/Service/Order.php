@@ -2,15 +2,16 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Service;
 
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Models\Erp\People\People;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class Order extends BaseModel implements AuditableContract
 {
@@ -126,7 +127,8 @@ class Order extends BaseModel implements AuditableContract
         );
     }
 
-    public function scopeByStatus(Builder $query, string|array $params = []): Builder
+    #[Scope]
+    public function byStatus(Builder $query, string|array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'status'), function ($query, $params) {

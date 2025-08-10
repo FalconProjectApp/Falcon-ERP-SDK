@@ -4,9 +4,10 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ValidateTrait\Data;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Setting extends BaseModel
 {
@@ -36,7 +37,8 @@ class Setting extends BaseModel
     |
     */
 
-    public function scopeByName($query, $name): Data
+    #[Scope]
+    public function byName($query, $name): Data
     {
         $setting = $query->where('name', $name)->first();
 

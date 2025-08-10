@@ -5,6 +5,7 @@ namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use FalconERP\Skeleton\Observers\CacheObserver;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Observers\NotificationObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -33,17 +34,20 @@ class Import extends BaseModel
         'observation',
     ];
 
-    public function scopeByStatus($query, array $params = [])
+    #[Scope]
+    public function byStatus($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'status'), fn ($query, $params) => $query->whereIn('status', $params));
     }
 
-    public function scopeByIssuerPeopleId($query, array $params = [])
+    #[Scope]
+    public function byIssuerPeopleId($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'issuer_people_id'), fn ($query, $params) => $query->whereIn('issuer_people_id', $params));
     }
 
-    public function scopeByRecipientPeopleId($query, array $params = [])
+    #[Scope]
+    public function byRecipientPeopleId($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'recipient_people_id'), fn ($query, $params) => $query->whereIn('recipient_people_id', $params));
     }

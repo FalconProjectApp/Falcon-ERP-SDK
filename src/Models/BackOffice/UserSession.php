@@ -4,6 +4,7 @@ namespace FalconERP\Skeleton\Models\BackOffice;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 
 class UserSession extends BaseModel
@@ -20,7 +21,8 @@ class UserSession extends BaseModel
     /**
      * byDescription function.
      */
-    public function scopeByIpAndAgent(Builder $query, string $ip, string $agent): Builder
+    #[Scope]
+    public function byIpAndAgent(Builder $query, string $ip, string $agent): Builder
     {
         return $query
             ->where('ip', $ip)

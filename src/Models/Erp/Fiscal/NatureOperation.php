@@ -2,14 +2,15 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
-use FalconERP\Skeleton\Enums\Fiscal\NatureOperationTypeEnum;
-use FalconERP\Skeleton\Observers\CacheObserver;
-use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Observers\CacheObserver;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use FalconERP\Skeleton\Enums\Fiscal\NatureOperationTypeEnum;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 #[ObservedBy([
@@ -55,7 +56,8 @@ class NatureOperation extends BaseModel
     |
     */
 
-    public function scopeBySerieIds($query, array $params = [])
+    #[Scope]
+    public function bySerieIds($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'serie_ids'), fn ($query, $params) => $query->whereIn('serie_id', $params));
     }

@@ -10,6 +10,7 @@ use FalconERP\Skeleton\Models\Erp\Shop\Shop;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
@@ -94,7 +95,8 @@ class Group extends BaseModel implements AuditableContract
     | Here you may specify the scopes that the model should have with
     |
     */
-    public function scopeByShopIds(Builder $query, string | array $params = []): Builder
+    #[Scope]
+    public function byShopIds(Builder $query, string | array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'shop_ids'), function ($query, $params) {

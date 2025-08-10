@@ -2,9 +2,10 @@
 
 namespace FalconERP\Skeleton\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PgDatabase extends BaseModel
 {
@@ -16,7 +17,8 @@ class PgDatabase extends BaseModel
 
     public static $title = 'Pg Database';
 
-    public function scopeByDatname($query, string $datname)
+    #[Scope]
+    public function byDatname($query, string $datname)
     {
         return $query->where('datname', 'bc_'.$datname);
     }

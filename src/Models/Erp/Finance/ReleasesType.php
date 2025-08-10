@@ -2,11 +2,12 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
-use FalconERP\Skeleton\Enums\ReleaseTypeEnum;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use FalconERP\Skeleton\Enums\ReleaseTypeEnum;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class ReleasesType extends BaseModel
@@ -27,7 +28,8 @@ class ReleasesType extends BaseModel
         'type'   => ReleaseTypeEnum::TYPE_CLIENT,
     ];
 
-    protected function scopeByReleaseType(Builder $query, array $params = []): Builder
+    #[Scope]
+    protected function byReleaseType(Builder $query, array $params = []): Builder
     {
         return $query->when(
             $this->filtered($params, 'release_type'),

@@ -2,15 +2,16 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
-use FalconERP\Skeleton\Enums\Fiscal\SerieEnvironmentEnum;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use FalconERP\Skeleton\Observers\CacheObserver;
-use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Observers\CacheObserver;
+use FalconERP\Skeleton\Models\Erp\People\People;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use FalconERP\Skeleton\Enums\Fiscal\SerieEnvironmentEnum;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 #[ObservedBy([
@@ -58,17 +59,20 @@ class Serie extends BaseModel
     |
     */
 
-    public function scopeByPeopleIssuerIds($query, array $params = [])
+    #[Scope]
+    public function byPeopleIssuerIds($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'people_issuer_ids'), fn ($query, $params) => $query->whereIn('people_issuer_id', $params));
     }
 
-    public function scopeByModels($query, array $params = [])
+    #[Scope]
+    public function byModels($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'models'), fn ($query, $params) => $query->whereIn('model', $params));
     }
 
-    public function scopeByEnvironments($query, array $params = [])
+    #[Scope]
+    public function byEnvironments($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'environments'), fn ($query, $params) => $query->whereIn('environment', $params));
     }
