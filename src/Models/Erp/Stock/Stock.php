@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use FalconERP\Skeleton\Observers\NotificationObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use FalconERP\Skeleton\Database\Factories\StockFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -28,6 +27,7 @@ use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use FalconERP\Skeleton\Models\Erp\Stock\Traits\Stock\StockCollunsTrait;
 use FalconERP\Skeleton\Models\Erp\Stock\Traits\Stock\StockSegmentTrait;
+use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
 
 #[ObservedBy([
     CacheObserver::class,
