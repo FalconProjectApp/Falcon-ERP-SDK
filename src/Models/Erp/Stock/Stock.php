@@ -5,28 +5,29 @@ declare(strict_types = 1);
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
 use Carbon\Carbon;
-use FalconERP\Skeleton\Database\Factories\StockFactory;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use FalconERP\Skeleton\Models\Erp\Shop\Shop;
-use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
-use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\StockSegmentTrait;
-use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use Illuminate\Database\Eloquent\Builder;
+use FalconERP\Skeleton\Models\Erp\Shop\Shop;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use FalconERP\Skeleton\Database\Factories\StockFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Stock\StockCollunsTrait;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Stock\StockSegmentTrait;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -39,28 +40,8 @@ class Stock extends BaseModel implements AuditableContract
     use HasFactory;
     use SetSchemaTrait;
     use SoftDeletes;
+    use StockCollunsTrait;
     use StockSegmentTrait;
-
-    public const ATTRIBUTE_ID              = 'id';
-    public const ATTRIBUTE_PRODUCT_ID      = 'product_id';
-    public const ATTRIBUTE_VOLUME_TYPE_ID  = 'volume_type_id';
-    public const ATTRIBUTE_DESCRIPTION     = 'description';
-    public const ATTRIBUTE_BALANCE_TRANSIT = 'balance_transit';
-    public const ATTRIBUTE_BALANCE_STOCK   = 'balance_stock';
-    public const ATTRIBUTE_VALUE           = 'value';
-    public const ATTRIBUTE_COLOR           = 'color';
-    public const ATTRIBUTE_ON_SHOP         = 'on_shop';
-    public const ATTRIBUTE_MEASURE         = 'measure';
-    public const ATTRIBUTE_WEIGHT          = 'weight';
-    public const ATTRIBUTE_HEIGHT          = 'height';
-    public const ATTRIBUTE_WIDTH           = 'width';
-    public const ATTRIBUTE_DEPTH           = 'depth';
-    public const ATTRIBUTE_STATUS          = 'status';
-    public const ATTRIBUTE_OBS             = 'obs';
-    public const V_ATTRIBUTE_IDLE_DAYS     = 'idle_days';
-    public const V_ATTRIBUTE_BALANCE       = 'balance';
-    public const V_ATTRIBUTE_VALUE_TOTAL   = 'value_total';
-    public const V_ATTRIBUTE_ACTIONS       = 'actions';
 
     protected $fillable = [
         self::ATTRIBUTE_ID,

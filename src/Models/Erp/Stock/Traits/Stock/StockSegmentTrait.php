@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace FalconERP\Skeleton\Models\Erp\Stock\Traits\Request;
+namespace FalconERP\Skeleton\Models\Erp\Stock\Traits\Stock;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
