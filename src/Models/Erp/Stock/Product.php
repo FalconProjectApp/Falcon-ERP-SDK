@@ -4,28 +4,28 @@ declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use OwenIt\Auditing\Auditable;
-use FalconERP\Skeleton\Enums\ArchiveEnum;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use FalconERP\Skeleton\Database\Factories\ProductFactory;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
-use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
-use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
+use FalconERP\Skeleton\Enums\ArchiveEnum;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\ProductCollunsTrait;
 use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\ProductSegmentTrait;
+use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -46,7 +46,7 @@ class Product extends BaseModel implements AuditableContract
         self::ATTRIBUTE_GROUPS_ID,
         self::ATTRIBUTE_STATUS,
         self::ATTRIBUTE_DESCRIPTION,
-        self::ATTRIBUTE_EAN,
+        self::V_ATTRIBUTE_EAN,
         self::ATTRIBUTE_LAST_BUY_VALUE,
         self::ATTRIBUTE_LAST_SELL_VALUE,
         self::ATTRIBUTE_LAST_RENT_VALUE,
@@ -58,7 +58,7 @@ class Product extends BaseModel implements AuditableContract
         self::ATTRIBUTE_GROUPS_ID       => 'integer',
         self::ATTRIBUTE_STATUS          => 'string',
         self::ATTRIBUTE_DESCRIPTION     => 'string',
-        self::ATTRIBUTE_EAN             => 'string',
+        self::V_ATTRIBUTE_EAN           => 'string',
         self::ATTRIBUTE_LAST_BUY_VALUE  => 'integer',
         self::ATTRIBUTE_LAST_SELL_VALUE => 'integer',
         self::ATTRIBUTE_LAST_RENT_VALUE => 'integer',
