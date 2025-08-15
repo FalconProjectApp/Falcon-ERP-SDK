@@ -4,16 +4,15 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\BackOffice\DataBase;
 
+use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
 use FalconERP\Skeleton\Models\User;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 
 class Database extends BaseModel
 {
@@ -22,6 +21,7 @@ class Database extends BaseModel
     protected $connection = 'pgsql';
 
     protected $fillable = [
+        'base_people_id',
         'base',
     ];
 
@@ -37,14 +37,6 @@ class Database extends BaseModel
     | Here you may specify the relationships that the model should have with
     |
     */
-
-    /**
-     * ActionsMovements function.
-     */
-    public function user(): HasOne
-    {
-        return $this->hasOne(User::class);
-    }
 
     /**
      * userAccess function.
