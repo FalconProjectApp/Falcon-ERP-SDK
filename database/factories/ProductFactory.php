@@ -21,7 +21,7 @@ class ProductFactory extends Factory
             self::ATTRIBUTE_GROUPS_ID       => Group::factory(),
             self::ATTRIBUTE_STATUS          => fake()->boolean(90),
             self::ATTRIBUTE_DESCRIPTION     => fake()->sentence(),
-            self::ATTRIBUTE_EAN             => fake()->unique()->ean13(),
+            self::V_ATTRIBUTE_EAN           => fake()->unique()->ean13(),
             self::ATTRIBUTE_LAST_BUY_VALUE  => fake()->randomNumber(6, true),
             self::ATTRIBUTE_LAST_SELL_VALUE => fake()->randomNumber(6, true),
             self::ATTRIBUTE_LAST_RENT_VALUE => fake()->randomNumber(6, true),

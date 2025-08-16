@@ -240,6 +240,8 @@ class Stock extends BaseModel implements AuditableContract
             'can_delete'   => $this->canDelete(),
             'can_follow'   => $this->canFollow(),
             'can_unfollow' => $this->canUnfollow(),
+            'can_exit'     => $this->canExit(),
+            'can_enter'    => $this->canEnter(),
         ];
     }
 
@@ -273,6 +275,22 @@ class Stock extends BaseModel implements AuditableContract
             !$this->trashed()
             && auth()->check()
             && $this->followers()->where('follower_people_id', auth()->people()?->id)->exists()
+        ) ?? false;
+    }
+
+    private function canExit(): bool
+    {
+        return (
+            !$this->trashed()
+            && auth()->check()
+        ) ?? false;
+    }
+
+    private function canEnter(): bool
+    {
+        return (
+            !$this->trashed()
+            && auth()->check()
         ) ?? false;
     }
 }
