@@ -78,7 +78,6 @@ class Request extends BaseModel implements AuditableContract
     protected $attributes = [
         self::ATTRIBUTE_FREIGHT_VALUE     => 0,
         self::ATTRIBUTE_DISCOUNT_VALUE    => 0,
-        self::V_ATTRIBUTE_CONTINUOUS_DAYS => 0,
     ];
 
     /*
