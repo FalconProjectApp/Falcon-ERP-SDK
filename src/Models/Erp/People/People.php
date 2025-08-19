@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use FalconERP\Skeleton\Enums\People\PeopleContactEnum;
 use FalconERP\Skeleton\Observers\NotificationObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use FalconERP\Skeleton\Enums\People\PeopleDocumentEnum;
@@ -234,6 +235,20 @@ class People extends BaseModel implements AuditableContract
     | Here you may specify the attributes that should be cast to native types.
     |
     */
+
+    protected function mainEmail(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->peopleContacts->where('type', PeopleContactEnum::TYPE_EMAIL)->first()?->value,
+        );
+    }
+
+    protected function mainPhone(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->peopleContacts->where('type', PeopleContactEnum::TYPE_PHONE)->first()?->value,
+        );
+    }
 
     protected function mainDocument(): Attribute
     {
