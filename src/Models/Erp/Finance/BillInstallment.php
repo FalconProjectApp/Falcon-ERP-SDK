@@ -4,29 +4,29 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
-use OwenIt\Auditing\Auditable;
 use FalconERP\Skeleton\Enums\ArchiveEnum;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use FalconERP\Skeleton\Enums\Finance\BillEnum;
 use FalconERP\Skeleton\Events\InstallmentCheck;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use QuantumTecnology\ServiceBasicsExtension\Models\Archive;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use QuantumTecnology\ModelBasicsExtension\Observers\EventDispatcherObserver;
+use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use QuantumTecnology\ServiceBasicsExtension\Models\Archive;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
-use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
-use QuantumTecnology\ModelBasicsExtension\Observers\EventDispatcherObserver;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -84,6 +84,22 @@ class BillInstallment extends BaseModel implements AuditableContract
             ->first();
     }
 
+    public function followers(): MorphToMany
+    {
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')
+            ->withTimestamps()
+            ->withTrashed();
+    }
+
+    public function followings(): MorphToMany
+    {
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'follower_people_id', 'followable_id')
+            ->withTimestamps()
+            ->withTrashed();
+    }
+
     /**
      * RegistrationFile1 function.
      * Returning the main email of the people.
@@ -123,29 +139,57 @@ class BillInstallment extends BaseModel implements AuditableContract
         );
     }
 
-    public function followers(): MorphToMany
-    {
-        return $this
-            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')
-            ->withTimestamps()
-            ->withTrashed();
-    }
-
-    public function followings(): MorphToMany
-    {
-        return $this
-            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'follower_people_id', 'followable_id')
-            ->withTimestamps()
-            ->withTrashed();
-    }
-
-
     #[Scope]
     protected function byBillIds(Builder $query, array $bills = []): Builder
     {
         return $query->when(
             $this->filtered($bills, 'bill_ids'),
             fn ($query, $bills) => $query->whereIn('bill_id', $bills)
+        );
+    }
+
+    #[Scope]
+    protected function byDueDateStart(Builder $query, array $due_date_start = []): Builder
+    {
+        return $query->when(
+            $this->filtered($due_date_start, 'due_date_start'),
+            fn ($query, $due_date_start) => $query->where('due_date', '>=', $due_date_start[0])
+        );
+    }
+
+    #[Scope]
+    protected function byDueDateEnd(Builder $query, array $due_date_end = []): Builder
+    {
+        return $query->when(
+            $this->filtered($due_date_end, 'due_date_end'),
+            fn ($query, $due_date_end) => $query->where('due_date', '<=', $due_date_end[0])
+        );
+    }
+
+    #[Scope]
+    protected function byPeopleIds(Builder $query, array $people_ids = []): Builder
+    {
+        return $query->when(
+            $this->filtered($people_ids, 'people_ids'),
+            fn ($query, $people_ids) => $query->whereHas('bill.people', fn ($q) => $q->whereIn('id', $people_ids))
+        );
+    }
+
+    #[Scope]
+    protected function byFinancialAccountIds(Builder $query, array $financial_account_ids = []): Builder
+    {
+        return $query->when(
+            $this->filtered($financial_account_ids, 'financial_account_ids'),
+            fn ($query, $financial_account_ids) => $query->whereHas('bill.financialAccount', fn ($q) => $q->whereIn('id', $financial_account_ids))
+        );
+    }
+
+    #[Scope]
+    protected function byType(Builder $query, array $types = []): Builder
+    {
+        return $query->when(
+            $this->filtered($types, 'type'),
+            fn ($query, $types) => $query->whereIn('type', $types)
         );
     }
 
