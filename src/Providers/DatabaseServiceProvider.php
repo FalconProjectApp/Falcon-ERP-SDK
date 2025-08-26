@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Providers;
 
@@ -20,12 +20,13 @@ class DatabaseServiceProvider extends ServiceProvider
     public function boot(): bool
     {
         $isAuth = match (true) {
-            $this->routeIs('/erp/private/') => $this->erpRoute(),
-            $this->routeIs('/user')         => $this->userRoute(),
-            $this->routeIs('/erp/public/')  => true,
-            $this->routeIs('/backoffice/')  => $this->backofficeRoute(),
-            $this->routeIs('/telescope/')   => false,
-            default                         => true,
+            $this->routeIs('/erp/private/')  => $this->erpRoute(),
+            $this->routeIs('/user/private/') => $this->erpRoute(),
+            $this->routeIs('/user/public/')  => $this->userRoute(),
+            $this->routeIs('/erp/public/')   => true,
+            $this->routeIs('/backoffice/')   => $this->backofficeRoute(),
+            $this->routeIs('/telescope/')    => false,
+            default                          => true,
         };
 
         abort_if(
@@ -66,7 +67,6 @@ class DatabaseServiceProvider extends ServiceProvider
             'searched'         => $shop->searched + 1,
             'last_searched_at' => Carbon::now(),
         ]);
-
         auth()->setDatabase($shop->databases);
 
         return true;
