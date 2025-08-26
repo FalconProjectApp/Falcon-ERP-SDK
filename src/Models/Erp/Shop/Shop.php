@@ -4,25 +4,25 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Shop;
 
-use Illuminate\Support\Str;
-use OwenIt\Auditing\Auditable;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Models\BackOffice\Shop as BackOfficeShop;
 use FalconERP\Skeleton\Models\Erp\People\People;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use FalconERP\Skeleton\Models\Erp\Service\Service;
 use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
-use FalconERP\Skeleton\Models\BackOffice\Shop as BackOfficeShop;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
@@ -91,7 +91,7 @@ class Shop extends BaseModel implements AuditableContract
     {
         return $this
             ->morphMany(BackOfficeShop::class, 'shopable')
-            ->where('database_id', auth()->database()->id);
+            ->when(request()->has('database'), fn ($query) => $query->where('database_id', request()->database->id));
     }
 
     public function segments(): HasMany

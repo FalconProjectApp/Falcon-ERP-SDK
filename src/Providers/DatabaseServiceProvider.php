@@ -39,6 +39,7 @@ class DatabaseServiceProvider extends ServiceProvider
 
     private function userRoute(): bool
     {
+
         abort_if(
             !request()->has('shop'),
             Response::HTTP_BAD_REQUEST,
@@ -65,7 +66,7 @@ class DatabaseServiceProvider extends ServiceProvider
             'searched'         => $shop->searched + 1,
             'last_searched_at' => Carbon::now(),
         ]);
-        auth()->check();
+
         auth()->setDatabase($shop->databases);
 
         return true;

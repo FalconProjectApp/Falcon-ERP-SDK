@@ -17,9 +17,13 @@ class PgDataBase extends BaseModel
     protected $fillable = [];
 
     #[Scope]
-    public function byDatname($query, string $datname)
+    public function byDatnames($query, array|string $datnames)
     {
-        return $query->where('datname', $datname);
+        if( is_string($datnames) ) {
+            $datnames = [$datnames];
+        }
+
+        return $query->whereIn('datname', $datnames);
     }
 
     public static function createDatabase(string $base): bool
