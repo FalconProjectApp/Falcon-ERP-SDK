@@ -144,6 +144,17 @@ class Stock extends BaseModel implements AuditableContract
     }
 
     #[Scope]
+    public function byGroupIds(Builder $query, string | array $params = []): Builder
+    {
+        return $query
+            ->when($this->filtered($params, 'group_ids'), function ($query, $params) {
+                $query->whereHas('product', function ($query) use ($params) {
+                    $query->whereIn('group_id', $params);
+                });
+            });
+    }
+
+    #[Scope]
     public function byProductIds(Builder $query, string | array $params = []): Builder
     {
         return $query
