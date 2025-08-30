@@ -32,7 +32,7 @@ class DatabaseServiceProvider extends ServiceProvider
         abort_if(
             false === $isAuth && 'OPTIONS' !== request()->server->get('REQUEST_METHOD'),
             Response::HTTP_UNAUTHORIZED,
-            'Não autorizado!'
+            __('Não autorizado!')
         );
 
         return true;
@@ -44,13 +44,13 @@ class DatabaseServiceProvider extends ServiceProvider
         abort_if(
             !request()->has('shop'),
             Response::HTTP_BAD_REQUEST,
-            'Shop não informado!'
+            __('Shop não informado!')
         );
 
         abort_if(
             request()->has('shop') && is_null(request()->shop),
             Response::HTTP_BAD_REQUEST,
-            'Shop não informado!'
+            __('Shop não informado!')
         );
 
         $shop = Shop::query()

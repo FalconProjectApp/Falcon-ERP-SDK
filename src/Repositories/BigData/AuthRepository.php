@@ -38,7 +38,7 @@ class AuthRepository
         }
 
         if ($data->isEmpty() && class_exists(Setting::class)) {
-            $data = Setting::byName('datahub_access');
+            $data = Setting::query()->byName('datahub_access');
         }
 
         abort_if(
