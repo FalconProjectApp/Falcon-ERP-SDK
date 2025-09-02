@@ -20,11 +20,11 @@ class DatabaseServiceProvider extends ServiceProvider
     public function boot(): bool
     {
         $isAuth = match (true) {
-            $this->routeIs('/erp/private/')  => $this->erpRoute(),
-            $this->routeIs('/user/private/') => $this->erpRoute(),
-            $this->routeIs('/user/public/')  => $this->userRoute(),
+            $this->routeIs('/erp/private/')  => $this->private(),
+            $this->routeIs('/user/private/') => $this->private(),
+            $this->routeIs('/user/public/')  => $this->public(),
             $this->routeIs('/erp/public/')   => true,
-            $this->routeIs('/backoffice/')   => $this->backofficeRoute(),
+            $this->routeIs('/backoffice/')   => $this->private(),
             $this->routeIs('/telescope/')    => false,
             default                          => true,
         };
@@ -38,9 +38,8 @@ class DatabaseServiceProvider extends ServiceProvider
         return true;
     }
 
-    private function userRoute(): bool
+    private function public(): bool
     {
-
         abort_if(
             !request()->has('shop'),
             Response::HTTP_BAD_REQUEST,
@@ -67,21 +66,13 @@ class DatabaseServiceProvider extends ServiceProvider
             'searched'         => $shop->searched + 1,
             'last_searched_at' => Carbon::now(),
         ]);
+
         auth()->setDatabase($shop->databases);
 
         return true;
     }
 
-    private function erpRoute()
-    {
-        if (!auth()->check()) {
-            return false;
-        }
-
-        return auth()->database();
-    }
-
-    private function backofficeRoute()
+    private function private()
     {
         if (!auth()->check()) {
             return false;
