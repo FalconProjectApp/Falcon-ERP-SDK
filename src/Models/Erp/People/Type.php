@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use FalconERP\Skeleton\Database\Factories\People\TypeFactory;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
+use FalconERP\Skeleton\Enums\People\Type\LegalEntityTypesEnum;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class Type extends BaseModel implements AuditableContract
@@ -30,7 +31,7 @@ class Type extends BaseModel implements AuditableContract
     protected $casts = [
         'id'          => 'integer',
         'description' => 'string',
-        'type'        => TypesEnum::class,
+        'type'        => LegalEntityTypesEnum::class,
     ];
 
     protected static function newFactory()
