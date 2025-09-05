@@ -261,14 +261,12 @@ class People extends BaseModel implements AuditableContract
     protected function mainDocument(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->peopleDocuments()->first()?->value,
+            get: fn () => $this->peopleDocuments->first()?->value,
         );
     }
 
     protected function mainAddress(): Attribute
     {
-        $this->loadMissing('addresses');
-
         return Attribute::make(
             get: fn () => $this->addresses->where('main', true)->first(),
         );
@@ -277,14 +275,14 @@ class People extends BaseModel implements AuditableContract
     protected function cnpj(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->peopleDocuments()->where('type', PeopleDocumentEnum::TYPE_CNPJ)->first()?->value,
+            get: fn () => $this->peopleDocuments->where('type', PeopleDocumentEnum::TYPE_CNPJ)->first()?->value,
         );
     }
 
     protected function cpf(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->peopleDocuments()->where('type', PeopleDocumentEnum::TYPE_CPF)->first()?->value,
+            get: fn () => $this->peopleDocuments->where('type', PeopleDocumentEnum::TYPE_CPF)->first()?->value,
         );
     }
 
@@ -298,14 +296,14 @@ class People extends BaseModel implements AuditableContract
     protected function ie(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->peopleDocuments()->where('type', PeopleDocumentEnum::TYPE_IE)->first()?->value,
+            get: fn () => $this->peopleDocuments->where('type', PeopleDocumentEnum::TYPE_IE)->first()?->value,
         );
     }
 
     protected function im(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->peopleDocuments()->where('type', PeopleDocumentEnum::TYPE_IM)->first()?->value,
+            get: fn () => $this->peopleDocuments->where('type', PeopleDocumentEnum::TYPE_IM)->first()?->value,
         );
     }
 
@@ -327,7 +325,7 @@ class People extends BaseModel implements AuditableContract
     protected function age(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->birth_date?->age,
+            get: fn () => $this->birth_date ? abs(now()->diffInYears($this->birth_date)) : null,
         );
     }
 

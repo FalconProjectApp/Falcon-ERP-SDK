@@ -169,7 +169,7 @@ trait PeopleSegmentTrait
         $this->loadMissing('segments');
 
         return Attribute::make(
-            get: fn () => $this->segments->where('name', 'exame_admission_date')->first()?->value,
+            get: fn (): ?string => $this->segments->where('name', 'exame_admission_date')->first()?->value,
         );
     }
 
@@ -178,7 +178,7 @@ trait PeopleSegmentTrait
         $this->loadMissing('segments');
 
         return Attribute::make(
-            get: fn () => $this->segments->where('name', 'exame_demission_date')->first()?->value,
+            get: fn (): ?string => $this->segments->where('name', 'exame_demission_date')->first()?->value,
         );
     }
 
@@ -187,7 +187,7 @@ trait PeopleSegmentTrait
         $this->loadMissing('segments');
 
         return Attribute::make(
-            get: fn () => $this->segments->where('name', 'uses_transportation_voucher')->first()?->value,
+            get: fn (): bool => (bool) $this->segments->where('name', 'uses_transportation_voucher')->first()?->value,
         );
     }
 
@@ -196,7 +196,7 @@ trait PeopleSegmentTrait
         $this->loadMissing('segments');
 
         return Attribute::make(
-            get: fn () => $this->segments->where('name', 'transportation_voucher_value')->first()?->value,
+            get: fn (): ?int => (int) $this->segments->where('name', 'transportation_voucher_value')->first()?->value,
         );
     }
 
@@ -205,7 +205,7 @@ trait PeopleSegmentTrait
         $this->loadMissing('segments');
 
         return Attribute::make(
-            get: fn () => $this->segments->where('name', 'uses_food_voucher')->first()?->value,
+            get: fn (): bool => (bool) $this->segments->where('name', 'uses_food_voucher')->first()?->value,
         );
     }
 
@@ -214,7 +214,7 @@ trait PeopleSegmentTrait
         $this->loadMissing('segments');
 
         return Attribute::make(
-            get: fn (): ?int => $this->segments->where('name', 'food_voucher_value')->first()?->value,
+            get: fn (): ?int => (int) $this->segments->where('name', 'food_voucher_value')->first()?->value,
         );
     }
 
@@ -223,7 +223,7 @@ trait PeopleSegmentTrait
         $this->loadMissing('segments');
 
         return Attribute::make(
-            get: fn (): bool => $this->segments->where('name', 'uses_health_plan')->first()?->value,
+            get: fn (): bool => (bool) $this->segments->where('name', 'uses_health_plan')->first()?->value,
         );
     }
 
@@ -232,7 +232,7 @@ trait PeopleSegmentTrait
         $this->loadMissing('segments');
 
         return Attribute::make(
-            get: fn (): ?int => $this->segments->where('name', 'health_plan_value')->first()?->value,
+            get: fn (): ?int => (int) (int) $this->segments->where('name', 'health_plan_value')->first()?->value,
         );
     }
 
@@ -241,7 +241,7 @@ trait PeopleSegmentTrait
         $this->loadMissing('segments');
 
         return Attribute::make(
-            get: fn (): bool => $this->segments->where('name', 'uses_life_insurance')->first()?->value,
+            get: fn (): bool => (bool) $this->segments->where('name', 'uses_life_insurance')->first()?->value,
         );
     }
 
@@ -250,7 +250,7 @@ trait PeopleSegmentTrait
         $this->loadMissing('segments');
 
         return Attribute::make(
-            get: fn (): ?int => $this->segments->where('name', 'life_insurance_value')->first()?->value,
+            get: fn (): ?int => (int) $this->segments->where('name', 'life_insurance_value')->first()?->value,
         );
     }
 
@@ -259,7 +259,7 @@ trait PeopleSegmentTrait
         $this->loadMissing('segments');
 
         return Attribute::make(
-            get: fn (): bool => $this->segments->where('name', 'first_job')->first()?->value,
+            get: fn (): bool => (bool) $this->segments->where('name', 'first_job')->first()?->value,
         );
     }
 
@@ -268,7 +268,7 @@ trait PeopleSegmentTrait
         $this->loadMissing('segments');
 
         return Attribute::make(
-            get: fn (): bool => $this->segments->where('name', 'has_disability')->first()?->value,
+            get: fn (): bool => (bool) $this->segments->where('name', 'has_disability')->first()?->value,
         );
     }
 
@@ -277,7 +277,7 @@ trait PeopleSegmentTrait
         $this->loadMissing('segments');
 
         return Attribute::make(
-            get: fn (): bool => $this->segments->where('name', 'works_simultaneously_in_another_company')->first()?->value,
+            get: fn (): bool => (bool) $this->segments->where('name', 'works_simultaneously_in_another_company')->first()?->value,
         );
     }
 
