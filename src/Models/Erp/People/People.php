@@ -4,34 +4,34 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\People;
 
-use OwenIt\Auditing\Auditable;
-use FalconERP\Skeleton\Models\User;
-use FalconERP\Skeleton\Enums\ArchiveEnum;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use FalconERP\Skeleton\Enums\People\PeopleCrtEnum;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use FalconERP\Skeleton\Enums\People\PeopleContactEnum;
-use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use FalconERP\Skeleton\Enums\People\PeopleDocumentEnum;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
-use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
-use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
 use FalconERP\Skeleton\Database\Factories\People\PersonFactory;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
-use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
+use FalconERP\Skeleton\Enums\ArchiveEnum;
+use FalconERP\Skeleton\Enums\People\PeopleContactEnum;
+use FalconERP\Skeleton\Enums\People\PeopleCrtEnum;
+use FalconERP\Skeleton\Enums\People\PeopleDocumentEnum;
+use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
 use FalconERP\Skeleton\Models\Erp\People\Traits\People\PeopleSegmentTrait;
+use FalconERP\Skeleton\Models\User;
+use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ModelBasicsExtension\Observers\EventDispatcherObserver;
+use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -107,7 +107,15 @@ class People extends BaseModel implements AuditableContract
     |
     */
 
+    /**
+     * @deprecated version 8.0.0 Use type() instead
+     */
     public function types(): BelongsTo
+    {
+        return $this->belongsTo(Type::class);
+    }
+
+    public function type(): BelongsTo
     {
         return $this->belongsTo(Type::class);
     }
@@ -303,6 +311,35 @@ class People extends BaseModel implements AuditableContract
     {
         return Attribute::make(
             get: fn () => '4789099',
+        );
+    }
+
+    protected function isLegalEntityType(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => (bool) $this->type->is_legal_entity_type
+                ?? false,
+        );
+    }
+
+    protected function age(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->birth_date?->age,
+        );
+    }
+
+    protected function isMinor(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): bool => (int) $this->age < 18,
+        );
+    }
+
+    protected function isAdult(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): bool => (int) $this->age >= 18,
         );
     }
 
