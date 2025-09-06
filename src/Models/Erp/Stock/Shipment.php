@@ -42,6 +42,7 @@ class Shipment extends BaseModel implements AuditableContract
 
     protected $fillable = [
         self::ATTRIBUTE_STATUS,
+        self::ATTRIBUTE_DRIVER_ID,
     ];
 
     protected $casts = [

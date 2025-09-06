@@ -7,6 +7,7 @@ namespace FalconERP\Skeleton;
 use Exception;
 use FalconERP\Skeleton\Repositories\BigData\AuthRepository;
 use FalconERP\Skeleton\Repositories\BigData\CityRepository;
+use FalconERP\Skeleton\Repositories\BigData\DeliveryRepository;
 use FalconERP\Skeleton\Repositories\BigData\IpRepository;
 use FalconERP\Skeleton\Repositories\BigData\XmlRepository;
 use FalconERP\Skeleton\Repositories\Finance\AccountRepository;
@@ -33,11 +34,12 @@ class Falcon
         }
 
         return match ($module) {
-            'xml'   => new XmlRepository(self::$auth),
-            'city'  => new CityRepository(self::$auth),
-            'ip'    => new IpRepository(self::$auth),
-            'auth'  => new AuthRepository(),
-            default => false,
+            'xml'      => new XmlRepository(self::$auth),
+            'city'     => new CityRepository(self::$auth),
+            'ip'       => new IpRepository(self::$auth),
+            'delivery' => new DeliveryRepository(self::$auth),
+            'auth'     => new AuthRepository(),
+            default    => false,
         };
     }
 
