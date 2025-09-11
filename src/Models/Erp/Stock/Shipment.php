@@ -6,6 +6,7 @@ namespace FalconERP\Skeleton\Models\Erp\Stock;
 
 use FalconERP\Skeleton\Database\Factories\ShipmentFactory;
 use FalconERP\Skeleton\Enums\ArchiveEnum;
+use FalconERP\Skeleton\Enums\Stock\Shipment\ShipmentStatusEnum;
 use FalconERP\Skeleton\Models\Erp\People\People;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -19,6 +20,7 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
@@ -35,6 +37,7 @@ class Shipment extends BaseModel implements AuditableContract
     use HasFactory;
     use SetSchemaTrait;
     use SoftDeletes;
+    //use HasUuids;
 
     public const ATTRIBUTE_ID        = 'id';
     public const ATTRIBUTE_DRIVER_ID = 'driver_id';
@@ -48,7 +51,7 @@ class Shipment extends BaseModel implements AuditableContract
     protected $casts = [
         self::ATTRIBUTE_ID        => 'integer',
         self::ATTRIBUTE_DRIVER_ID => 'integer',
-        self::ATTRIBUTE_STATUS    => 'string',
+        self::ATTRIBUTE_STATUS    => ShipmentStatusEnum::class,
     ];
 
     /*

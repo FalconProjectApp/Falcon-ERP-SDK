@@ -1,28 +1,23 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use OwenIt\Auditing\Auditable;
-use FalconERP\Skeleton\Enums\ArchiveEnum;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use FalconERP\Skeleton\Models\Erp\Stock\Shipment;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use FalconERP\Skeleton\Database\Factories\ShipmentFactory;
+use FalconERP\Skeleton\Enums\ArchiveEnum;
+use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
-use FalconERP\Skeleton\Observers\NotificationObserver;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -37,18 +32,38 @@ class ShipmentRoute extends BaseModel implements AuditableContract
     use SetSchemaTrait;
     use SoftDeletes;
 
-    public const ATTRIBUTE_ID        = 'id';
-    public const ATTRIBUTE_DRIVER_ID = 'driver_id';
-    public const ATTRIBUTE_STATUS    = 'status';
+    public const ATTRIBUTE_ID                         = 'id';
+    public const ATTRIBUTE_SHIPMENT_ID                = 'shipment_id';
+    public const ATTRIBUTE_ROUTE                      = 'route';
+    public const ATTRIBUTE_PRIORITY                   = 'priority';
+    public const ATTRIBUTE_DRIVER_DEPARTURE           = 'departured_at';
+    public const ATTRIBUTE_DRIVER_ARRIVAL             = 'arrived_at';
+    public const ATTRIBUTE_DRIVER_ESTIMATED_ARRIVAL   = 'estimated_arrival_at';
+    public const ATTRIBUTE_DRIVER_ESTIMATED_DEPARTURE = 'estimated_departure_at';
+    public const ATTRIBUTE_STATUS                     = 'status';
 
     protected $fillable = [
+        self::ATTRIBUTE_SHIPMENT_ID,
+        self::ATTRIBUTE_ROUTE,
+        self::ATTRIBUTE_PRIORITY,
+        self::ATTRIBUTE_DRIVER_DEPARTURE,
+        self::ATTRIBUTE_DRIVER_ARRIVAL,
+        self::ATTRIBUTE_DRIVER_ESTIMATED_ARRIVAL,
+        self::ATTRIBUTE_DRIVER_ESTIMATED_DEPARTURE,
         self::ATTRIBUTE_STATUS,
+
     ];
 
     protected $casts = [
-        self::ATTRIBUTE_ID        => 'integer',
-        self::ATTRIBUTE_DRIVER_ID => 'integer',
-        self::ATTRIBUTE_STATUS    => 'string',
+        self::ATTRIBUTE_ID                         => 'integer',
+        self::ATTRIBUTE_SHIPMENT_ID                => 'integer',
+        self::ATTRIBUTE_ROUTE                      => 'string',
+        self::ATTRIBUTE_PRIORITY                   => 'integer',
+        self::ATTRIBUTE_DRIVER_DEPARTURE           => 'datetime',
+        self::ATTRIBUTE_DRIVER_ARRIVAL             => 'datetime',
+        self::ATTRIBUTE_DRIVER_ESTIMATED_ARRIVAL   => 'datetime',
+        self::ATTRIBUTE_DRIVER_ESTIMATED_DEPARTURE => 'datetime',
+        self::ATTRIBUTE_STATUS                     => 'string',
     ];
 
     /*

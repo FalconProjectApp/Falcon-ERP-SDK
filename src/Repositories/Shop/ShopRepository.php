@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace FalconERP\Skeleton\Repositories\Shop;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use QuantumTecnology\ValidateTrait\Data;
 
 class ShopRepository
@@ -16,15 +17,16 @@ class ShopRepository
     public ?string $id            = null;
     public array | object $errors = [];
     public array | object $data   = [];
-    private string $urlApi;
-    private ?string $authorization;
+    public array | object $params = [];
 
     public int $timeout = 30;
+    private string $urlApi;
+    private ?string $authorization;
 
     public function __construct(array $params = [])
     {
         $this->urlApi = sprintf(
-            '%s/erp/private/shop/shops/v1',
+            '%s/erp/private/shops/v1',
             config('falconservices.shop.' . config('app.env') . '.url_api')
         );
 
@@ -33,20 +35,38 @@ class ShopRepository
         $this->timeout = config('falconservices.timeout', 30);
     }
 
-    public function index(): self
+    public function index(?string $search = null, ?int $perPage = null): self
     {
         if (blank($this->authorization)) {
             return $this;
         }
 
-        $response = Http::withToken($this->authorization, null)
+        if (!blank($search)) {
+            $this->params['search'] = $search;
+        }
+
+        if (!blank($perPage)) {
+            $this->params['per_page'] = $perPage;
+        }
+
+        $response = Http::withToken($this->authorization)
             ->retry(3, 2000, throw: false)
             ->acceptJson()
             ->asJson()
-            ->get("{$this->urlApi}");
+            ->connectTimeout($this->timeout)
+            ->get($this->urlApi, $this->params);
+
+        $this->http_code = $response->status();
 
         if (!$response->successful()) {
-            $this->data = collect();
+            $this->message = $response->object()->message ?? $this->message;
+            $this->errors  = $response->object()->data ?? $this->errors;
+            $this->data    = collect();
+
+            Log::error('Request failed', [
+                'http_code' => $this->http_code,
+                'response'  => $response->body(),
+            ]);
 
             return $this;
         }
@@ -98,15 +118,24 @@ class ShopRepository
             return $this;
         }
 
-        $response = Http::withToken($this->authorization, null)
+        $response = Http::withToken($this->authorization)
             ->retry(3, 2000, throw: false)
             ->acceptJson()
             ->asJson()
+            ->connectTimeout($this->timeout)
             ->post($this->urlApi, $this->data->toArray());
 
+        $this->http_code = $response->status();
+
         if (!$response->successful()) {
-            $this->http_code = $response->status();
-            $this->data      = collect();
+            $this->message = $response->object()->message ?? $this->message;
+            $this->errors  = $response->object()->data ?? $this->errors;
+            $this->data    = collect();
+
+            Log::error('Request failed', [
+                'http_code' => $this->http_code,
+                'response'  => $response->body(),
+            ]);
 
             return $this;
         }

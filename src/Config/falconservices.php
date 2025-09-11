@@ -59,7 +59,7 @@ return [
             'url_api' => env('FALCON_SHOP_URL', 'https://n0isrx5qib.execute-api.us-east-1.amazonaws.com'),
         ],
         'local' => [
-            'url_api' => env('FALCON_SHOP_URL', 'http://falcon-nginx:90'),
+            'url_api' => env('FALCON_SHOP_URL', 'http://localhost:8008'),
         ],
     ],
 
