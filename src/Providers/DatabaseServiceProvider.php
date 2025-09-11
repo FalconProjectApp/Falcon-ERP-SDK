@@ -25,7 +25,7 @@ class DatabaseServiceProvider extends ServiceProvider
             $this->routeIs('/user/public/')  => $this->public(),
             $this->routeIs('/erp/public/')   => true,
             $this->routeIs('/backoffice/')   => $this->private(),
-            $this->routeIs('/telescope/')    => false,
+            $this->routeIs('/telescope/')    => config('telescope.enabled', false),
             default                          => true,
         };
 
