@@ -263,7 +263,7 @@ class BillInstallment extends BaseModel implements AuditableContract
     private function canPay(): bool
     {
         return !$this->trashed()
-            && BillEnum::STATUS_OPEN === $this->status
+            && in_array($this->status, [BillEnum::STATUS_OPEN, BillEnum::STATUS_PAID_PARTIAL])
             && null !== $this->bill
             && BillEnum::TYPE_PAY === $this->bill?->type;
     }
@@ -271,7 +271,7 @@ class BillInstallment extends BaseModel implements AuditableContract
     private function canReceive(): bool
     {
         return !$this->trashed()
-            && BillEnum::STATUS_OPEN === $this->status
+            && in_array($this->status, [BillEnum::STATUS_OPEN, BillEnum::STATUS_PAID_PARTIAL])
             && null !== $this->bill
             && BillEnum::TYPE_RECEIVE === $this->bill?->type;
     }
