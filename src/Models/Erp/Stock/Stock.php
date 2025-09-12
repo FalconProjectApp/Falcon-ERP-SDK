@@ -46,6 +46,7 @@ class Stock extends BaseModel implements AuditableContract
     protected $fillable = [
         self::ATTRIBUTE_ID,
         self::ATTRIBUTE_PRODUCT_ID,
+        self::V_ATTRIBUTE_DUN,
         self::ATTRIBUTE_VOLUME_TYPE_ID,
         self::ATTRIBUTE_DESCRIPTION,
         self::ATTRIBUTE_BALANCE_TRANSIT,
@@ -64,6 +65,7 @@ class Stock extends BaseModel implements AuditableContract
 
     protected $casts = [
         self::ATTRIBUTE_PRODUCT_ID     => 'integer',
+
         self::ATTRIBUTE_VOLUME_TYPE_ID => 'integer',
         self::ATTRIBUTE_VALUE          => 'integer',
 
@@ -71,6 +73,18 @@ class Stock extends BaseModel implements AuditableContract
         self::V_ATTRIBUTE_BALANCE     => 'integer',
         self::V_ATTRIBUTE_VALUE_TOTAL => 'integer',
         self::V_ATTRIBUTE_ACTIONS     => 'array',
+        self::V_ATTRIBUTE_DUN         => 'string',
+        self::ATTRIBUTE_DESCRIPTION   => 'string',
+        self::ATTRIBUTE_COLOR         => 'string',
+        self::ATTRIBUTE_ON_SHOP       => 'boolean',
+        self::ATTRIBUTE_MEASURE       => 'string',
+        self::ATTRIBUTE_WEIGHT        => 'string',
+        self::ATTRIBUTE_HEIGHT        => 'string',
+        self::ATTRIBUTE_WIDTH         => 'string',
+        self::ATTRIBUTE_DEPTH         => 'string',
+        self::ATTRIBUTE_STATUS        => 'boolean',
+        self::ATTRIBUTE_OBS           => 'string',
+self::V_ATTRIBUTE_DUN
     ];
 
     /*
