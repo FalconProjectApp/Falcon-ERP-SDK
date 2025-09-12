@@ -4,7 +4,10 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Repositories\BigData;
 
+use FalconERP\Skeleton\Falcon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class CityRepository
 {
@@ -29,9 +32,30 @@ class CityRepository
             config('falconservices.big_data.'.config('app.env').'.url_api')
         );
 
-        $this->authorization = $auth->data->access_token;
+        $this->authorization();
 
         $this->timeout = config('falconservices.timeout', 30);
+    }
+
+    public function authorization(): ?string
+    {
+        $cacheKey = sprintf('%s_falcon_big_data_auth', database()->base);
+
+        if (!Cache::has($cacheKey)) {
+            $auth = Falcon::bigDataService('auth')->login();
+
+            if (isset($auth->data->access_token, $auth->data->expires_in)) {
+                Cache::put(
+                    $cacheKey,
+                    $auth->data->access_token,
+                    now()->addMinutes(max(1, $auth->data->expires_in / 60 - 1))
+                );
+            } else {
+                throw new \RuntimeException('Failed to retrieve authorization token.');
+            }
+        }
+
+        return $this->authorization = Cache::get($cacheKey);
     }
 
     public function get(?string $search = null)
@@ -55,6 +79,8 @@ class CityRepository
             $this->message = $response->object()->message ?? $this->message;
             $this->errors  = $response->object()->data ?? $this->errors;
             $this->data    = collect();
+
+            Log::warning('Request failed', (array) $response);
 
             return $this;
         }
