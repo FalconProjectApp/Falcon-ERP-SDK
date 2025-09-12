@@ -14,32 +14,21 @@ use FalconERP\Skeleton\Repositories\Finance\AccountRepository;
 use FalconERP\Skeleton\Repositories\Finance\BillRepository;
 use FalconERP\Skeleton\Repositories\Fiscal\InvoiceRepository;
 use FalconERP\Skeleton\Repositories\Shop\ShopRepository;
+use Illuminate\Support\Facades\Cache;
 
 class Falcon
 {
     private static $auth;
 
-    public static function bigDataService(string $module, bool $isPrivate = true)
+    public static function bigDataService(string $module)
     {
-        if (!self::$auth && $isPrivate) {
-            self::$auth = true;
-
-            try {
-                self::$auth = self::bigDataService('auth')->login();
-            } catch (Exception $e) {
-                self::$auth = false;
-
-                return null;
-            }
-        }
-
         return match ($module) {
             'xml'      => new XmlRepository(self::$auth),
             'city'     => new CityRepository(self::$auth),
             'ip'       => new IpRepository(self::$auth),
             'delivery' => new DeliveryRepository(self::$auth),
             'auth'     => new AuthRepository(),
-            default    => false,
+            default    => throw new Exception("Invalid module: $module"),
         };
     }
 
@@ -48,7 +37,7 @@ class Falcon
         return match ($module) {
             'bill'    => new BillRepository(),
             'account' => new AccountRepository(),
-            default   => false,
+            default   => throw new Exception("Invalid module: $module"),
         };
     }
 
@@ -56,7 +45,7 @@ class Falcon
     {
         return match ($module) {
             'invoice' => new InvoiceRepository(),
-            default   => false,
+            default   => throw new Exception("Invalid module: $module"),
         };
     }
 
@@ -64,7 +53,7 @@ class Falcon
     {
         return match ($module) {
             'shop'  => new ShopRepository($params),
-            default => false,
+            default => throw new Exception("Invalid module: $module"),
         };
     }
 }
