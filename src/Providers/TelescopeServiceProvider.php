@@ -1,24 +1,28 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Providers;
 
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
 use Laravel\Telescope\TelescopeApplicationServiceProvider;
-use Override;
 
 class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 {
     /**
      * Register any application services.
      */
-    #[Override]
+    #[\Override]
     public function register(): void
     {
         Telescope::night();
+
+        Telescope::tag(function ($entry) {
+            return ['service:'.Str::slug(config('app.name'))];
+        });
 
         $this->hideSensitiveRequestDetails();
 
@@ -65,14 +69,14 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         ]);
     }
 
-    #[Override]
+    #[\Override]
     protected function gate(): void
     {
         Gate::define('viewTelescope', fn ($user): bool => in_array($user->email, [
         ]));
     }
 
-    #[Override]
+    #[\Override]
     protected function authorization(): void
     {
         $this->gate();
