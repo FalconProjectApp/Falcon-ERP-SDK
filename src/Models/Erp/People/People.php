@@ -327,7 +327,7 @@ class People extends BaseModel implements AuditableContract
     protected function age(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->birth_date?->age,
+            get: fn (): int => $this->birth_date?->age ?? 0,
         );
     }
 
