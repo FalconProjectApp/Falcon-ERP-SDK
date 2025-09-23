@@ -78,13 +78,14 @@ class DatabaseServiceProvider extends ServiceProvider
         $token = request()->bearerToken();
 
         abort_if(
-            is_null($token),
+            is_null($token) && 'OPTIONS' !== request()->server->get('REQUEST_METHOD'),
             Response::HTTP_UNAUTHORIZED,
             __('Token não informado!')
         );
 
+        $personalAccessToken = PersonalAccessToken::findToken($token);
         abort_if(
-            PersonalAccessToken::findToken($token)->expires_at->isPast(),
+            (is_null($personalAccessToken) || $personalAccessToken->expires_at->isPast()) && 'OPTIONS' !== request()->server->get('REQUEST_METHOD'),
             Response::HTTP_FORBIDDEN,
             __('Token expirado!')
         );
