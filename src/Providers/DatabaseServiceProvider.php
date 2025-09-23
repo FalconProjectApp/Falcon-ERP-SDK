@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace FalconERP\Skeleton\Providers;
 
 use Carbon\Carbon;
+use FalconERP\Skeleton\Models\BackOffice\PersonalAccessToken;
 use FalconERP\Skeleton\Models\BackOffice\Shop;
 use Illuminate\Http\Response;
 use Illuminate\Support\ServiceProvider;
@@ -74,6 +75,20 @@ class DatabaseServiceProvider extends ServiceProvider
 
     private function private()
     {
+        $token = request()->bearerToken();
+
+        abort_if(
+            is_null($token),
+            Response::HTTP_UNAUTHORIZED,
+            __('Token não informado!')
+        );
+
+        abort_if(
+            PersonalAccessToken::findToken($token)->expires_at->isPast(),
+            Response::HTTP_FORBIDDEN,
+            __('Token expirado!')
+        );
+
         if (!auth()->check()) {
             return false;
         }
