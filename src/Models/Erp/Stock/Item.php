@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
 use FalconERP\Skeleton\Database\Factories\ItemFactory;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Request\ProductCollunsTrait;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +21,7 @@ class Item extends BaseModel
     use HasFactory;
     use SetSchemaTrait;
     use SoftDeletes;
+    use ProductCollunsTrait;
 
     protected $fillable = [
         'stock_id',
@@ -80,7 +82,7 @@ class Item extends BaseModel
     protected function cBarra(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->stock->product->bar_code,
+            get: fn () => $this->stock->product->{self::V_ATTRIBUTE_EAN},
         );
     }
 
@@ -154,7 +156,7 @@ class Item extends BaseModel
     protected function cEAN(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->stock->product->bar_code,
+            get: fn () => $this->stock->product->{self::V_ATTRIBUTE_EAN},
         );
     }
 
@@ -164,7 +166,7 @@ class Item extends BaseModel
     protected function cEANTrib(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->stock->product->bar_code,
+            get: fn () => $this->stock->product->{self::V_ATTRIBUTE_EAN},
         );
     }
 

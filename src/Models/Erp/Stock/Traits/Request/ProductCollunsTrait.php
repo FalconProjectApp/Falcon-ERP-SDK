@@ -8,7 +8,6 @@ trait ProductCollunsTrait
 {
     public const ATTRIBUTE_ID              = 'id';
     public const ATTRIBUTE_GROUPS_ID       = 'group_id';
-    public const ATTRIBUTE_VOLUME_TYPE_ID  = 'volume_types_id';
     public const ATTRIBUTE_STATUS          = 'status';
     public const ATTRIBUTE_DESCRIPTION     = 'description';
     public const V_ATTRIBUTE_EAN           = 'ean';

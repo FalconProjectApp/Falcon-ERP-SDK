@@ -4,21 +4,23 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use OwenIt\Auditing\Auditable;
-use Illuminate\Database\Eloquent\Builder;
-use FalconERP\Skeleton\Models\Erp\Shop\Shop;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use FalconERP\Skeleton\Database\Factories\GroupFactory;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use FalconERP\Skeleton\Models\Erp\Shop\Shop;
+use FalconERP\Skeleton\Models\Erp\Shop\ShopLinked;
+use FalconERP\Skeleton\Models\Erp\Stock\Traits\Group\GroupCollunsTrait;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
@@ -26,24 +28,20 @@ class Group extends BaseModel implements AuditableContract
 {
     use ActionTrait;
     use Auditable;
+    use GroupCollunsTrait;
     use HasFactory;
     use SetSchemaTrait;
     use SoftDeletes;
 
-    public const ATTRIBUTE_DESCRIPTION = 'description';
-
     protected $fillable = [
         self::ATTRIBUTE_DESCRIPTION,
+        self::ATTRIBUTE_PARENT_ID,
     ];
 
     protected $casts = [
         self::ATTRIBUTE_DESCRIPTION => 'string',
+        self::ATTRIBUTE_PARENT_ID   => 'integer',
     ];
-
-    protected static function newFactory()
-    {
-        return GroupFactory::new();
-    }
 
     /*
     |--------------------------------------------------------------------------
@@ -87,6 +85,15 @@ class Group extends BaseModel implements AuditableContract
             ->withTrashed();
     }
 
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(
+            related: self::class,
+            foreignKey: self::ATTRIBUTE_PARENT_ID,
+            ownerKey: self::ATTRIBUTE_ID,
+        );
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Scopes
@@ -109,6 +116,11 @@ class Group extends BaseModel implements AuditableContract
     public function canView(): bool
     {
         return true;
+    }
+
+    protected static function newFactory()
+    {
+        return GroupFactory::new();
     }
 
     /*

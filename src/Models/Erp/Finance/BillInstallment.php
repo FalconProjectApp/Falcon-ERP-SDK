@@ -171,7 +171,7 @@ class BillInstallment extends BaseModel implements AuditableContract
     {
         return $query->when(
             $this->filtered($people_ids, 'people_ids'),
-            fn ($query, $people_ids) => $query->whereHas('bill.people', fn ($q) => $q->whereIn('id', $people_ids))
+            fn ($query, $people_ids) => $query->whereHas('bill', fn ($q) => $q->whereIn('people_id', $people_ids))
         );
     }
 
@@ -180,7 +180,7 @@ class BillInstallment extends BaseModel implements AuditableContract
     {
         return $query->when(
             $this->filtered($financial_account_ids, 'financial_account_ids'),
-            fn ($query, $financial_account_ids) => $query->whereHas('bill.financialAccount', fn ($q) => $q->whereIn('id', $financial_account_ids))
+            fn ($query, $financial_account_ids) => $query->whereHas('bill', fn ($q) => $q->whereIn('financial_account_id', $financial_account_ids))
         );
     }
 
@@ -188,8 +188,17 @@ class BillInstallment extends BaseModel implements AuditableContract
     protected function byType(Builder $query, array $types = []): Builder
     {
         return $query->when(
-            $this->filtered($types, 'type'),
-            fn ($query, $types) => $query->whereIn('type', $types)
+            $this->filtered($types, 'types'),
+            fn ($query, $types) => $query->whereHas('bill', fn ($q) => $q->whereIn('type', $types))
+        );
+    }
+
+    #[Scope]
+    protected function byStatus(Builder $query, array $status = []): Builder
+    {
+        return $query->when(
+            $this->filtered($status, 'status'),
+            fn ($query, $status) => $query->whereIn('status', $status)
         );
     }
 
