@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
@@ -9,7 +9,9 @@ use FalconERP\Skeleton\Enums\ArchiveEnum;
 use FalconERP\Skeleton\Enums\Stock\Shipment\ShipmentStatusEnum;
 use FalconERP\Skeleton\Models\Erp\People\People;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use FalconERP\Skeleton\Observers\NotificationObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -19,8 +21,6 @@ use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
-use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
@@ -37,7 +37,7 @@ class Shipment extends BaseModel implements AuditableContract
     use HasFactory;
     use SetSchemaTrait;
     use SoftDeletes;
-    //use HasUuids;
+    // use HasUuids;
 
     public const ATTRIBUTE_ID        = 'id';
     public const ATTRIBUTE_DRIVER_ID = 'driver_id';
@@ -154,12 +154,21 @@ class Shipment extends BaseModel implements AuditableContract
     protected function setActions(): array
     {
         return [
-            'can_view'     => $this->canView(),
-            'can_restore'  => $this->canRestore(),
-            'can_update'   => $this->canUpdate(),
-            'can_delete'   => $this->canDelete(),
-            'can_follow'   => $this->canFollow(),
-            'can_unfollow' => $this->canUnfollow(),
+            'can_view'              => $this->canView(),
+            'can_restore'           => $this->canRestore(),
+            'can_update'            => $this->canUpdate(),
+            'can_delete'            => $this->canDelete(),
+            'can_follow'            => $this->canFollow(),
+            'can_unfollow'          => $this->canUnfollow(),
+            'can_transit'           => $this->canTransit(),
+            'can_deliver'           => $this->canDeliver(),
+            'can_cancel'            => $this->canCancel(),
+            'can_return'            => $this->canReturn(),
+            'can_fail_delivery'     => $this->canFailDelivery(),
+            'can_on_hold'           => $this->canOnHold(),
+            'can_complete'          => $this->canComplete(),
+            'can_partially_deliver' => $this->canPartiallyDeliver(),
+            'can_awaiting_pickup'   => $this->canAwaitingPickup(),
         ];
     }
 
@@ -171,6 +180,51 @@ class Shipment extends BaseModel implements AuditableContract
     private function canRestore(): bool
     {
         return $this->trashed();
+    }
+
+    private function canTransit(): bool
+    {
+        return ShipmentStatusEnum::PENDING === $this->status;
+    }
+
+    private function canDeliver(): bool
+    {
+        return ShipmentStatusEnum::IN_TRANSIT === $this->status;
+    }
+
+    private function canCancel(): bool
+    {
+        return in_array($this->status, [ShipmentStatusEnum::PENDING, ShipmentStatusEnum::IN_TRANSIT], true);
+    }
+
+    private function canReturn(): bool
+    {
+        return ShipmentStatusEnum::DELIVERED === $this->status;
+    }
+
+    private function canFailDelivery(): bool
+    {
+        return ShipmentStatusEnum::IN_TRANSIT === $this->status;
+    }
+
+    private function canOnHold(): bool
+    {
+        return ShipmentStatusEnum::IN_TRANSIT === $this->status;
+    }
+
+    private function canComplete(): bool
+    {
+        return ShipmentStatusEnum::IN_TRANSIT === $this->status;
+    }
+
+    private function canPartiallyDeliver(): bool
+    {
+        return ShipmentStatusEnum::IN_TRANSIT === $this->status;
+    }
+
+    private function canAwaitingPickup(): bool
+    {
+        return ShipmentStatusEnum::IN_TRANSIT === $this->status;
     }
 
     private function canUpdate(): bool
