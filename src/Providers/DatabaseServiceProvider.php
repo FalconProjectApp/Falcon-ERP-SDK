@@ -75,25 +75,27 @@ class DatabaseServiceProvider extends ServiceProvider
 
     private function private()
     {
+        $token = request()->bearerToken();
+
+        abort_if(
+            is_null($token) && 'OPTIONS' !== request()->server->get('REQUEST_METHOD'),
+            Response::HTTP_UNAUTHORIZED,
+            __('Token não informado!')
+        );
+
+        $personalAccessToken = PersonalAccessToken::findToken($token);
+
+        if((is_null($personalAccessToken) || $personalAccessToken->expires_at->isPast()) && 'OPTIONS' !== request()->server->get('REQUEST_METHOD')){
+            header('Access-Control-Allow-Origin: *');
+            abort(Response::HTTP_FORBIDDEN, __('Token expirado!'));
+        }
+
+       /*  abort_if(
+            (is_null($personalAccessToken) || $personalAccessToken->expires_at->isPast()) && 'OPTIONS' !== request()->server->get('REQUEST_METHOD'),
+            Response::HTTP_FORBIDDEN,
+            __('Token expirado!')); */
+
         if (!auth()->check()) {
-            $token = request()->bearerToken();
-
-            abort_if(
-                is_null($token) && 'OPTIONS' !== request()->server->get('REQUEST_METHOD'),
-                Response::HTTP_UNAUTHORIZED,
-                __('Token não informado!')
-            );
-
-            if($token){
-                $personalAccessToken = PersonalAccessToken::findToken($token);
-
-                abort_if(
-                    (is_null($personalAccessToken) || $personalAccessToken->expires_at->isPast()) && 'OPTIONS' !== request()->server->get('REQUEST_METHOD'),
-                    Response::HTTP_FORBIDDEN,
-                    __('Token expirado!')
-                );
-            }
-
             return false;
         }
 
