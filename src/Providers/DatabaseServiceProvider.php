@@ -30,11 +30,10 @@ class DatabaseServiceProvider extends ServiceProvider
             default                          => true,
         };
 
-        abort_if(
-            false === $isAuth && 'OPTIONS' !== request()->server->get('REQUEST_METHOD'),
-            Response::HTTP_UNAUTHORIZED,
-            __('Não autorizado!')
-        );
+        if(false === $isAuth && 'OPTIONS' !== request()->server->get('REQUEST_METHOD')){
+            header('Access-Control-Allow-Origin: *');
+            abort(Response::HTTP_UNAUTHORIZED, __('Não autorizado!'));
+        }
 
         return true;
     }
@@ -75,21 +74,23 @@ class DatabaseServiceProvider extends ServiceProvider
 
     private function private()
     {
-        $token = request()->bearerToken();
-
-        if(is_null($token) && 'OPTIONS' !== request()->server->get('REQUEST_METHOD')){
-            header('Access-Control-Allow-Origin: *');
-            abort(Response::HTTP_UNAUTHORIZED, __('Token não informado!'));
-        }
-
-        $personalAccessToken = PersonalAccessToken::findToken($token);
-
-        if((is_null($personalAccessToken) || $personalAccessToken->expires_at->isPast()) && 'OPTIONS' !== request()->server->get('REQUEST_METHOD')){
-            header('Access-Control-Allow-Origin: *');
-            abort(Response::HTTP_FORBIDDEN, __('Token expirado!'));
-        }
-
         if (!auth()->check()) {
+            $token = request()->bearerToken();
+
+            if(is_null($token) && 'OPTIONS' !== request()->server->get('REQUEST_METHOD')){
+                header('Access-Control-Allow-Origin: *');
+                abort(Response::HTTP_UNAUTHORIZED, __('Token não informado!'));
+            }
+
+            if($token){
+                $personalAccessToken = PersonalAccessToken::findToken($token);
+
+                if((is_null($personalAccessToken) || $personalAccessToken->expires_at->isPast()) && 'OPTIONS' !== request()->server->get('REQUEST_METHOD')){
+                    header('Access-Control-Allow-Origin: *');
+                    abort(Response::HTTP_FORBIDDEN, __('Token expirado!'));
+                }
+            }
+
             return false;
         }
 
