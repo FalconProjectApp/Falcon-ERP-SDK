@@ -11,6 +11,7 @@ trait ProductCollunsTrait
     public const ATTRIBUTE_STATUS          = 'status';
     public const ATTRIBUTE_DESCRIPTION     = 'description';
     public const V_ATTRIBUTE_EAN           = 'ean';
+    public const V_ATTRIBUTE_NCM           = 'ncm';
     public const ATTRIBUTE_LAST_BUY_VALUE  = 'last_buy_value';
     public const ATTRIBUTE_LAST_SELL_VALUE = 'last_sell_value';
     public const ATTRIBUTE_LAST_RENT_VALUE = 'last_rent_value';
