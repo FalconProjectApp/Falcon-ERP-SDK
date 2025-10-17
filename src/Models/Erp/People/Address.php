@@ -4,14 +4,14 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\People;
 
-use Illuminate\Support\Str;
 use FalconERP\Skeleton\Falcon;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Attributes\Scope;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class Address extends BaseModel
@@ -53,6 +53,53 @@ class Address extends BaseModel
         'city_ibge'  => 'string',
         'state_ibge' => 'string',
     ];
+
+    /**
+     * TODO: esta quebrando esta função, e deveria ser um evento talvez. ou um observed
+     */
+    /*     protected function cityIbge(): Attribute
+        {
+            return Attribute::make(
+                get: function ($value) {
+
+                    if (blank($value) && !blank($this->city)) {
+                        dd($this->city);
+                        $value = Falcon::bigDataService('city')
+                            ->get($this->city)
+                            ->data
+                            ->where('slug', $this->city_slug)
+                            ->first()
+                            ?->ibge;
+                        dd($value);
+                        $this->city_ibge = $value;
+
+                        if ($this->isDirty('city_ibge')) {
+                            $this->save();
+                        }
+                    }
+
+                    return $value;
+                },
+            );
+        } */
+
+    /*
+    |--------------------------------------------------------------------------
+    | Scopes
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the scopes that the model should have with
+    |
+    */
+
+    #[Scope]
+    public function byPeopleIds(Builder $query, string | array $params = []): Builder
+    {
+        return $query
+            ->when($this->filtered($params, 'people_ids'), function ($query, $params) {
+                $query->whereIn('people_id', $params);
+            });
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -111,47 +158,5 @@ class Address extends BaseModel
         return Attribute::make(
             get: fn () => $this->road,
         );
-    }
-
-    protected function cityIbge(): Attribute
-    {
-        return Attribute::make(
-            get: function ($value) {
-                if (blank($value) && !blank($this->city)) {
-                    $value = Falcon::bigDataService('city')
-                        ->get($this->city)
-                        ->data
-                        ->where('slug', $this->city_slug)
-                        ->first()
-                        ?->ibge;
-
-                    $this->city_ibge = $value;
-
-                    if ($this->isDirty('city_ibge')) {
-                        $this->save();
-                    }
-                }
-
-                return $value;
-            },
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Scopes
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify the scopes that the model should have with
-    |
-    */
-
-    #[Scope]
-    public function byPeopleIds(Builder $query, string | array $params = []): Builder
-    {
-        return $query
-            ->when($this->filtered($params, 'people_ids'), function ($query, $params) {
-                $query->whereIn('people_id', $params);
-            });
     }
 }
