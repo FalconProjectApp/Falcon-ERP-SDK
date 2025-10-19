@@ -48,6 +48,14 @@ trait RequestNfeTrait
             !blank($this->tag_obs_cont) && $nfe->tagobsCont($this->tag_obs_cont->toObject());
             !blank($this->tag_obs_fisco) && $nfe->tagobsFisco($this->tag_obs_fisco->toObject());
             !blank($this->tag_inf_adic) && $nfe->taginfAdic($this->tag_inf_adic->toObject());
+            !blank($this->tag_transp) && $nfe->tagTransp($this->tag_transp->toObject());
+            !blank($this->tag_veic_transp) && $nfe->tagVeicTransp($this->tag_veic_transp->toObject());
+            !blank($this->tag_ret_transp) && $nfe->tagRetTransp($this->tag_ret_transp->toObject());
+            !blank($this->tag_reboque) && $nfe->tagReboque($this->tag_reboque->toObject());
+            !blank($this->tag_vagao) && $nfe->tagVagao($this->tag_vagao->toObject());
+            !blank($this->tag_vol) && $nfe->tagVol($this->tag_vol->toObject());
+            !blank($this->tag_fat) && $nfe->tagFat($this->tag_fat->toObject());
+            !blank($this->tag_dup) && $nfe->tagDup($this->tag_dup->toObject());
 
             $this->items->each(function ($item, $key) use ($nfe) {
                 $itemNumber = $key + 1;
@@ -181,6 +189,122 @@ trait RequestNfeTrait
     }
 
     /**
+     * tag_veic_transp.
+     */
+    protected function tagVeicTransp(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'placa' => 'ABC1111',
+                'UF'    => 'RJ',
+                'RNTC'  => '999999',
+            ])
+        );
+    }
+
+    /**
+     * tag_ret_transp.
+     */
+    protected function tagRetTransp(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'vServ'    => 240.00,
+                'vBCRet'   => 240.00,
+                'pICMSRet' => 1.00,
+                'vICMSRet' => 2.40,
+                'CFOP'     => '5353',
+                'cMunFG'   => '3518800',
+            ])
+        );
+    }
+
+    /**
+     * tag_transp.
+     */
+    protected function tagTransp(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'modFrete' => 1,
+            ])
+        );
+    }
+
+    /**
+     * tag_reboque.
+     */
+    protected function tagReboque(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'placa' => 'ABC1111',
+                'UF'    => 'RJ',
+                'RNTC'  => '999999',
+            ])
+        );
+    }
+
+    /**
+     * tag_vagao.
+     */
+    protected function tagVagao(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'vagao' => 'YY452-19',
+            ])
+        );
+    }
+
+    /**
+     * tag_vol.
+     */
+    protected function tagVol(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'item'  => 1,
+                'qVol'  => 2,
+                'esp'   => 'caixa',
+                'marca' => 'OLX',
+                'nVol'  => '11111',
+                'pesoL' => 10.50,
+                'pesoB' => 11.00,
+            ])
+        );
+    }
+
+    /**
+     * tag_fat.
+     */
+    protected function tagFat(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'nFat'  => '1233',
+                'vOrig' => 1254.22,
+                'vDesc' => null,
+                'vLiq'  => 1254.22,
+            ])
+        );
+    }
+
+    /**
+     * tag_dup.
+     */
+    protected function tagDup(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'nDup'  => '1233-1',
+                'dVenc' => '2017-08-22',
+                'vDup'  => 1254.22,
+            ])
+        );
+    }
+
+    /**
      * tag_obs_fisco.
      */
     protected function tagObsFisco(): Attribute
@@ -270,7 +394,7 @@ trait RequestNfeTrait
 
         return Attribute::make(
             get: fn () => new Data([
-                'xLgr'    => $enderEmit->street,
+                'xLgr'    => $enderEmit->road,
                 'nro'     => $enderEmit->number,
                 'xCpl'    => $enderEmit->complement,
                 'xBairro' => $enderEmit->neighborhood,
@@ -332,7 +456,7 @@ trait RequestNfeTrait
 
         return Attribute::make(
             get: fn () => new Data([
-                'xLgr'    => $enderDest->street,
+                'xLgr'    => $enderDest->road,
                 'nro'     => $enderDest->number,
                 'xCpl'    => $enderDest->complement,
                 'xBairro' => $enderDest->neighborhood,
@@ -663,8 +787,6 @@ trait RequestNfeTrait
      */
     protected function sameCountry(): Attribute
     {
-        dd($this->ender_dest);
-
         if (blank($this->third)) {
             return Attribute::make(
                 get: fn () => true,

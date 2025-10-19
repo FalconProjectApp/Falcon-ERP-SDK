@@ -116,7 +116,7 @@ class Item extends BaseModel
     protected function uCom(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->stock->product?->volumeType?->initials,
+            get: fn () => $this->stock?->volumeType?->initials,
         );
     }
 
@@ -176,7 +176,7 @@ class Item extends BaseModel
     protected function uTrib(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->stock->product?->volumeType?->initials,
+            get: fn () => $this->stock?->volumeType?->initials,
         );
     }
 
