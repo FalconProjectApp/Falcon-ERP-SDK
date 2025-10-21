@@ -25,6 +25,13 @@ class ShopSegment extends BaseModel
         'whatsapp_number',
         'instagram',
         'has_automatically_finish',
+        'certificate_password',
+        'schemes_sped_nfe',
+        'version_sped',
+        'token_ibpt',
+        'csc',
+        'csc_id',
+        'a_proxy_conf'
     ];
 
     /*

@@ -63,6 +63,7 @@ class Shop extends BaseModel implements AuditableContract
         'whatsapp_number'          => 'string',
         'instagram'                => 'string',
         'has_automatically_finish' => 'bool',
+        'certificate_password'     => 'string',
         'schemes_sped_nfe'         => 'string',
         'version_sped'             => 'string',
         'token_ibpt'               => 'string',
@@ -143,10 +144,10 @@ class Shop extends BaseModel implements AuditableContract
             ->withTrashed();
     }
 
-    public function certificateFile(): MorphMany
+    public function certificates(): MorphMany
     {
         return $this->archives()
-            ->where('name', ArchiveEnum::CERTIFICATE_FILE);
+            ->where('name', ArchiveEnum::NAME_CERTIFICATE_FILE);
     }
 
     /*
@@ -352,7 +353,7 @@ class Shop extends BaseModel implements AuditableContract
     protected function certificate(): Attribute
     {
         return Attribute::make(
-            get: fn (): Certificate => Certificate::readPfx(file_get_contents(storage_path('certificado.pfx')), $this->certificate_password),
+            get: fn (): Certificate => Certificate::readPfx($this->certificates->first(), $this->certificate_password),
         );
     }
 

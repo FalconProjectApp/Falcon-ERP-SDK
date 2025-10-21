@@ -9,14 +9,14 @@ use QuantumTecnology\EnumBasicsExtension\BaseEnum;
 
 abstract class ArchiveEnum extends BaseEnum
 {
-    public const NAME_SHOP_LOGO     = 'shop_logo';
-    public const NAME_PRODUCT_IMAGE = 'product_image';
-    public const NAME_PEOPLE_IMAGE  = 'people_image';
-    public const NAME_PEOPLE_FILE   = 'people_file';
-    public const NAME_BILL_FILE     = 'bill_file';
-    public const NAME_EMAIL_FILE    = 'email_file';
-    public const CERTIFICATE_FILE   = 'certificate_file';
-    public const XML_ASSIGN_FILE    = 'xml_assign_file';
+    public const NAME_SHOP_LOGO        = 'shop_logo';
+    public const NAME_PRODUCT_IMAGE    = 'product_image';
+    public const NAME_PEOPLE_IMAGE     = 'people_image';
+    public const NAME_PEOPLE_FILE      = 'people_file';
+    public const NAME_BILL_FILE        = 'bill_file';
+    public const NAME_EMAIL_FILE       = 'email_file';
+    public const NAME_CERTIFICATE_FILE = 'certificate_file';
+    public const NAME_XML_ASSIGN_FILE  = 'xml_assign_file';
 
     public const MIME_TYPE_IMAGE_JPG  = 'image/jpg';
     public const MIME_TYPE_IMAGE_JPEG = 'image/jpeg';
