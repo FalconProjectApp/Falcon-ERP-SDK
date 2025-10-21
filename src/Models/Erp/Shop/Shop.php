@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Shop;
 
+use FalconERP\Skeleton\Enums\ArchiveEnum;
 use FalconERP\Skeleton\Models\BackOffice\Shop as BackOfficeShop;
 use FalconERP\Skeleton\Models\Erp\People\People;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
@@ -19,12 +20,15 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use NFePHP\Common\Certificate;
+use NFePHP\NFe\Common\Tools;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
+use QuantumTecnology\ValidateTrait\Data;
 
 class Shop extends BaseModel implements AuditableContract
 {
@@ -131,6 +135,12 @@ class Shop extends BaseModel implements AuditableContract
             ->morphToMany(static::class, 'followable', PeopleFollow::class, 'follower_people_id', 'followable_id')
             ->withTimestamps()
             ->withTrashed();
+    }
+
+    public function files(): MorphMany
+    {
+        return $this->archives()
+            ->where('name', ArchiveEnum::CERTIFICATE_FILE);
     }
 
     /*
@@ -248,6 +258,53 @@ class Shop extends BaseModel implements AuditableContract
     {
         return Attribute::make(
             get: fn () => (bool) $this->segments()->where('name', 'has_automatically_finish')->first()?->value,
+        );
+    }
+
+    /**
+     * config_sped_nfe.
+     */
+    protected function configSpedNfe(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): Data => new Data([
+                'atualizacao' => '2015-10-02 06:01:21',
+                'tpAmb'       => 2,
+                'razaosocial' => $this->people_issuer->name,
+                'siglaUF'     => $this->people_issuer->main_address->state,
+                'cnpj'        => $this->people_issuer->cnpj,
+                'schemes'     => 'PL_010_V1.30',
+                'versao'      => '3.10',
+                'tokenIBPT'   => 'AAAAAAA',
+                'CSC'         => 'GPB0JBWLUR6HWFTVEAS6RJ69GPCROFPBBB8G',
+                'CSCid'       => '000002',
+                'aProxyConf'  => [
+                    'proxyIp'   => '',
+                    'proxyPort' => '',
+                    'proxyUser' => '',
+                    'proxyPass' => '',
+                ],
+            ]),
+        );
+    }
+
+    /**
+     * certificate.
+     */
+    protected function certificate(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): Certificate => Certificate::readPfx(file_get_contents(storage_path('certificado.pfx')), $this->password),
+        );
+    }
+
+    /**
+     * sefaz.
+     */
+    protected function sefaz(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): Tools => new Tools($this->config_sped_nfe->toJson(), $this->certificate),
         );
     }
 
