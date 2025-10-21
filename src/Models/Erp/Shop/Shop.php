@@ -277,35 +277,39 @@ class Shop extends BaseModel implements AuditableContract
     protected function schemesSpedNfe(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->segments()->where('name', 'schemes_sped_nfe')->first()?->value ?? 'PL_010_V1.30',
+            get: fn () => $this->segments()->where('name', 'schemes_sped_nfe')->first()?->value,
         );
     }
 
     protected function versionSped(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->segments()->where('name', 'version_sped')->first()?->value ?? '3.10',
+            get: fn () => $this->segments()->where('name', 'version_sped')->first()?->value,
         );
     }
 
     protected function tokenIbpt(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->segments()->where('name', 'token_ibpt')->first()?->value ?? 'AAAAAAA',
+            get: fn () => $this->segments()->where('name', 'token_ibpt')->first()?->value,
         );
     }
 
     protected function csc(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->segments()->where('name', 'csc')->first()?->value ?? 'GPB0JBWLUR6HWFTVEAS6RJ69GPCROFPBBB8G',
+            get: fn () => $this->segments()->where('name', 'csc')->first()?->value,
+            set: fn ($value) => [
+                'name'  => 'csc',
+                'value' => $value,
+            ],
         );
     }
 
     protected function cscId(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->segments()->where('name', 'csc_id')->first()?->value ?? '000002',
+            get: fn () => $this->segments()->where('name', 'csc_id')->first()?->value,
         );
     }
 
@@ -329,20 +333,15 @@ class Shop extends BaseModel implements AuditableContract
             get: fn (): Data => new Data([
                 'atualizacao' => '2015-10-02 06:01:21',
                 'tpAmb'       => 2,
-                'razaosocial' => $this->people_issuer->name,
-                'siglaUF'     => $this->people_issuer->main_address->state,
-                'cnpj'        => $this->people_issuer->cnpj,
-                'schemes'     => $this->schemes_sped_nfe ?? 'PL_010_V1.30',
-                'versao'      => $this->version_sped ?? '3.10',
-                'tokenIBPT'   => $this->token_ibpt ?? 'AAAAAAA',
-                'CSC'         => $this->csc ?? 'GPB0JBWLUR6HWFTVEAS6RJ69GPCROFPBBB8G',
-                'CSCid'       => $this->csc_id ?? '000002',
-                'aProxyConf'  => $this->a_proxy_conf ?? [
-                    'proxyIp'   => '',
-                    'proxyPort' => '',
-                    'proxyUser' => '',
-                    'proxyPass' => '',
-                ],
+                'razaosocial' => $this->peopleIssuer?->name,
+                'siglaUF'     => $this->peopleIssuer?->main_address?->state,
+                'cnpj'        => $this->peopleIssuer?->cnpj,
+                'schemes'     => $this->schemes_sped_nfe,
+                'versao'      => $this->version_sped,
+                'tokenIBPT'   => $this->token_ibpt,
+                'CSC'         => $this->csc,
+                'CSCid'       => $this->csc_id,
+                'aProxyConf'  => $this->a_proxy_conf,
             ]),
         );
     }
