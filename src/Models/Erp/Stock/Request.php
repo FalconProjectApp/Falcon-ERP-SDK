@@ -281,6 +281,7 @@ class Request extends BaseModel implements AuditableContract
             'can_edit_payment'      => $this->canEditPayment(),
             'can_edit_request_type' => $this->canEditRequestType(),
             'can_edit_items'        => $this->canEditItems(),
+            'can_download_xml'      => $this->canDownloadXml(),
         ];
     }
 
@@ -432,5 +433,12 @@ class Request extends BaseModel implements AuditableContract
             !$this->trashed()
             && RequestEnum::REQUEST_STATUS_OPEN === $this->status
             && 0 === $this->items()->count();
+    }
+
+    private function canDownloadXml(): bool
+    {
+        return
+            !$this->trashed()
+            && $this->has_errors === false;
     }
 }
