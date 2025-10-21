@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Enums;
 
 use Illuminate\Support\Collection;
@@ -13,6 +15,8 @@ abstract class ArchiveEnum extends BaseEnum
     public const NAME_PEOPLE_FILE   = 'people_file';
     public const NAME_BILL_FILE     = 'bill_file';
     public const NAME_EMAIL_FILE    = 'email_file';
+    public const CERTIFICATE_FILE   = 'certificate_file';
+    public const XML_ASSIGN_FILE    = 'xml_assign_file';
 
     public const MIME_TYPE_IMAGE_JPG  = 'image/jpg';
     public const MIME_TYPE_IMAGE_JPEG = 'image/jpeg';
@@ -36,6 +40,8 @@ abstract class ArchiveEnum extends BaseEnum
     public const MIME_TYPE_TXT  = 'text/plain';
     public const MIME_TYPE_CSV  = 'text/csv';
     public const MIME_TYPE_FILE = 'application/octet-stream';
+    public const MIME_TYPE_PFX  = 'application/x-pkcs12';
+    public const MIME_TYPE_XML  = 'application/xml';
 
     public const RULE_PUBLIC  = 'public';
     public const RULE_PRIVATE = 'private';

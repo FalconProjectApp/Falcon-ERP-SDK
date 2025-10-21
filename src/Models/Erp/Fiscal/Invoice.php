@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use FalconERP\Skeleton\Observers\CacheObserver;
+use FalconERP\Skeleton\Enums\ArchiveEnum;
 use FalconERP\Skeleton\Models\Erp\People\People;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -18,9 +23,10 @@ use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 ])]
 class Invoice extends BaseModel
 {
+    use ArchiveModelTrait;
     use HasFactory;
-    use SoftDeletes;
     use SetSchemaTrait;
+    use SoftDeletes;
 
     protected $fillable = [
         'batch_id',
@@ -64,6 +70,15 @@ class Invoice extends BaseModel
     public function peopleRecipient()
     {
         return $this->belongsTo(People::class, 'people_recipient_id');
+    }
+
+    /**
+     * xml assign.
+     */
+    public function xmlAssign(): MorphMany
+    {
+        return $this->archives()
+            ->where('name', ArchiveEnum::XML_ASSIGN_FILE);
     }
 
     /*

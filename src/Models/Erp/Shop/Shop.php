@@ -63,6 +63,12 @@ class Shop extends BaseModel implements AuditableContract
         'whatsapp_number'          => 'string',
         'instagram'                => 'string',
         'has_automatically_finish' => 'bool',
+        'schemes_sped_nfe'         => 'string',
+        'version_sped'             => 'string',
+        'token_ibpt'               => 'string',
+        'csc'                      => 'string',
+        'csc_id'                   => 'string',
+        'a_proxy_conf'             => 'array',
     ];
 
     protected $appends = [];
@@ -137,7 +143,7 @@ class Shop extends BaseModel implements AuditableContract
             ->withTrashed();
     }
 
-    public function files(): MorphMany
+    public function certificateFile(): MorphMany
     {
         return $this->archives()
             ->where('name', ArchiveEnum::CERTIFICATE_FILE);
@@ -261,6 +267,59 @@ class Shop extends BaseModel implements AuditableContract
         );
     }
 
+    protected function certificatePassword(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->segments()->where('name', 'certificate_password')->first()?->value,
+        );
+    }
+
+    protected function schemesSpedNfe(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->segments()->where('name', 'schemes_sped_nfe')->first()?->value ?? 'PL_010_V1.30',
+        );
+    }
+
+    protected function versionSped(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->segments()->where('name', 'version_sped')->first()?->value ?? '3.10',
+        );
+    }
+
+    protected function tokenIbpt(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->segments()->where('name', 'token_ibpt')->first()?->value ?? 'AAAAAAA',
+        );
+    }
+
+    protected function csc(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->segments()->where('name', 'csc')->first()?->value ?? 'GPB0JBWLUR6HWFTVEAS6RJ69GPCROFPBBB8G',
+        );
+    }
+
+    protected function cscId(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->segments()->where('name', 'csc_id')->first()?->value ?? '000002',
+        );
+    }
+
+    protected function aProxyConf(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => json_decode($this->segments()->where('name', 'a_proxy_conf')->first()?->value ?? '{}', true),
+            set: fn ($value) => [
+                'name'  => 'a_proxy_conf',
+                'value' => json_encode($value),
+            ],
+        );
+    }
+
     /**
      * config_sped_nfe.
      */
@@ -273,12 +332,12 @@ class Shop extends BaseModel implements AuditableContract
                 'razaosocial' => $this->people_issuer->name,
                 'siglaUF'     => $this->people_issuer->main_address->state,
                 'cnpj'        => $this->people_issuer->cnpj,
-                'schemes'     => 'PL_010_V1.30',
-                'versao'      => '3.10',
-                'tokenIBPT'   => 'AAAAAAA',
-                'CSC'         => 'GPB0JBWLUR6HWFTVEAS6RJ69GPCROFPBBB8G',
-                'CSCid'       => '000002',
-                'aProxyConf'  => [
+                'schemes'     => $this->schemes_sped_nfe ?? 'PL_010_V1.30',
+                'versao'      => $this->version_sped ?? '3.10',
+                'tokenIBPT'   => $this->token_ibpt ?? 'AAAAAAA',
+                'CSC'         => $this->csc ?? 'GPB0JBWLUR6HWFTVEAS6RJ69GPCROFPBBB8G',
+                'CSCid'       => $this->csc_id ?? '000002',
+                'aProxyConf'  => $this->a_proxy_conf ?? [
                     'proxyIp'   => '',
                     'proxyPort' => '',
                     'proxyUser' => '',
@@ -294,7 +353,7 @@ class Shop extends BaseModel implements AuditableContract
     protected function certificate(): Attribute
     {
         return Attribute::make(
-            get: fn (): Certificate => Certificate::readPfx(file_get_contents(storage_path('certificado.pfx')), $this->password),
+            get: fn (): Certificate => Certificate::readPfx(file_get_contents(storage_path('certificado.pfx')), $this->certificate_password),
         );
     }
 
