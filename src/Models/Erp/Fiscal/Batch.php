@@ -3,17 +3,17 @@
 namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
-use FalconERP\Skeleton\Observers\CacheObserver;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Observers\NotificationObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 
 #[ObservedBy([
-    CacheObserver::class,
-    NotificationObserver::class,
+    //CacheObserver::class,
+    //NotificationObserver::class,
 ])]
 class Batch extends BaseModel
 {
@@ -55,6 +55,7 @@ class Batch extends BaseModel
     {
         return $this->hasMany(Protocol::class);
     }
+
     public function invoices()
     {
         return $this->hasMany(Invoice::class);
