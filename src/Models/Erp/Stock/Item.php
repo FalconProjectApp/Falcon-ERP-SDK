@@ -304,10 +304,10 @@ class Item extends BaseModel
     {
         return Attribute::make(
             get: fn () => new Data([
-                'orig'     => $this->stock->product->ncm->origin ?? 0,
-                'CST'      => $this->stock->product->ncm->cst ?? 0,
+                'orig'     => $this->stock->product->origin ?? 0,
+                'CST'      => $this->stock->product->cst ?? '00',
                 'modBC'    => 0,
-                'vBC'      => 0,
+                'vBC'      => $this->value,
                 'pICMS'    => 0,
                 'vICMS'    => 0,
                 'modBCST'  => 0,
@@ -316,6 +316,40 @@ class Item extends BaseModel
                 'vBCST'    => 0,
                 'pICMSST'  => 0,
                 'vICMSST'  => 0,
+            ]),
+        );
+    }
+
+    /**
+     * tag_pis.
+     */
+    protected function tagPis(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'CST'       => $this->stock->product->cst ?? '07',
+                'vBC'       => $this->value,
+                'pPIS'      => '1',
+                'vPIS'      => '1',
+                'qBCProd'   => $this->amount,
+                'vAliqProd' => null,
+            ]),
+        );
+    }
+
+    /**
+     * tag_cofins.
+     */
+    protected function tagCofins(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'CST'       => $this->stock->product->cst ?? '07',
+                'vBC'       => $this->value,
+                'pCOFINS'   => '1',
+                'vCOFINS'   => '1',
+                'qBCProd'   => $this->amount,
+                'vAliqProd' => null,
             ]),
         );
     }

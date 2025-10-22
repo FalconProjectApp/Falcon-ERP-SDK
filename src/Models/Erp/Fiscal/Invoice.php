@@ -78,7 +78,7 @@ class Invoice extends BaseModel
     public function xmlAssign(): MorphMany
     {
         return $this->archives()
-            ->where('name', ArchiveEnum::XML_ASSIGN_FILE);
+            ->where('name', ArchiveEnum::NAME_XML_ASSIGN_FILE);
     }
 
     /*

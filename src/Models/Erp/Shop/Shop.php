@@ -353,7 +353,7 @@ class Shop extends BaseModel implements AuditableContract
     protected function certificate(): Attribute
     {
         return Attribute::make(
-            get: fn (): Certificate => Certificate::readPfx($this->certificates->first(), $this->certificate_password),
+            get: fn (): Certificate => Certificate::readPfx(base64_decode($this->certificates->first()->base64), $this->certificate_password),
         );
     }
 

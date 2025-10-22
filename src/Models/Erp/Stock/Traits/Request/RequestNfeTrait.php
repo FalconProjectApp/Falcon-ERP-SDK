@@ -43,19 +43,6 @@ trait RequestNfeTrait
             !blank($this->tag_ender_emit) && $nfe->tagenderEmit($this->tag_ender_emit->toObject());
             !blank($this->tag_dest) && $nfe->tagdest($this->tag_dest->toObject());
             !blank($this->tag_ender_dest) && $nfe->tagenderDest($this->tag_ender_dest->toObject());
-            !blank($this->tag_pag) && $nfe->tagpag($this->tag_pag->toObject());
-            !blank($this->tag_det_pag) && $nfe->tagdetPag($this->tag_det_pag->toObject());
-            !blank($this->tag_obs_cont) && $nfe->tagobsCont($this->tag_obs_cont->toObject());
-            !blank($this->tag_obs_fisco) && $nfe->tagobsFisco($this->tag_obs_fisco->toObject());
-            !blank($this->tag_inf_adic) && $nfe->taginfAdic($this->tag_inf_adic->toObject());
-            !blank($this->tag_transp) && $nfe->tagTransp($this->tag_transp->toObject());
-            !blank($this->tag_veic_transp) && $nfe->tagVeicTransp($this->tag_veic_transp->toObject());
-            !blank($this->tag_ret_transp) && $nfe->tagRetTransp($this->tag_ret_transp->toObject());
-            !blank($this->tag_reboque) && $nfe->tagReboque($this->tag_reboque->toObject());
-            !blank($this->tag_vagao) && $nfe->tagVagao($this->tag_vagao->toObject());
-            !blank($this->tag_vol) && $nfe->tagVol($this->tag_vol->toObject());
-            !blank($this->tag_fat) && $nfe->tagFat($this->tag_fat->toObject());
-            !blank($this->tag_dup) && $nfe->tagDup($this->tag_dup->toObject());
 
             $this->items->each(function ($item, $key) use ($nfe) {
                 $itemNumber = $key + 1;
@@ -69,12 +56,36 @@ trait RequestNfeTrait
                     'item' => $itemNumber,
                 ])->toObject());
 
-                $nfe->tagICMS($item->tag_icms->toObject());
+                $nfe->tagICMS($item->tag_icms->merge([
+                    'item' => $itemNumber,
+                ])->toObject());
                 // $nfe->tagICMSSN($item->tag_icms_sn->toObject());
-                // $nfe->tagPIS($item->tag_pis->toObject());
-                // $nfe->tagCOFINS($item->tag_cofins->toObject());
+                $nfe->tagPIS($item->tag_pis->merge([
+                    'item' => $itemNumber,
+                ])->toObject());
+                $nfe->tagCOFINS($item->tag_cofins->merge([
+                    'item' => $itemNumber,
+                ])->toObject());
                 // $nfe->tagICMSUFDest($item->tag_icms_uf_dest->toObject());
             });
+            $nfe->tagICMSTot();
+            !blank($this->tag_pag) && $nfe->tagpag($this->tag_pag->toObject());
+            !blank($this->tag_det_pag) && $nfe->tagdetPag($this->tag_det_pag->toObject());
+            !blank($this->tag_obs_cont) && $nfe->tagobsCont($this->tag_obs_cont->toObject());
+            !blank($this->tag_obs_fisco) && $nfe->tagobsFisco($this->tag_obs_fisco->toObject());
+            !blank($this->tag_transp) && $nfe->tagTransp($this->tag_transp->toObject());
+            !blank($this->tag_veic_transp) && $nfe->tagVeicTransp($this->tag_veic_transp->toObject());
+            //!blank($this->tag_ret_transp) && $nfe->tagRetTransp($this->tag_ret_transp->toObject());
+            !blank($this->tag_reboque) && $nfe->tagReboque($this->tag_reboque->toObject());
+            //!blank($this->tag_vagao) && $nfe->tagVagao($this->tag_vagao->toObject());
+            !blank($this->tag_vol) && $nfe->tagVol($this->tag_vol->toObject());
+            !blank($this->tag_fat) && $nfe->tagFat($this->tag_fat->toObject());
+            !blank($this->tag_dup) && $nfe->tagDup($this->tag_dup->toObject());
+            //!blank($this->tag_retirada) && $nfe->tagRetirada($this->tag_retirada->toObject());
+            !blank($this->tag_entrega) && $nfe->tagEntrega($this->tag_entrega->toObject());
+            //!blank($this->tag_icms_tot) && $nfe->tagICMSTot($this->tag_icms_tot->toObject());
+            //!blank($this->tag_inf_adic) && $nfe->taginfAdic($this->tag_inf_adic->toObject());
+
         }
 
         return Attribute::make(
@@ -151,6 +162,29 @@ trait RequestNfeTrait
 
     /**
      * tag_det_pag.
+     *
+     * NOTA:
+     * indPag re-incluso no layout 4.00 NT_2016_V1.51
+     *
+     * NOTA:
+     * tPag 14 - duplicata foi removido do layout 4.00 na NT_2016_V1.51
+     *
+     * Node com o detalhamento da forma de pagamento OBRIGATÓRIO para NFCe e NFe layout4.00
+     *
+     * NOTA:
+     * para NFe (modelo 55), temos ...
+     * vPag=0.00 mas pode ter valor se a venda for à vista
+     * tPag é usualmente:
+     *  15 = Boleto Bancário
+     *  16 = Depósito Bancário
+     *  17 = Pagamento Instantâneo (PIX)
+     *  18 = Transferência bancária, Carteira Digital
+     *  19 = Programa de fidelidade, Cashback, Crédito Virtual
+     *  90 = Sem pagamento
+     *  98 = Regime Especial NFF
+     *  99 = Outros
+     *
+     * Porém podem haver casos que os outros nodes e valores tenham de ser usados.
      */
     protected function tagDetPag(): Attribute
     {
@@ -158,7 +192,11 @@ trait RequestNfeTrait
 
         if (null === $this->paymentMethod) {
             return Attribute::make(
-                get: fn () => null,
+                get: fn () => new Data([
+                    'indPag' => 0,
+                    'tPag'   => 90,
+                    'vPag'   => '0.00',
+                ]),
             );
         }
 
@@ -470,6 +508,72 @@ trait RequestNfeTrait
         );
     }
 
+    /**
+     * tag_retirada.
+     */
+    protected function tagRetirada(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'xNome'   => 'Beltrano e Cia Ltda',
+                'xLgr'    => 'Rua Um',
+                'nro'     => '123',
+                'xCpl'    => 'sobreloja',
+                'xBairro' => 'centro',
+                'cMun'    => '3550308',
+                'xMun'    => 'Sao Paulo',
+                'UF'      => 'SP',
+                'CEP'     => '01023000',
+                'cPais'   => '1058',
+                'xPais'   => 'BRASIL',
+                'fone'    => '1122225544',
+                'email'   => 'contato@beltrano.com.br',
+                'CNPJ'    => '12345678901234',
+                'CPF'     => null,
+                'IE'      => '12345678901',
+            ])
+        );
+    }
+
+    /**
+     * tag_entrega.
+     */
+    protected function tagEntrega(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+                'xNome'   => 'Beltrano e Cia Ltda',
+                'xLgr'    => 'Rua Um',
+                'nro'     => '123',
+                'xCpl'    => 'sobreloja',
+                'xBairro' => 'centro',
+                'cMun'    => '3550308',
+                'xMun'    => 'Sao Paulo',
+                'UF'      => 'SP',
+                'CEP'     => '01023000',
+                'cPais'   => '1058',
+                'xPais'   => 'BRASIL',
+                'fone'    => '1122225544',
+                'email'   => 'contato@beltrano.com.br',
+                'CNPJ'    => $this->third->cnpj ?? null,
+                'CPF'     => $this->third->cpf ?? null,
+                'IE'      => '12345678901',
+            ])
+        );
+    }
+
+    /**
+     * tag_entrega.
+     */
+    protected function tagICMSTot(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => new Data([
+
+            ])
+        );
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Attributes
@@ -594,12 +698,16 @@ trait RequestNfeTrait
      */
     protected function idDest(): Attribute
     {
-        return Attribute::make(
+
+        /* return Attribute::make(
             get: fn () => match ($this->requestType->request_type) {
                 RequestEnum::REQUEST_TYPE_INPUT  => $this->same_state ? 1 : ($this->same_country ? 2 : 3),
                 RequestEnum::REQUEST_TYPE_OUTPUT => $this->same_state ? 5 : ($this->same_country ? 6 : 7),
                 default                          => 0,
             }
+        ); */
+        return Attribute::make(
+            get: fn () => $this->same_state ? 1 : ($this->same_country ? 2 : 3)
         );
     }
 
@@ -620,7 +728,7 @@ trait RequestNfeTrait
     protected function serie(): Attribute
     {
         return Attribute::make(
-            get: fn () => Str::padLeft($this->requestType->natureOperationDefault->serie->id, 3, '0'),
+            get: fn () => $this->requestType->natureOperationDefault->serie->id,
         );
     }
 
