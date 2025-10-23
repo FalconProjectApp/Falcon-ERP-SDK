@@ -2,15 +2,15 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
-use App\Models\Erp\Finance\PaymentMethod;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use FalconERP\Skeleton\Observers\CacheObserver;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Observers\NotificationObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use FalconERP\Skeleton\Models\Erp\Finance\PaymentMethod;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 
 #[ObservedBy([
     CacheObserver::class,

@@ -1,25 +1,27 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 #[ObservedBy([
-    //CacheObserver::class,
-    //NotificationObserver::class,
+    // CacheObserver::class,
+    // NotificationObserver::class,
 ])]
 class Batch extends BaseModel
 {
     use HasFactory;
-    use SoftDeletes;
     use SetSchemaTrait;
+    use SoftDeletes;
 
     protected $fillable = [
         'version_application',
@@ -93,4 +95,12 @@ class Batch extends BaseModel
     | Here you may specify the attributes that should be cast to native types.
     |
     */
+
+    /**
+     * invoices_count.
+     */
+    protected function invoicesCount(): int
+    {
+        return $this->invoices()->count();
+    }
 }

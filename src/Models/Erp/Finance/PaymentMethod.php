@@ -1,23 +1,24 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
-use OwenIt\Auditing\Auditable;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use FalconERP\Skeleton\Models\Erp\Stock\Request;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use FalconERP\Skeleton\Models\Erp\Stock\RequestHeader;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class PaymentMethod extends BaseModel implements AuditableContract
 {
-    use HasFactory;
-    use SoftDeletes;
-    use SetSchemaTrait;
     use Auditable;
+    use HasFactory;
+    use SetSchemaTrait;
+    use SoftDeletes;
 
     protected $fillable = [
         'description',
@@ -39,7 +40,7 @@ class PaymentMethod extends BaseModel implements AuditableContract
         return $this->belongsTo(Request::class);
     }
 
-        /*
+    /*
     |--------------------------------------------------------------------------
     | Actions
     |--------------------------------------------------------------------------
