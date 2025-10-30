@@ -72,7 +72,7 @@ class Item extends BaseModel
     protected function xProd(): Attribute
     {
         return Attribute::make(
-            get: fn () => Str::limit($this->stock->product->description, 120),
+            get: fn () => Str::limit($this->stock?->product->description, 120),
         );
     }
 
@@ -82,7 +82,7 @@ class Item extends BaseModel
     protected function cBarra(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->stock->product->{self::V_ATTRIBUTE_EAN},
+            get: fn () => $this->stock?->product->{self::V_ATTRIBUTE_EAN},
         );
     }
 
@@ -92,14 +92,14 @@ class Item extends BaseModel
     protected function cProd(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->stock->product->id,
+            get: fn () => $this->stock?->product->id,
         );
     }
 
     protected function cest(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->stock->product->cest,
+            get: fn () => $this->stock?->product->cest,
         );
     }
 
@@ -156,7 +156,7 @@ class Item extends BaseModel
     protected function cEAN(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->stock->product->{self::V_ATTRIBUTE_EAN},
+            get: fn () => $this->stock?->product->{self::V_ATTRIBUTE_EAN},
         );
     }
 
@@ -166,7 +166,7 @@ class Item extends BaseModel
     protected function cEANTrib(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->stock->product->{self::V_ATTRIBUTE_EAN},
+            get: fn () => $this->stock?->product->{self::V_ATTRIBUTE_EAN},
         );
     }
 
@@ -265,7 +265,7 @@ class Item extends BaseModel
     protected function ncm(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->stock->product->ncm,
+            get: fn () => $this->stock?->product->ncm,
         );
     }
 
@@ -304,8 +304,8 @@ class Item extends BaseModel
     {
         return Attribute::make(
             get: fn () => new Data([
-                'orig'     => $this->stock->product->origin ?? 0,
-                'CST'      => $this->stock->product->cst ?? '00',
+                'orig'     => $this->stock?->product->origin ?? 0,
+                'CST'      => $this->stock?->product->cst ?? '00',
                 'modBC'    => 0,
                 'vBC'      => $this->value,
                 'pICMS'    => 0,
@@ -327,7 +327,7 @@ class Item extends BaseModel
     {
         return Attribute::make(
             get: fn () => new Data([
-                'CST'       => $this->stock->product->cst ?? '07',
+                'CST'       => $this->stock?->product->cst ?? '07',
                 'vBC'       => $this->value,
                 'pPIS'      => '1',
                 'vPIS'      => '1',
@@ -344,7 +344,7 @@ class Item extends BaseModel
     {
         return Attribute::make(
             get: fn () => new Data([
-                'CST'       => $this->stock->product->cst ?? '07',
+                'CST'       => $this->stock?->product->cst ?? '07',
                 'vBC'       => $this->value,
                 'pCOFINS'   => '1',
                 'vCOFINS'   => '1',

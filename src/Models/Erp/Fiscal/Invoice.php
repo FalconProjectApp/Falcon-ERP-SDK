@@ -6,6 +6,7 @@ namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
 use FalconERP\Skeleton\Enums\ArchiveEnum;
 use FalconERP\Skeleton\Models\Erp\People\People;
+use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use FalconERP\Skeleton\Observers\NotificationObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
@@ -36,13 +38,16 @@ class Invoice extends BaseModel
         'people_issuer_id',
         'people_recipient_id',
         'type_environment',
+        'access_key',
     ];
+
     protected $casts = [
         'batch_id'            => 'integer',
         'nature_operation_id' => 'integer',
         'people_issuer_id'    => 'integer',
         'people_recipient_id' => 'integer',
         'type_environment'    => 'string',
+        'access_key'          => 'string',
     ];
 
     /*
@@ -91,6 +96,22 @@ class Invoice extends BaseModel
     public function invoicePayments(): HasMany
     {
         return $this->hasMany(InvoicePayment::class);
+    }
+
+    public function followers(): MorphToMany
+    {
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'followable_id', 'follower_people_id')
+            ->withTimestamps()
+            ->withTrashed();
+    }
+
+    public function followings(): MorphToMany
+    {
+        return $this
+            ->morphToMany(static::class, 'followable', PeopleFollow::class, 'follower_people_id', 'followable_id')
+            ->withTimestamps()
+            ->withTrashed();
     }
 
     /*
