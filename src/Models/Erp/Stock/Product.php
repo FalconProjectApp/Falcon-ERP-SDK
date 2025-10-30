@@ -255,7 +255,8 @@ class Product extends BaseModel implements AuditableContract
 
     private function canDelete(): bool
     {
-        return !$this->trashed();
+        return !$this->trashed()
+            && $this->stocks()->count() > 1;
     }
 
     private function canFollow(): bool

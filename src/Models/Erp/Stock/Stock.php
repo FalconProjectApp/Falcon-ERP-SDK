@@ -106,6 +106,11 @@ self::V_ATTRIBUTE_DUN
         return $this->belongsTo(VolumeType::class, self::ATTRIBUTE_VOLUME_TYPE_ID)->withTrashed();
     }
 
+    public function items(): HasMany
+    {
+        return $this->hasMany(Item::class);
+    }
+
     /**
      * ShopServices function.
      */
@@ -282,7 +287,8 @@ self::V_ATTRIBUTE_DUN
 
     private function canDelete(): bool
     {
-        return !$this->trashed();
+        return !$this->trashed()
+            && $this->items()->count() > 0;
     }
 
     private function canFollow(): bool
