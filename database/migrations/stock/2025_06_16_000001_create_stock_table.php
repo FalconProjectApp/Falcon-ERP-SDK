@@ -208,7 +208,8 @@ return new class extends Migration {
             $table->string('name')
                 ->comment('Representa o nome do segmento');
             $table->string('value')
-                ->comment('Representa o valor do segmento');
+                ->comment('Representa o valor do segmento')
+                ->nullable();
 
             $table->timestamps();
             $table->softDeletes()
