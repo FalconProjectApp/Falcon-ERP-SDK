@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6e3c3c4bcb179ef284701cf703ee8a30",
+    "content-hash": "fd14b509706ff148bbf5b3a35a834758",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -4021,27 +4021,32 @@
         },
         {
             "name": "quantumtecnology/controller-basics-extension",
-            "version": "2.7.14",
+            "version": "3.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension.git",
-                "reference": "fe7690984a4abd32b4f6bacf4eacd50e9634985c"
+                "reference": "92735752a0370fd8a0456d74d52e0909482b179f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Controller-Basics-Extension/zipball/fe7690984a4abd32b4f6bacf4eacd50e9634985c",
-                "reference": "fe7690984a4abd32b4f6bacf4eacd50e9634985c",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Controller-Basics-Extension/zipball/92735752a0370fd8a0456d74d52e0909482b179f",
+                "reference": "92735752a0370fd8a0456d74d52e0909482b179f",
                 "shasum": ""
             },
             "require": {
-                "illuminate/contracts": "^10.0 || ^11.0 || ^12.0",
-                "illuminate/support": "^10.0 || ^11.0 || ^12.0",
-                "php": "^8.3",
-                "quantumtecnology/service-basics-extension": "^2.0 | ^2.1",
-                "vinkla/hashids": "^11.0 || ^12.0 || ^13.0"
+                "php": "^8.2",
+                "quantumtecnology/service-basics-extension": "^3.0",
+                "vinkla/hashids": "^13.0 | ^12.0"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.70"
+                "friendsofphp/php-cs-fixer": "^3.70",
+                "laravel/pint": "^1.13",
+                "orchestra/testbench": "^10.4",
+                "pestphp/pest": "^3.8",
+                "pestphp/pest-plugin-faker": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.2",
+                "pestphp/pest-plugin-watch": "^3.0",
+                "rector/rector": "^2.1"
             },
             "type": "library",
             "extra": {
@@ -4068,6 +4073,11 @@
                     "name": "Luis Gustavo Santarosa",
                     "email": "gustavo-computacao@hotmail.com",
                     "role": "Developer"
+                },
+                {
+                    "name": "Bruno Henrique da Costa",
+                    "email": "bhcosta90@gmail.com",
+                    "role": "Developer"
                 }
             ],
             "description": "Controller Basics Extension",
@@ -4075,9 +4085,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension/issues",
-                "source": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension/tree/2.7.14"
+                "source": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension/tree/3.4.0"
             },
-            "time": "2025-08-18T14:24:24+00:00"
+            "time": "2025-11-04T12:17:52+00:00"
         },
         {
             "name": "quantumtecnology/enum-basics-extension",
@@ -4295,22 +4305,22 @@
         },
         {
             "name": "quantumtecnology/service-basics-extension",
-            "version": "2.6.12",
+            "version": "3.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Service-Basics-Extension.git",
-                "reference": "3125f40040a4e6f143b9daf9ba57b7aff1650a1b"
+                "reference": "70a26e40f14595ba7a7f8fba41e517b8beac7e2d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Service-Basics-Extension/zipball/3125f40040a4e6f143b9daf9ba57b7aff1650a1b",
-                "reference": "3125f40040a4e6f143b9daf9ba57b7aff1650a1b",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Service-Basics-Extension/zipball/70a26e40f14595ba7a7f8fba41e517b8beac7e2d",
+                "reference": "70a26e40f14595ba7a7f8fba41e517b8beac7e2d",
                 "shasum": ""
             },
             "require": {
                 "laravel/framework": "^10.0 | ^11.0| ^12.0",
                 "php": "^8.0",
-                "quantumtecnology/handler-basics-extension": "^2.0",
+                "quantumtecnology/handler-basics-extension": "2.1.1",
                 "quantumtecnology/model-basics-extension": "^2.0",
                 "quantumtecnology/perpage-trait": "^2.0",
                 "quantumtecnology/validate-trait": "^2.0"
@@ -4347,9 +4357,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Service-Basics-Extension/issues",
-                "source": "https://github.com/Quantum-Tecnology/Service-Basics-Extension/tree/2.6.12"
+                "source": "https://github.com/Quantum-Tecnology/Service-Basics-Extension/tree/3.0.4"
             },
-            "time": "2025-08-20T00:03:02+00:00"
+            "time": "2025-10-28T12:10:29+00:00"
         },
         {
             "name": "quantumtecnology/validate-trait",
