@@ -10,7 +10,9 @@ use FalconERP\Skeleton\Enums\Stock\Shipment\ShipmentStatusEnum;
 use FalconERP\Skeleton\Models\Erp\People\People;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -141,6 +143,22 @@ class Shipment extends BaseModel implements AuditableContract
     | Here you may specify the scopes that the model should have with
     |
     */
+
+    #[Scope]
+    protected function byStatus(Builder $query, string | array $params = []): void
+    {
+        $query->when($this->filtered($params, 'status'), function ($query, $params) {
+            $query->whereIn(self::ATTRIBUTE_STATUS, $params);
+        });
+    }
+
+    #[Scope]
+    protected function byDriverIds(Builder $query, string | array $params = []): void
+    {
+        $query->when($this->filtered($params, 'driver_ids'), function ($query, $params) {
+            $query->whereIn(self::ATTRIBUTE_DRIVER_ID, $params);
+        });
+    }
 
     /*
     |--------------------------------------------------------------------------
