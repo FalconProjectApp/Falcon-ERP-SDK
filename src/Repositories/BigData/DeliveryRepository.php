@@ -8,6 +8,7 @@ use FalconERP\Skeleton\Falcon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use QuantumTecnology\ValidateTrait\Data;
 
 class DeliveryRepository
 {
@@ -73,6 +74,40 @@ class DeliveryRepository
             ->get("{$this->urlApi}/calculate-distance", [
                 'start' => $start,
                 'end'   => $end,
+            ]);
+
+        $this->http_code = $response->status();
+
+        if (!$response->successful()) {
+            $this->message = $response->object()->message ?? $this->message;
+            $this->errors  = $response->object()->data ?? $this->errors;
+            $this->data    = collect();
+
+            Log::warning('Request failed', (array) $this);
+
+            return $this;
+        }
+
+        $this->success = $response->successful() && $response->object()->success;
+        $this->message = $response->object()->message;
+        $this->data    = new Data($response->object()->data);
+
+        return $this;
+    }
+
+    public function bestRoute(array $routes): self
+    {
+        if (blank($this->authorization)) {
+            return $this;
+        }
+
+        $response = Http::withToken($this->authorization)
+            ->retry(3, 2000, throw: false)
+            ->acceptJson()
+            ->asJson()
+            ->connectTimeout($this->timeout)
+            ->get("{$this->urlApi}/calculate-best-route", [
+                'addresses' => $routes,
             ]);
 
         $this->http_code = $response->status();

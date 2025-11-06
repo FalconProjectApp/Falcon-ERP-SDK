@@ -49,15 +49,19 @@ class Shipment extends BaseModel implements AuditableContract
     public const ATTRIBUTE_DRIVER_ID = 'driver_id';
     public const ATTRIBUTE_STATUS    = 'status';
 
+    public const ATTRIBUTE_DISTANCE_METERS = 'distance_meters';
+
     protected $fillable = [
         self::ATTRIBUTE_STATUS,
         self::ATTRIBUTE_DRIVER_ID,
+        self::ATTRIBUTE_DISTANCE_METERS,
     ];
 
     protected $casts = [
-        self::ATTRIBUTE_ID        => 'integer',
-        self::ATTRIBUTE_DRIVER_ID => 'integer',
-        self::ATTRIBUTE_STATUS    => ShipmentStatusEnum::class,
+        self::ATTRIBUTE_ID              => 'integer',
+        self::ATTRIBUTE_DRIVER_ID       => 'integer',
+        self::ATTRIBUTE_STATUS          => ShipmentStatusEnum::class,
+        self::ATTRIBUTE_DISTANCE_METERS => 'integer',
     ];
 
     /*
@@ -153,14 +157,6 @@ class Shipment extends BaseModel implements AuditableContract
     {
         $query->when($this->filtered($params, 'status'), function ($query, $params) {
             $query->whereIn(self::ATTRIBUTE_STATUS, $params);
-        });
-    }
-
-    #[Scope]
-    protected function byDriverIds(Builder $query, string | array $params = []): void
-    {
-        $query->when($this->filtered($params, 'driver_ids'), function ($query, $params) {
-            $query->whereIn(self::ATTRIBUTE_DRIVER_ID, $params);
         });
     }
 
