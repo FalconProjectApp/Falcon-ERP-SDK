@@ -184,7 +184,6 @@ class Shipment extends BaseModel implements AuditableContract
             'can_return'            => $this->canReturn(),
             'can_fail_delivery'     => $this->canFailDelivery(),
             'can_on_hold'           => $this->canOnHold(),
-            'can_complete'          => $this->canComplete(),
             'can_partially_deliver' => $this->canPartiallyDeliver(),
             'can_awaiting_pickup'   => $this->canAwaitingPickup(),
         ];
@@ -202,37 +201,48 @@ class Shipment extends BaseModel implements AuditableContract
 
     private function canTransit(): bool
     {
-        return ShipmentStatusEnum::PENDING === $this->status;
+        return ShipmentStatusEnum::AWAITING_PICKUP === $this->status
+            && $this->driver_id !== null;
     }
 
     private function canDeliver(): bool
     {
-        return ShipmentStatusEnum::IN_TRANSIT === $this->status;
+        return in_array($this->status, [
+            ShipmentStatusEnum::IN_TRANSIT,
+            ShipmentStatusEnum::PARTIALLY_DELIVERED,
+        ]);
     }
 
     private function canCancel(): bool
     {
-        return in_array($this->status, [ShipmentStatusEnum::PENDING, ShipmentStatusEnum::IN_TRANSIT], true);
+        return in_array($this->status, [
+            ShipmentStatusEnum::IN_TRANSIT,
+            ShipmentStatusEnum::PARTIALLY_DELIVERED,
+        ]);
     }
 
     private function canReturn(): bool
     {
-        return ShipmentStatusEnum::DELIVERED === $this->status;
+        return in_array($this->status, [
+            ShipmentStatusEnum::IN_TRANSIT,
+            ShipmentStatusEnum::PARTIALLY_DELIVERED,
+        ]);
     }
 
     private function canFailDelivery(): bool
     {
-        return ShipmentStatusEnum::IN_TRANSIT === $this->status;
+        return in_array($this->status, [
+            ShipmentStatusEnum::IN_TRANSIT,
+            ShipmentStatusEnum::PARTIALLY_DELIVERED,
+        ]);
     }
 
     private function canOnHold(): bool
     {
-        return ShipmentStatusEnum::IN_TRANSIT === $this->status;
-    }
-
-    private function canComplete(): bool
-    {
-        return ShipmentStatusEnum::IN_TRANSIT === $this->status;
+        return in_array($this->status, [
+            ShipmentStatusEnum::IN_TRANSIT,
+            ShipmentStatusEnum::PARTIALLY_DELIVERED,
+        ]);
     }
 
     private function canPartiallyDeliver(): bool
@@ -242,7 +252,7 @@ class Shipment extends BaseModel implements AuditableContract
 
     private function canAwaitingPickup(): bool
     {
-        return ShipmentStatusEnum::IN_TRANSIT === $this->status;
+        return ShipmentStatusEnum::PENDING === $this->status;
     }
 
     private function canUpdate(): bool
