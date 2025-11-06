@@ -4,15 +4,18 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
+use App\Policies\ShipmentPolicy;
 use FalconERP\Skeleton\Database\Factories\ShipmentFactory;
 use FalconERP\Skeleton\Enums\ArchiveEnum;
 use FalconERP\Skeleton\Enums\Stock\Shipment\ShipmentStatusEnum;
 use FalconERP\Skeleton\Models\Erp\People\People;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use FalconERP\Skeleton\Observers\NotificationObserver;
+use Gate;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -31,6 +34,7 @@ use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
     CacheObserver::class,
     NotificationObserver::class,
 ])]
+#[UsePolicy(ShipmentPolicy::class)]
 class Shipment extends BaseModel implements AuditableContract
 {
     use ActionTrait;
@@ -201,58 +205,42 @@ class Shipment extends BaseModel implements AuditableContract
 
     private function canTransit(): bool
     {
-        return ShipmentStatusEnum::AWAITING_PICKUP === $this->status
-            && $this->driver_id !== null;
+        return Gate::inspect('transit', $this)->allowed();
     }
 
     private function canDeliver(): bool
     {
-        return in_array($this->status, [
-            ShipmentStatusEnum::IN_TRANSIT,
-            ShipmentStatusEnum::PARTIALLY_DELIVERED,
-        ]);
+        return Gate::inspect('delivery', $this)->allowed();
     }
 
     private function canCancel(): bool
     {
-        return in_array($this->status, [
-            ShipmentStatusEnum::IN_TRANSIT,
-            ShipmentStatusEnum::PARTIALLY_DELIVERED,
-        ]);
+        return Gate::inspect('cancel', $this)->allowed();
     }
 
     private function canReturn(): bool
     {
-        return in_array($this->status, [
-            ShipmentStatusEnum::IN_TRANSIT,
-            ShipmentStatusEnum::PARTIALLY_DELIVERED,
-        ]);
+        return Gate::inspect('return', $this)->allowed();
     }
 
     private function canFailDelivery(): bool
     {
-        return in_array($this->status, [
-            ShipmentStatusEnum::IN_TRANSIT,
-            ShipmentStatusEnum::PARTIALLY_DELIVERED,
-        ]);
+        return Gate::inspect('fail', $this)->allowed();
     }
 
     private function canOnHold(): bool
     {
-        return in_array($this->status, [
-            ShipmentStatusEnum::IN_TRANSIT,
-            ShipmentStatusEnum::PARTIALLY_DELIVERED,
-        ]);
+        return Gate::inspect('onHold', $this)->allowed();
     }
 
     private function canPartiallyDeliver(): bool
     {
-        return ShipmentStatusEnum::IN_TRANSIT === $this->status;
+        return Gate::inspect('partiallyDelivered', $this)->allowed();
     }
 
     private function canAwaitingPickup(): bool
     {
-        return ShipmentStatusEnum::PENDING === $this->status;
+        return Gate::inspect('awaitingPickup', $this)->allowed();
     }
 
     private function canUpdate(): bool
