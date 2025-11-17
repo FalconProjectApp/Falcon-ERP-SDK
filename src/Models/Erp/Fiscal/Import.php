@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
@@ -129,7 +129,6 @@ class Import extends BaseModel
         );
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | Actions
@@ -142,10 +141,11 @@ class Import extends BaseModel
     protected function setActions(): array
     {
         return [
-            'can_view'     => $this->canView(),
-            'can_restore'  => $this->canRestore(),
-            'can_update'   => $this->canUpdate(),
-            'can_delete'   => $this->canDelete(),
+            'can_view'    => $this->canView(),
+            'can_restore' => $this->canRestore(),
+            'can_update'  => $this->canUpdate(),
+            'can_delete'  => $this->canDelete(),
+            'can_import'  => $this->canImport(),
         ];
     }
 
@@ -167,5 +167,13 @@ class Import extends BaseModel
     private function canDelete(): bool
     {
         return !$this->trashed();
+    }
+
+    private function canImport(): bool
+    {
+        return !$this->trashed()
+            && 'pending' === $this->status
+            && null !== $this->issuer_people_id
+            && null !== $this->recipient_people_id;
     }
 }
