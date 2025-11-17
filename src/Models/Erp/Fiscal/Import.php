@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 #[ObservedBy([
@@ -21,6 +22,7 @@ use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 ])]
 class Import extends BaseModel
 {
+    use ActionTrait;
     use HasFactory;
     use SetSchemaTrait;
     use SoftDeletes;
@@ -125,5 +127,45 @@ class Import extends BaseModel
             get: fn ($value) => json_decode($value),
             set: fn ($value) => json_encode($value)
         );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Actions
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the actions that the model should have with
+    |
+    */
+
+    protected function setActions(): array
+    {
+        return [
+            'can_view'     => $this->canView(),
+            'can_restore'  => $this->canRestore(),
+            'can_update'   => $this->canUpdate(),
+            'can_delete'   => $this->canDelete(),
+        ];
+    }
+
+    private function canView(): bool
+    {
+        return true;
+    }
+
+    private function canRestore(): bool
+    {
+        return $this->trashed();
+    }
+
+    private function canUpdate(): bool
+    {
+        return !$this->trashed();
+    }
+
+    private function canDelete(): bool
+    {
+        return !$this->trashed();
     }
 }
