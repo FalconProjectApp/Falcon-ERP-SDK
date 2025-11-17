@@ -246,6 +246,8 @@ class People extends BaseModel implements AuditableContract
 
     protected function mainEmail(): Attribute
     {
+        $this->loadMissing('peopleContacts');
+
         return Attribute::make(
             get: fn () => $this->peopleContacts->where('type', PeopleContactEnum::TYPE_EMAIL)->first()?->value,
         );
@@ -253,6 +255,7 @@ class People extends BaseModel implements AuditableContract
 
     protected function mainPhone(): Attribute
     {
+        $this->loadMissing('peopleContacts');
         return Attribute::make(
             get: fn () => $this->peopleContacts->where('type', PeopleContactEnum::TYPE_PHONE)->first()?->value,
         );
@@ -260,6 +263,7 @@ class People extends BaseModel implements AuditableContract
 
     protected function mainDocument(): Attribute
     {
+        $this->loadMissing('peopleDocuments');
         return Attribute::make(
             get: fn () => $this->peopleDocuments()->first()?->value,
         );

@@ -2,7 +2,7 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
-use FalconERP\Skeleton\Observers\CacheObserver;
+use FalconERP\Skeleton\Models\Erp\People\People;
 use FalconERP\Skeleton\Observers\NotificationObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 #[ObservedBy([
@@ -50,6 +51,30 @@ class Import extends BaseModel
     public function byRecipientPeopleId($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'recipient_people_id'), fn ($query, $params) => $query->whereIn('recipient_people_id', $params));
+    }
+
+    public function peopleIssuer()
+    {
+        return $this->belongsTo(
+            related: People::class,
+            foreignKey: 'issuer_people_id',
+        );
+    }
+
+    public function peopleRecipient()
+    {
+        return $this->belongsTo(
+            related: People::class,
+            foreignKey: 'recipient_people_id',
+        );
+    }
+
+    public function peopleImporter()
+    {
+        return $this->belongsTo(
+            related: People::class,
+            foreignKey: 'importer_people_id',
+        );
     }
 
     protected function dataStd(): Attribute
