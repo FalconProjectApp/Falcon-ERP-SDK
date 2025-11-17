@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
 use FalconERP\Skeleton\Models\Erp\People\People;
@@ -20,8 +22,8 @@ use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 class Import extends BaseModel
 {
     use HasFactory;
-    use SoftDeletes;
     use SetSchemaTrait;
+    use SoftDeletes;
 
     protected $fillable = [
         'issuer_people_id',
@@ -36,21 +38,38 @@ class Import extends BaseModel
     ];
 
     #[Scope]
-    public function byStatus($query, array $params = [])
+    public function byStatuses($query, array $params = [])
     {
-        return $query->when($this->filtered($params, 'status'), fn ($query, $params) => $query->whereIn('status', $params));
+        return $query->when($this->filtered($params, 'statuses'),
+            fn ($query, $params) => $query->whereIn('status', $params));
     }
 
     #[Scope]
-    public function byIssuerPeopleId($query, array $params = [])
+    public function byIssuerPeopleIds($query, array $params = [])
     {
-        return $query->when($this->filtered($params, 'issuer_people_id'), fn ($query, $params) => $query->whereIn('issuer_people_id', $params));
+        return $query->when($this->filtered($params, 'issuer_people_ids'),
+            fn ($query, $params) => $query->whereIn('issuer_people_id', $params));
     }
 
     #[Scope]
-    public function byRecipientPeopleId($query, array $params = [])
+    public function byRecipientPeopleIds($query, array $params = [])
     {
-        return $query->when($this->filtered($params, 'recipient_people_id'), fn ($query, $params) => $query->whereIn('recipient_people_id', $params));
+        return $query->when($this->filtered($params, 'recipient_people_ids'),
+            fn ($query, $params) => $query->whereIn('recipient_people_id', $params));
+    }
+
+    #[Scope]
+    public function byImporterPeopleIds($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'importer_people_ids'),
+            fn ($query, $params) => $query->whereIn('importer_people_id', $params));
+    }
+
+    #[Scope]
+    public function byTypes($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'types'),
+            fn ($query, $params) => $query->whereIn('type', $params));
     }
 
     public function peopleIssuer()
