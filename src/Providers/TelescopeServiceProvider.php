@@ -21,6 +21,14 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         Telescope::night();
 
         Telescope::tag(function ($entry) {
+            return ['env:'.Str::slug(config('app.env'))];
+        });
+
+        Telescope::tag(function ($entry) {
+            return ['debug:'.Str::slug(config('app.debug'))];
+        });
+
+        Telescope::tag(function ($entry) {
             return ['service:'.Str::slug(config('app.name'))];
         });
 
