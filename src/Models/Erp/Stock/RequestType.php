@@ -25,11 +25,11 @@ class RequestType extends BaseModel
         'description',
         'request_type',
         'type',
-        'is_active',
+        'active',
     ];
 
     protected $attributes = [
-        'is_active' => true,
+        'active' => true,
         'type'      => RequestEnum::TYPE_CLIENT,
     ];
 
