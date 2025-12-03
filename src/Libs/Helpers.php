@@ -4,6 +4,8 @@
  * Helpers.
  */
 
+use FalconERP\Skeleton\Models\BackOffice\DataBase\Database;
+
 if (!function_exists('people')) {
     function people(bool $active = true,
         bool $refresh = false,
@@ -25,6 +27,19 @@ if (!function_exists('database')) {
         bool $refresh = false,
     ): FalconERP\Skeleton\Models\BackOffice\DataBase\Database|false {
         return auth()->database($active, $refresh);
+    }
+}
+
+if (!function_exists('tenant')) {
+    function tenant(?Database $tenant = null): ?Database
+    {
+        static $currentTenant = null;
+
+        if ($tenant instanceof Database) {
+            $currentTenant = $tenant;
+        }
+
+        return $currentTenant;
     }
 }
 

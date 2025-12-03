@@ -4,16 +4,18 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\BackOffice\DataBase;
 
-use FalconERP\Skeleton\Models\User;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
+use FalconERP\Skeleton\Models\User;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 
 class Database extends BaseModel
 {
@@ -99,6 +101,43 @@ class Database extends BaseModel
     | Here you may specify the others that the model should have with
     |
     */
+
+    public function connect(): void
+    {
+        if (app()->environment('testing')) {
+            return;
+        }
+
+        DB::purge('tenant');
+
+        Config::set([
+            'database.default'                           => 'tenant',
+            'database.connections.tenant.driver'         => config('database.connections.pgsql.driver'),
+            'database.connections.tenant.host'           => app()->isLocal() ? config('database.connections.pgsql.host') : $this->group->host,
+            'database.connections.tenant.port'           => app()->isLocal() ? config('database.connections.pgsql.port') : $this->group->port,
+            'database.connections.tenant.username'       => $this->group->user,
+            'database.connections.tenant.password'       => Crypt::decryptString($this->group->secret),
+            'database.connections.tenant.database'       => sprintf('bc_%s', $this->base),
+            'database.connections.tenant.charset'        => config('database.connections.pgsql.charset'),
+            'database.connections.tenant.prefix_indexes' => config('database.connections.pgsql.prefix_indexes'),
+            'database.connections.tenant.search_path'    => config('database.connections.pgsql.search_path'),
+            'database.connections.tenant.sslmode'        => config('database.connections.pgsql.sslmode'),
+        ]);
+
+        DB::reconnect('tenant');
+    }
+
+    public function disconnect(): void
+    {
+        $databaseConnection = 'pgsql';
+
+        DB::purge($databaseConnection);
+        Config::set([
+            'database.default' => $databaseConnection,
+        ]);
+
+        DB::reconnect($databaseConnection);
+    }
 
     /*
     |--------------------------------------------------------------------------
