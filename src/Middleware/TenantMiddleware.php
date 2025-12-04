@@ -24,12 +24,12 @@ class TenantMiddleware
 
         $tenant = false;
 
-        if ($request->hasHeader('authorization')) {
+        if ($request->hasHeader('authorization') && !blank($request->header('authorization'))) {
             $user   = $this->getUser($request->header('authorization'));
             $tenant = $user->databasesAccess()->where('is_active', true)->sole();
         }
 
-        if ($request->hasHeader('x-shop-name')) {
+        if ($request->hasHeader('x-shop-name') && !blank($request->header('x-shop-name'))) {
             $shopName = $request->header('x-shop-name');
 
             $shop = Shop::query()
@@ -73,13 +73,23 @@ class TenantMiddleware
         $tenantKey = str_replace('Bearer ', '', $token);
         $id        = explode('|', $tenantKey)[0] ?? '';
 
-        return PersonalAccessToken::query()->where('id', $id)->firstOrFail()->tokenable;
+        return $id ? PersonalAccessToken::query()->where('id', $id)->firstOrFail()->tokenable : throw new \InvalidArgumentException('Invalid token provided.');
     }
 
     private function getPeople(): People
     {
         $basePeopleId = auth()->user()->databasesAccess()->wherePivot('database_id', tenant()->id)->first()?->pivot->base_people_id;
 
-        return People::find($basePeopleId);
+        if (!$basePeopleId) {
+            throw new \RuntimeException('Base people ID not found for the current user.');
+        }
+
+        $people = People::find($basePeopleId);
+
+        if (!$people) {
+            throw new \RuntimeException('People not found for the given base people ID.');
+        }
+
+        return $people;
     }
 }
