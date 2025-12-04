@@ -4027,7 +4027,7 @@
         },
         {
             "name": "quantumtecnology/controller-basics-extension",
-            "version": "3.x-dev",
+            "version": "3.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension.git",
@@ -4055,7 +4055,6 @@
                 "pestphp/pest-plugin-watch": "^3.0",
                 "rector/rector": "^2.1"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -4093,7 +4092,7 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension/issues",
-                "source": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension/tree/3.x"
+                "source": "https://github.com/Quantum-Tecnology/Controller-Basics-Extension/tree/3.5.3"
             },
             "time": "2025-12-04T18:12:12+00:00"
         },
