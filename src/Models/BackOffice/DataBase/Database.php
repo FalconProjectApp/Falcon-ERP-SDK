@@ -53,6 +53,7 @@ class Database extends BaseModel
             ->withPivot([
                 'is_active',
                 'environment',
+                'base_people_id',
             ]);
     }
 
@@ -137,6 +138,7 @@ class Database extends BaseModel
         ]);
 
         DB::reconnect($databaseConnection);
+
     }
 
     /*
@@ -150,16 +152,22 @@ class Database extends BaseModel
 
     protected function environment(): Attribute
     {
+        $this->loadMissing('userAccess');
+
         return Attribute::get(fn () => $this->userAccess->first()?->pivot->environment);
     }
 
     protected function isActive(): Attribute
     {
+        $this->loadMissing('userAccess');
+
         return Attribute::get(fn () => $this->userAccess->first()?->pivot->is_active);
     }
 
     protected function basePeopleId(): Attribute
     {
+        $this->loadMissing('userAccess');
+
         return Attribute::get(fn () => $this->userAccess->first()?->pivot->base_people_id);
     }
 }

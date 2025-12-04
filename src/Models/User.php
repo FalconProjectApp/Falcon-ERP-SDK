@@ -129,7 +129,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     public function databasesUsersAccess(): HasMany
     {
         return $this->hasMany(DatabasesUsersAccess::class)
-            ->where('database_id', request()->database->id);
+            ->where('database_id', tenant()->id ?? null);
     }
 
     /**

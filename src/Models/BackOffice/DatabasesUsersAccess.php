@@ -22,6 +22,7 @@ class DatabasesUsersAccess extends BaseModel
         'database_id',
         'base_people_id',
         'is_active',
+        'user_id',
         'created_at',
         'updated_at',
     ];
