@@ -24,7 +24,7 @@ class TenantMiddleware
 
         $tenant = false;
 
-        if ($request->hasHeader('authorization') && !blank($request->header('authorization'))) {
+        if ($request->hasHeader('authorization') && !blank($request->header('authorization')) && !in_array($request->header('authorization'), ['Bearer ', 'Bearer null'])) {
             $user   = $this->getUser($request->header('authorization'));
             $tenant = $user->databasesAccess()->where('is_active', true)->sole();
         }
