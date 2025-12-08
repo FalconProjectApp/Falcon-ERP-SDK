@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\People\Traits\People;
 
@@ -286,8 +286,14 @@ trait PeopleSegmentTrait
     {
         $this->loadMissing('segments');
 
+        $value = $this->segments->where('name', 'crt')->first()?->value;
+
+        if (is_string($value) && !empty($value)) {
+            $value = (int) $value;
+        }
+
         return Attribute::make(
-            get: fn (): ?int => $this->segments->where('name', 'crt')->first()?->value ?? PeopleCrtEnum::REGIME_MEI->value,
+            get: fn (): ?int => $value ?? PeopleCrtEnum::REGIME_MEI->value,
         );
     }
 }
