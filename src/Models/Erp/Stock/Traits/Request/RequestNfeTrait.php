@@ -68,7 +68,7 @@ trait RequestNfeTrait
                 ])->toObject());
                 // $nfe->tagICMSUFDest($item->tag_icms_uf_dest->toObject());
             });
-            $nfe->tagICMSTot();
+            //$nfe->tagICMSTot();
             !blank($this->tag_pag) && $nfe->tagpag($this->tag_pag->toObject());
             !blank($this->tag_det_pag) && $nfe->tagdetPag($this->tag_det_pag->toObject());
             !blank($this->tag_obs_cont) && $nfe->tagobsCont($this->tag_obs_cont->toObject());
