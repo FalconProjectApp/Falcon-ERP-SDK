@@ -1,10 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Middleware;
 
 use Carbon\Carbon;
+use Closure;
 use FalconERP\Skeleton\Models\BackOffice\DataBase\Database;
 use FalconERP\Skeleton\Models\BackOffice\Shop;
 use FalconERP\Skeleton\Models\Erp\People\People;
@@ -13,10 +14,12 @@ use FalconERP\Skeleton\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
+use RuntimeException;
 
 class TenantMiddleware
 {
-    public function handle(Request $request, \Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         if (tenant() instanceof Database) {
             tenant()->disconnect();
@@ -33,8 +36,8 @@ class TenantMiddleware
             $shopName = $request->header('x-shop-name');
 
             $shop = Shop::query()
-            ->where('slug', $shopName)
-            ->first();
+                ->where('slug', $shopName)
+                ->first();
 
             abort_if(
                 null === $shop,
@@ -55,12 +58,15 @@ class TenantMiddleware
         }
 
         tenant($tenant);
+
+        $isLoggedIn = auth()->check();
+
         $tenant->connect();
-        Log::info('Tenant connected: '.$tenant->id);
+        Log::info('Tenant connected: ' . $tenant->id);
         Log::debug('Tenant details: ', $tenant->toArray());
 
-        if (auth()->check()) {
-            Log::debug('User '.auth()->id().' connected to tenant: '.$tenant->id);
+        if ($isLoggedIn) {
+            Log::debug('User ' . auth()->id() . ' connected to tenant: ' . $tenant->id);
 
             people($this->getPeople());
         }
@@ -73,7 +79,7 @@ class TenantMiddleware
         $tenantKey = str_replace('Bearer ', '', $token);
         $id        = explode('|', $tenantKey)[0] ?? '';
 
-        return $id ? PersonalAccessToken::query()->where('id', $id)->firstOrFail()->tokenable : throw new \InvalidArgumentException('Invalid token provided.');
+        return $id ? PersonalAccessToken::query()->where('id', $id)->firstOrFail()->tokenable : throw new InvalidArgumentException('Invalid token provided.');
     }
 
     private function getPeople(): People
@@ -81,13 +87,13 @@ class TenantMiddleware
         $basePeopleId = auth()->user()->databasesAccess()->wherePivot('database_id', tenant()->id)->first()?->pivot->base_people_id;
 
         if (!$basePeopleId) {
-            throw new \RuntimeException('Base people ID not found for the current user.');
+            throw new RuntimeException('Base people ID not found for the current user.');
         }
 
         $people = People::find($basePeopleId);
 
         if (!$people) {
-            throw new \RuntimeException('People not found for the given base people ID.');
+            throw new RuntimeException('People not found for the given base people ID.');
         }
 
         return $people;

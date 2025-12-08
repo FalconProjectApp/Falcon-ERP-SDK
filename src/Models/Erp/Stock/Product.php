@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
@@ -37,10 +37,10 @@ class Product extends BaseModel implements AuditableContract
     use ArchiveModelTrait;
     use Auditable;
     use HasFactory;
+    use ProductCollunsTrait;
+    use ProductSegmentTrait;
     use SetSchemaTrait;
     use SoftDeletes;
-    use ProductSegmentTrait;
-    use ProductCollunsTrait;
 
     protected $fillable = [
         self::ATTRIBUTE_GROUPS_ID,
@@ -151,7 +151,7 @@ class Product extends BaseModel implements AuditableContract
     */
 
     #[Scope]
-    public function byGroupIds(Builder $query, string|array $params = []): Builder
+    public function byGroupIds(Builder $query, string | array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'group_ids'), function ($query, $params) {
@@ -160,7 +160,7 @@ class Product extends BaseModel implements AuditableContract
     }
 
     #[Scope]
-    public function byIds(Builder $query, string|array $params = []): Builder
+    public function byIds(Builder $query, string | array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'ids'), function ($query, $params) {
@@ -188,7 +188,14 @@ class Product extends BaseModel implements AuditableContract
         $this->loadMissing('stocks');
 
         return Attribute::make(
-            get: fn () => $this->stocks()->sum('balance_transit'),
+            get: fn () => $this
+                ->stocks()
+                ->when(request()->hasHeader('x-shop-name'), function ($query) {
+                    $query->whereHas('shops', function ($query) {
+                        $query->where('name', request()->header('x-shop-name'));
+                    });
+                })
+                ->sum('balance_transit'),
         );
     }
 
@@ -197,7 +204,13 @@ class Product extends BaseModel implements AuditableContract
         $this->loadMissing('stocks');
 
         return Attribute::make(
-            get: fn (): int => $this->stocks()->sum('balance_stock'),
+            get: fn (): int => $this
+                ->stocks()
+                ->when(request()->hasHeader('x-shop-name'), function ($query) {
+                    $query->whereHas('shops', function ($query) {
+                        $query->where('name', request()->header('x-shop-name'));
+                    });
+                })->sum('balance_stock'),
         );
     }
 
@@ -213,7 +226,13 @@ class Product extends BaseModel implements AuditableContract
         $this->loadMissing('stocks');
 
         return Attribute::make(
-            get: fn (): int => $this->stocks->sum('value_total'),
+            get: fn (): int => $this
+                ->stocks()
+                ->when(request()->hasHeader('x-shop-name'), function ($query) {
+                    $query->whereHas('shops', function ($query) {
+                        $query->where('name', request()->header('x-shop-name'));
+                    });
+                })->sum('value'),
         );
     }
 
