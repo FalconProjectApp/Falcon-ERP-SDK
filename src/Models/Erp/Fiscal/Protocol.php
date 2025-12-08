@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace FalconERP\Skeleton\Models\Erp\Fiscal;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use FalconERP\Skeleton\Observers\NotificationObserver;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
+use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -17,9 +20,10 @@ use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 ])]
 class Protocol extends BaseModel
 {
+    use ActionTrait;
     use HasFactory;
-    use SoftDeletes;
     use SetSchemaTrait;
+    use SoftDeletes;
 
     protected $fillable = [
         'batch_id',
@@ -116,4 +120,43 @@ class Protocol extends BaseModel
     | Here you may specify the attributes that should be cast to native types.
     |
     */
+
+        /*
+    |--------------------------------------------------------------------------
+    | Actions
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the actions that the model should have with
+    |
+    */
+
+    protected function setActions(): array
+    {
+        return [
+            'can_view'    => $this->canView(),
+            'can_restore' => $this->canRestore(),
+            'can_update'  => $this->canUpdate(),
+            'can_delete'  => $this->canDelete(),
+        ];
+    }
+
+    private function canView(): bool
+    {
+        return true;
+    }
+
+    private function canRestore(): bool
+    {
+        return $this->trashed() && false;
+    }
+
+    private function canUpdate(): bool
+    {
+        return !$this->trashed() && false;
+    }
+
+    private function canDelete(): bool
+    {
+        return !$this->trashed() && false;
+    }
 }

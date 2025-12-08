@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use FalconERP\Skeleton\Models\Erp\Finance\PaymentMethod;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -20,6 +21,7 @@ class InvoicePayment extends BaseModel
 {
     use HasFactory;
     use SoftDeletes;
+    use ActionTrait;
     use SetSchemaTrait;
 
     protected $fillable = [
@@ -89,4 +91,43 @@ class InvoicePayment extends BaseModel
     | Here you may specify the attributes that should be cast to native types.
     |
     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | Actions
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the actions that the model should have with
+    |
+    */
+
+    protected function setActions(): array
+    {
+        return [
+            'can_view'    => $this->canView(),
+            'can_restore' => $this->canRestore(),
+            'can_update'  => $this->canUpdate(),
+            'can_delete'  => $this->canDelete(),
+        ];
+    }
+
+    private function canView(): bool
+    {
+        return true;
+    }
+
+    private function canRestore(): bool
+    {
+        return $this->trashed() && false;
+    }
+
+    private function canUpdate(): bool
+    {
+        return !$this->trashed() && false;
+    }
+
+    private function canDelete(): bool
+    {
+        return !$this->trashed() && false;
+    }
 }
