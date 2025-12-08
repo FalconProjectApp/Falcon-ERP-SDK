@@ -226,7 +226,7 @@ class Product extends BaseModel implements AuditableContract
         $this->loadMissing('stocks');
 
         return Attribute::make(
-            get: fn (): int => $this
+            get: fn () => $this
                 ->stocks()
                 ->when(request()->hasHeader('x-shop-name'), function ($query) {
                     $query->whereHas('shops', function ($query) {
