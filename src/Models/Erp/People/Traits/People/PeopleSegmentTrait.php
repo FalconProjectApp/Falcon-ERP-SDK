@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\People\Traits\People;
 
+use FalconERP\Skeleton\Enums\People\PeopleCrtEnum;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -286,7 +287,7 @@ trait PeopleSegmentTrait
         $this->loadMissing('segments');
 
         return Attribute::make(
-            get: fn (): ?string => $this->segments->where('name', 'crt')->first()?->value,
+            get: fn (): ?int => $this->segments->where('name', 'crt')->first()?->value ?? PeopleCrtEnum::REGIME_MEI->value,
         );
     }
 }

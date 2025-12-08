@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Enums\People;
 
-enum PeopleCrtEnum: string
+enum PeopleCrtEnum: int
 {
     case REGIME_SIMPLES_NACIONAL                   = 1;
     case REGIME_SIMPLES_NACIONAL_EXCESSO_SUBLIMITE = 2;
