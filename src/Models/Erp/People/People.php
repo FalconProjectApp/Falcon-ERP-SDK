@@ -183,7 +183,7 @@ class People extends BaseModel implements AuditableContract
     {
         return $this
             ->users()
-            ->wherePivot('database_id', auth()->database()->id)
+            ->wherePivot('database_id', tenant()->id)
             ->wherePivot('base_people_id', people()->id);
     }
 

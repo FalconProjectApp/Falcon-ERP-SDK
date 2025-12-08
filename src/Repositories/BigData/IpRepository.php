@@ -41,7 +41,7 @@ class IpRepository
 
     public function authorization(): ?string
     {
-        $cacheKey = sprintf('%s_falcon_big_data_auth', database()->base);
+        $cacheKey = sprintf('%s_falcon_big_data_auth', tenant()->base);
 
         if (!Cache::has($cacheKey)) {
             $auth = Falcon::bigDataService('auth')->login();

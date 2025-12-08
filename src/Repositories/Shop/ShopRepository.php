@@ -32,7 +32,7 @@ class ShopRepository
             config('falconservices.shop.' . config('app.env') . '.url_api')
         );
 
-        $this->authorization = Cache::get(sprintf('%s_user_%s', database()->base, auth()->user()->id)) ?? $params['authorization'] ?? request()->header('Authorization');
+        $this->authorization = Cache::get(sprintf('%s_user_%s', tenant()->base, auth()->user()->id)) ?? $params['authorization'] ?? request()->header('Authorization');
 
         $this->timeout = config('falconservices.timeout', 30);
     }
