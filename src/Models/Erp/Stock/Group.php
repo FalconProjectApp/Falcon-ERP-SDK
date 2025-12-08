@@ -177,14 +177,14 @@ class Group extends BaseModel implements AuditableContract
     private function canFollow(): bool
     {
         return (!$this->trashed()
-            && !$this->followers()->where('follower_people_id', auth()->people()->id)->exists())
+            && !$this->followers()->where('follower_people_id', people()->id)->exists())
             ?? false;
     }
 
     private function canUnfollow(): bool
     {
         return (!$this->trashed()
-            && $this->followers()->where('follower_people_id', auth()->people()->id)->exists())
+            && $this->followers()->where('follower_people_id', people()->id)->exists())
             ?? false;
     }
 }

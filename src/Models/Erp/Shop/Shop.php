@@ -412,14 +412,14 @@ class Shop extends BaseModel implements AuditableContract
     {
         return (!$this->trashed()
             && !$this->is_public
-            && !$this->followers()->where('follower_people_id', auth()->people()?->id)->exists()
-            && $this->id !== auth()->people()?->id) ?? false;
+            && !$this->followers()->where('follower_people_id', people()?->id)->exists()
+            && $this->id !== people()?->id) ?? false;
     }
 
     private function canUnfollow(): bool
     {
         return (!$this->trashed()
             && !$this->is_public
-            && $this->followers()->where('follower_people_id', auth()->people()?->id)->exists()) ?? false;
+            && $this->followers()->where('follower_people_id', people()?->id)->exists()) ?? false;
     }
 }

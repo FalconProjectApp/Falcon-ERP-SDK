@@ -84,8 +84,8 @@ class ReleasesType extends BaseModel
 
         /* return (!$this->trashed()
             && !$this->is_public
-            && !$this->followers()->where('follower_people_id', auth()->people()?->id)->exists()
-            && $this->id !== auth()->people()?->id) ?? false; */
+            && !$this->followers()->where('follower_people_id', people()?->id)->exists()
+            && $this->id !== people()?->id) ?? false; */
     }
 
     private function canUnfollow(): bool
@@ -94,6 +94,6 @@ class ReleasesType extends BaseModel
 
         /* return (!$this->trashed()
             && !$this->is_public
-            && $this->followers()->where('follower_people_id', auth()->people()?->id)->exists()) ?? false; */
+            && $this->followers()->where('follower_people_id', people()?->id)->exists()) ?? false; */
     }
 }

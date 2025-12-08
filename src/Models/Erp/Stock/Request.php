@@ -310,7 +310,7 @@ class Request extends BaseModel implements AuditableContract
         return (
             !$this->trashed()
                 && auth()->check()
-                && !$this->followers()->where('follower_people_id', auth()->people()->id)->exists()
+                && !$this->followers()->where('follower_people_id', people()->id)->exists()
         ) ?? false;
     }
 
@@ -319,7 +319,7 @@ class Request extends BaseModel implements AuditableContract
         return (
             !$this->trashed()
                 && auth()->check()
-                && $this->followers()->where('follower_people_id', auth()->people()->id)->exists()
+                && $this->followers()->where('follower_people_id', people()->id)->exists()
         ) ?? false;
     }
 
