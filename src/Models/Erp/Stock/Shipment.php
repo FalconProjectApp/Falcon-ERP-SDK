@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
@@ -11,7 +11,6 @@ use FalconERP\Skeleton\Enums\Stock\Shipment\ShipmentStatusEnum;
 use FalconERP\Skeleton\Models\Erp\People\People;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use FalconERP\Skeleton\Observers\NotificationObserver;
-use Gate;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -22,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Gate;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
@@ -153,7 +153,7 @@ class Shipment extends BaseModel implements AuditableContract
     */
 
     #[Scope]
-    protected function byStatus(Builder $query, string | array $params = []): void
+    protected function byStatus(Builder $query, string|array $params = []): void
     {
         $query->when($this->filtered($params, 'status'), function ($query, $params) {
             $query->whereIn(self::ATTRIBUTE_STATUS, $params);
@@ -172,20 +172,21 @@ class Shipment extends BaseModel implements AuditableContract
     protected function setActions(): array
     {
         return [
-            'can_view'              => $this->canView(),
-            'can_restore'           => $this->canRestore(),
-            'can_update'            => $this->canUpdate(),
-            'can_delete'            => $this->canDelete(),
-            'can_follow'            => $this->canFollow(),
-            'can_unfollow'          => $this->canUnfollow(),
-            'can_transit'           => $this->canTransit(),
-            'can_deliver'           => $this->canDeliver(),
-            'can_cancel'            => $this->canCancel(),
-            'can_return'            => $this->canReturn(),
-            'can_fail_delivery'     => $this->canFailDelivery(),
-            'can_on_hold'           => $this->canOnHold(),
-            'can_partially_deliver' => $this->canPartiallyDeliver(),
-            'can_awaiting_pickup'   => $this->canAwaitingPickup(),
+            'can_view'                 => $this->canView(),
+            'can_restore'              => $this->canRestore(),
+            'can_update'               => $this->canUpdate(),
+            'can_delete'               => $this->canDelete(),
+            'can_follow'               => $this->canFollow(),
+            'can_unfollow'             => $this->canUnfollow(),
+            'can_transit'              => $this->canTransit(),
+            'can_deliver'              => $this->canDeliver(),
+            'can_cancel'               => $this->canCancel(),
+            'can_return'               => $this->canReturn(),
+            'can_fail_delivery'        => $this->canFailDelivery(),
+            'can_on_hold'              => $this->canOnHold(),
+            'can_partially_deliver'    => $this->canPartiallyDeliver(),
+            'can_awaiting_pickup'      => $this->canAwaitingPickup(),
+            'can_add_address_to_route' => $this->canAddAddressToRoute(),
         ];
     }
 
@@ -237,6 +238,11 @@ class Shipment extends BaseModel implements AuditableContract
     private function canAwaitingPickup(): bool
     {
         return Gate::inspect('awaitingPickup', $this)->allowed();
+    }
+
+    private function canAddAddressToRoute(): bool
+    {
+        return Gate::inspect('addAddressToRoute', $this)->allowed();
     }
 
     private function canUpdate(): bool
