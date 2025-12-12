@@ -9,6 +9,7 @@ use FalconERP\Skeleton\Enums\ArchiveEnum;
 use FalconERP\Skeleton\Enums\People\PeopleContactEnum;
 use FalconERP\Skeleton\Enums\People\PeopleCrtEnum;
 use FalconERP\Skeleton\Enums\People\PeopleDocumentEnum;
+use FalconERP\Skeleton\Enums\People\Type\LegalEntityTypesEnum;
 use FalconERP\Skeleton\Models\BackOffice\DatabasesUsersAccess;
 use FalconERP\Skeleton\Models\Erp\People\Traits\People\PeopleSegmentTrait;
 use FalconERP\Skeleton\Models\User;
@@ -183,8 +184,8 @@ class People extends BaseModel implements AuditableContract
     {
         return $this
             ->users()
-            ->wherePivot('database_id', tenant()->id)
-            ->wherePivot('base_people_id', people()->id);
+            ->wherePivot('database_id', auth()->database()->id)
+            ->wherePivot('base_people_id', auth()->people()->id);
     }
 
     public function segments(): HasMany
@@ -256,6 +257,7 @@ class People extends BaseModel implements AuditableContract
     protected function mainPhone(): Attribute
     {
         $this->loadMissing('peopleContacts');
+
         return Attribute::make(
             get: fn () => $this->peopleContacts->where('type', PeopleContactEnum::TYPE_PHONE)->first()?->value,
         );
@@ -264,6 +266,7 @@ class People extends BaseModel implements AuditableContract
     protected function mainDocument(): Attribute
     {
         $this->loadMissing('peopleDocuments');
+
         return Attribute::make(
             get: fn () => $this->peopleDocuments()->first()?->value,
         );
@@ -320,11 +323,13 @@ class People extends BaseModel implements AuditableContract
         );
     }
 
+    /**
+     * is_legal_entity_type.
+     */
     protected function isLegalEntityType(): Attribute
     {
         return Attribute::make(
-            get: fn () => (bool) $this->type->is_legal_entity_type
-                ?? false,
+            get: fn (): bool => LegalEntityTypesEnum::COMPANY === $this->type->legal_entity_type,
         );
     }
 
@@ -388,21 +393,21 @@ class People extends BaseModel implements AuditableContract
     private function canDelete(): bool
     {
         return !$this->trashed()
-            && $this->id !== people()?->id;
+            && $this->id !== auth()->people()?->id;
     }
 
     private function canFollow(): bool
     {
         return (!$this->trashed()
             && !$this->is_public
-            && !$this->followers()->where('follower_people_id', people()?->id)->exists()
-            && $this->id !== people()?->id) ?? false;
+            && !$this->followers()->where('follower_people_id', auth()->people()?->id)->exists()
+            && $this->id !== auth()->people()?->id) ?? false;
     }
 
     private function canUnfollow(): bool
     {
         return (!$this->trashed()
             && !$this->is_public
-            && $this->followers()->where('follower_people_id', people()?->id)->exists()) ?? false;
+            && $this->followers()->where('follower_people_id', auth()->people()?->id)->exists()) ?? false;
     }
 }
