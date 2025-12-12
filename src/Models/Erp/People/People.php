@@ -184,8 +184,8 @@ class People extends BaseModel implements AuditableContract
     {
         return $this
             ->users()
-            ->wherePivot('database_id', auth()->database()->id)
-            ->wherePivot('base_people_id', auth()->people()->id);
+            ->wherePivot('database_id', database()->id)
+            ->wherePivot('base_people_id', people()->id);
     }
 
     public function segments(): HasMany
@@ -393,21 +393,21 @@ class People extends BaseModel implements AuditableContract
     private function canDelete(): bool
     {
         return !$this->trashed()
-            && $this->id !== auth()->people()?->id;
+            && $this->id !== people()?->id;
     }
 
     private function canFollow(): bool
     {
         return (!$this->trashed()
             && !$this->is_public
-            && !$this->followers()->where('follower_people_id', auth()->people()?->id)->exists()
-            && $this->id !== auth()->people()?->id) ?? false;
+            && !$this->followers()->where('follower_people_id', people()?->id)->exists()
+            && $this->id !== people()?->id) ?? false;
     }
 
     private function canUnfollow(): bool
     {
         return (!$this->trashed()
             && !$this->is_public
-            && $this->followers()->where('follower_people_id', auth()->people()?->id)->exists()) ?? false;
+            && $this->followers()->where('follower_people_id', people()?->id)->exists()) ?? false;
     }
 }
