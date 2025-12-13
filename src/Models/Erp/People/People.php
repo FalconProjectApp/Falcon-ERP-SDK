@@ -328,8 +328,10 @@ class People extends BaseModel implements AuditableContract
      */
     protected function isLegalEntityType(): Attribute
     {
+        $this->loadMissing('type');
+        
         return Attribute::make(
-            get: fn (): bool => LegalEntityTypesEnum::COMPANY === $this->type->legal_entity_type,
+            get: fn (): bool => LegalEntityTypesEnum::COMPANY === $this->type?->legal_entity_type,
         );
     }
 
