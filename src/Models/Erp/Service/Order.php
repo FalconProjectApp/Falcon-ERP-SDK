@@ -2,17 +2,27 @@
 
 namespace FalconERP\Skeleton\Models\Erp\Service;
 
-use OwenIt\Auditing\Auditable;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use FalconERP\Skeleton\Enums\CacheEnum;
 use FalconERP\Skeleton\Models\Erp\People\People;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use FalconERP\Skeleton\Observers\NotificationObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
+use QuantumTecnology\ModelBasicsExtension\Observers\EventDispatcherObserver;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
+#[ObservedBy([
+    CacheObserver::class,
+    NotificationObserver::class,
+    EventDispatcherObserver::class,
+])]
 class Order extends BaseModel implements AuditableContract
 {
     use HasFactory;
@@ -28,6 +38,15 @@ class Order extends BaseModel implements AuditableContract
         'status',
         'scheduled_at',
         'obs',
+    ];
+
+    protected $caches = [
+        CacheEnum::KEY_ORDER_TOTAL_COUNT,
+        CacheEnum::KEY_ORDER_TRASHED_COUNT,
+        CacheEnum::KEY_ORDER_STATUS_OPEN_COUNT,
+        CacheEnum::KEY_ORDER_STATUS_IN_PROGRESS_COUNT,
+        CacheEnum::KEY_ORDER_STATUS_PAUSE_COUNT,
+        CacheEnum::KEY_ORDER_STATUS_CLOSEDS_COUNT,
     ];
 
     protected $appends = [];

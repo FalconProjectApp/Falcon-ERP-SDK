@@ -408,7 +408,7 @@ trait RequestNfeTrait
                 'IM'    => $emit->im,
                 // TODO: o cnae utilizado para emitir a nota deveria estar na request
                 'CNAE' => $emit->mainCnae,
-                'CRT'  => $emit->crt,
+                'CRT'  => $emit->crt ?? 1,
                 'CNPJ' => $emit->cnpj,
                 'CPF'  => $emit->cnpj ?: $emit->cpf,
             ])

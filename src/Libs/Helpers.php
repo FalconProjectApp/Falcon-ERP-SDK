@@ -23,7 +23,7 @@ if (!function_exists('tenant')) {
     function tenant(?Database $tenant = null): ?Database
     {
         static $currentTenant = null;
-
+        
         if ($tenant instanceof Database) {
             $currentTenant = $tenant;
         }
