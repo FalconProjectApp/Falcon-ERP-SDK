@@ -1331,5 +1331,367 @@ Este manual é um guia vivo. Sempre que identificar novos padrões ou melhores p
 
 ---
 
-**Última atualização**: 13/12/2025  
-**Versão**: 1.0.0
+## 🏢 Organização de Hierarquia em FormRequests
+
+Quando trabalhando com recursos hierárquicos, organize FormRequests refletindo a hierarquia:
+
+```
+app/Http/Requests/Erp/Private/V1/
+└── Warehouse/
+    ├── StoreRequest.php
+    ├── UpdateRequest.php  
+    ├── Aisle/
+    │   ├── StoreRequest.php
+    │   └── UpdateRequest.php
+    ├── Position/
+    │   ├── StoreRequest.php
+    │   └── BlockRequest.php
+    └── StockPosition/
+        ├── AllocateRequest.php
+        └── TransferRequest.php
+```
+
+**Namespace:** `App\Http\Requests\Erp\Private\V1\Warehouse\Aisle`
+
+**Benefícios:**
+- Organização visual clara da hierarquia
+- Facilita localização de validações
+- Evita conflitos de nomenclatura
+- Melhora manutenibilidade
+
+---
+
+## 🗂️ Models no Skeleton vs Services Locais
+
+### Models Compartilhados (FalconERP/Skeleton)
+
+Models compartilhados entre microserviços devem ficar no Skeleton:
+
+```php
+// No Skeleton: FalconERP/Skeleton/src/Models/Erp/Stock/
+use FalconERP\Skeleton\Models\Erp\Stock\Warehouse;
+use FalconERP\Skeleton\Models\Erp\Stock\WarehousePosition;
+```
+
+**IMPORTANTE:**
+- ✅ Migrations ficam no microserviço que cria a tabela
+- ✅ Models no Skeleton para reuso entre serviços
+- ✅ Factories no microserviço (referenciam model do Skeleton)
+- ✅ Policies no microserviço que possui as regras de negócio
+
+### Models Locais
+
+Models específicos de um microserviço ficam no próprio serviço:
+
+```php
+// No serviço: app/Models/Erp/Private/V1/
+use App\Models\Erp\Private\V1\LocalModel;
+```
+
+---
+
+## 🛡️ Policies e Gates: Substituindo abort_if/abort_unless
+
+### O Problema com abort_if
+
+```php
+// ❌ EVITE - Lógica de negócio dispersa
+public function block(WarehousePosition $position): Model
+{
+    abort_if(
+        PositionStatusEnum::AVAILABLE !== $position->status,
+        422,
+        'Only available positions can be blocked'
+    );
+    
+    // lógica de bloqueio...
+}
+```
+
+**Problemas:**
+- Lógica de autorização misturada com lógica de negócio
+- Dificulta testes unitários
+- Sem reuso de regras
+- Código duplicado entre métodos
+
+### A Solução: Policies + Gates
+
+```php
+// ✅ PREFIRA - Policy centraliza regras
+use Illuminate\Auth\Access\Response;
+use Illuminate\Support\Facades\Gate;
+
+#[UsePolicy(WarehousePositionPolicy::class)]
+class WarehousePosition extends Model { }
+
+class WarehousePositionPolicy
+{
+    public function block(User $user, WarehousePosition $position): Response
+    {
+        if (PositionStatusEnum::AVAILABLE !== $position->status) {
+            return Response::deny(__('Only available positions can be blocked'));
+        }
+        
+        if ($position->has_active_stock) {
+            return Response::deny(__('Cannot block position with active stock'));
+        }
+        
+        return Response::allow();
+    }
+}
+
+// No Service
+class WarehousePositionService extends BaseService
+{
+    public function block(WarehousePosition $position): Model
+    {
+        Gate::inspect('block', $position)->authorize();
+        
+        // Apenas lógica de negócio
+        $position->update(['status' => PositionStatusEnum::BLOCKED]);
+        
+        return $position;
+    }
+}
+```
+
+**Vantagens:**
+- ✅ Regras centralizadas e reutilizáveis
+- ✅ Fácil de testar isoladamente
+- ✅ Mensagens de erro consistentes
+- ✅ Separação clara de responsabilidades
+- ✅ Suporte a múltiplas validações
+- ✅ `Gate::inspect()` retorna detalhes da falha
+
+---
+
+## 📦 Resources: Transformação de Dados
+
+Sempre crie Resources para transformar Models em respostas JSON:
+
+```php
+namespace App\Http\Resources\Erp\Stock;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class WarehousePositionIndexResource extends JsonResource
+{
+    public function toArray($request): array
+    {
+        return [
+            // IDs sempre como integer
+            'id' => (int) $this->id,
+            'warehouse_aisle_id' => (int) $this->warehouse_aisle_id,
+            
+            // Enums: value e label
+            'status' => (string) $this->status?->value,
+            'status_label' => (string) $this->status?->label(),
+            'side' => (string) $this->side?->value,
+            'side_label' => (string) $this->side?->label(),
+            
+            // Strings e números
+            'code' => (string) $this->code,
+            'level' => (int) $this->level,
+            'max_weight' => (float) $this->max_weight,
+            
+            // Datas em ISO8601
+            'blocked_at' => $this->blocked_at?->toISOString(),
+            'created_at' => $this->created_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
+            
+            // Propriedades computadas (conditional)
+            'usage_percentage' => $this->when(
+                method_exists($this->resource, 'getUsagePercentage'),
+                fn () => $this->getUsagePercentage()
+            ),
+            
+            // Relacionamentos (lazy load safe)
+            'aisle' => $this->whenLoaded('aisle'),
+            'warehouse' => $this->whenLoaded('aisle.warehouse'),
+            'stock_positions' => $this->whenLoaded('stockPositions'),
+        ];
+    }
+}
+```
+
+**Registre no Controller:**
+
+```php
+class WarehousePositionController extends BaseController
+{
+    protected string $service  = WarehousePositionService::class;
+    protected string $resource = WarehousePositionIndexResource::class;
+    protected array $allowedIncludes = ['aisle', 'aisle.warehouse', 'stockPositions'];
+}
+```
+
+**Regras:**
+- ✅ Type cast TUDO: `(int)`, `(string)`, `(float)`
+- ✅ Enums: retorne `value` e `label()`
+- ✅ Datas: `->toISOString()` (padrão ISO8601)
+- ✅ Null safety: `?->` operator
+- ✅ Computed: `$this->when()` com `method_exists()`
+- ✅ Relacionamentos: `$this->whenLoaded()`
+
+---
+
+## 🧪 Factories com States
+
+Use states para criar variações de models em testes:
+
+```php
+namespace Database\Factories\Erp\Stock;
+
+use FalconERP\Skeleton\Models\Erp\Stock\WarehousePosition;
+use FalconERP\Skeleton\Enums\Erp\Stock\PositionStatusEnum;
+
+class WarehousePositionFactory extends Factory
+{
+    protected $model = WarehousePosition::class;
+
+    public function definition(): array
+    {
+        return [
+            'warehouse_aisle_id' => WarehouseAisle::factory(),
+            'code' => $this->faker->unique()->bothify('POS-###-??'),
+            'level' => $this->faker->numberBetween(1, 5),
+            'status' => PositionStatusEnum::AVAILABLE,
+        ];
+    }
+
+    public function blocked(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'status' => PositionStatusEnum::BLOCKED,
+            'blocked_at' => now(),
+        ]);
+    }
+
+    public function full(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'status' => PositionStatusEnum::OCCUPIED,
+        ]);
+    }
+
+    public function maintenance(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'status' => PositionStatusEnum::MAINTENANCE,
+        ]);
+    }
+}
+```
+
+**Uso nos Testes:**
+
+```php
+// Posição disponível (padrão)
+$position = WarehousePosition::factory()->create();
+
+// Posição bloqueada
+$blocked = WarehousePosition::factory()->blocked()->create();
+
+// Múltiplas posições com estados diferentes
+$positions = WarehousePosition::factory()
+    ->count(3)
+    ->sequence(
+        ['status' => PositionStatusEnum::AVAILABLE],
+        ['status' => PositionStatusEnum::BLOCKED],
+        ['status' => PositionStatusEnum::OCCUPIED],
+    )
+    ->create();
+```
+
+---
+
+## 🧭 Rotas: Padrão do Projeto
+
+### Estrutura Correta
+
+```php
+// routes/Erp/Private/WarehousePositions.php
+use Illuminate\Support\Facades\Route;
+
+Route::prefix('v1')
+    ->name('v1.')
+    ->namespace('V1')
+    ->controller('WarehousePositionController')  // ✅ STRING!
+    ->group(function (): void {
+        // Ações customizadas ANTES do apiResource
+        Route::post('{id}/block', 'block')->name('block');
+        Route::post('{id}/unblock', 'unblock')->name('unblock');
+        Route::get('{id}/usage', 'usage')->name('usage');
+        
+        // apiResource por último
+        Route::apiResource('', 'WarehousePositionController')
+            ->parameters(['' => 'id']);
+    });
+```
+
+### ❌ Evite
+
+```php
+// ❌ Array em controller
+->controller([WarehousePositionController::class])
+
+// ❌ Parâmetro não padronizado
+->parameters(['' => 'position_id'])
+
+// ❌ apiResource antes das rotas customizadas
+Route::apiResource('', 'WarehousePositionController');
+Route::post('{id}/block', 'block');  // Nunca será alcançada!
+```
+
+### ✅ Regras
+
+1. **Controller como string**: `->controller('ControllerName')`
+2. **Parâmetro sempre 'id'**: `->parameters(['' => 'id'])`
+3. **apiResource por último**: Evita conflitos de rota
+4. **Ações customizadas primeiro**: Declaradas antes do apiResource
+5. **Namespace V1**: Sempre use `->namespace('V1')`
+
+---
+
+## 🎯 Migrations: Ordem e Timestamps
+
+### Problema: Timestamps Duplicados
+
+Quando migrations têm o mesmo timestamp, a ordem de execução é imprevisível:
+
+```
+❌ 2025_12_14_161307_create_warehouse_positions_table.php
+❌ 2025_12_14_161307_create_stock_positions_table.php
+```
+
+Laravel pode executar `stock_positions` antes de `warehouse_positions`, causando erro de foreign key.
+
+### Solução: Sufixos Numéricos
+
+Adicione sufixo numérico ao timestamp:
+
+```
+✅ 2025_12_14_161307_000_create_warehouse_positions_table.php
+✅ 2025_12_14_161307_100_create_stock_positions_table.php
+```
+
+**Convenção:**
+- Incremente de **100 em 100**: `_000`, `_100`, `_200`, `_300`
+- Deixa espaço para inserir migrations intermediárias futuras
+- Mantém ordem alfabética = ordem de execução
+
+### Quando Usar
+
+Use sufixos quando:
+- ✅ Criando múltiplas migrations no mesmo minuto
+- ✅ Migrations com dependências entre si (foreign keys)
+- ✅ Migrations relacionadas logicamente
+
+Não precisa quando:
+- ❌ Migration isolada sem dependências
+- ❌ Migrations em minutos diferentes
+
+---
+
+**Última atualização**: 14/12/2025  
+**Versão**: 1.1.0
