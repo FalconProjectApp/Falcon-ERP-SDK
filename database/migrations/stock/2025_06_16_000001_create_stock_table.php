@@ -21,6 +21,7 @@ return new class extends Migration {
             config('database.connections.'.config('database.default').'.driver'),
             ['pgsql']
         )) {
+            // Cria o schema stock se não existir
             DB::statement('CREATE SCHEMA IF NOT EXISTS stock');
         }
 
@@ -389,5 +390,13 @@ return new class extends Migration {
         Schema::dropIfExists('stock.groups');
         Schema::dropIfExists('stock.shipment_routes');
         Schema::dropIfExists('stock.shipments');
+
+                if (in_array(
+            config('database.connections.'.config('database.default').'.driver'),
+            ['pgsql']
+        )) {
+              // Remove o schema stock (cuidado: isso apagará todas as tabelas dentro dele)
+        DB::statement('DROP SCHEMA IF EXISTS stock CASCADE');
+        }
     }
 };
