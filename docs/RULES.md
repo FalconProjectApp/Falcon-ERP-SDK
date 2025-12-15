@@ -1695,3 +1695,153 @@ NÃ£o precisa quando:
 
 **Ãšltima atualizaÃ§Ã£o**: 14/12/2025  
 **VersÃ£o**: 1.1.0
+
+---
+
+##  Organização de Hierarquia em FormRequests
+
+Quando trabalhando com recursos hierárquicos, organize FormRequests refletindo a hierarquia:
+
+```
+app/Http/Requests/Erp/Private/V1/
+ Warehouse/
+     StoreRequest.php
+     UpdateRequest.php  
+     Aisle/
+        StoreRequest.php
+        UpdateRequest.php
+     Position/
+        StoreRequest.php
+        BlockRequest.php
+     StockPosition/
+         AllocateRequest.php
+         TransferRequest.php
+```
+
+**Namespace:** `App\Http\Requests\Erp\Private\V1\Warehouse\Aisle`
+
+---
+
+##  Models no Skeleton vs Locais
+
+### Models Compartilhados (FalconERP/Skeleton)
+
+Models compartilhados entre microserviços vão para o Skeleton:
+- `use FalconERP\Skeleton\Models\Erp\Stock\Warehouse`
+
+**IMPORTANTE:**
+-  Migrations ficam no microserviço
+-  Models no Skeleton
+-  Factories no microserviço (referenciam Skeleton)
+
+---
+
+##  Policies e Gates
+
+Substitua `abort_if`/`abort_unless` por Policies:
+
+```php
+//  EVITE
+abort_if(condition, 422, 'message');
+
+//  PREFIRA
+Gate::inspect('action', $model)->authorize();
+```
+
+**Policy:**
+```php
+#[UsePolicy(WarehousePositionPolicy::class)]
+class WarehousePosition extends Model { }
+
+class WarehousePositionPolicy
+{
+    public function block(User $user, WarehousePosition $position): Response
+    {
+        if (condition) {
+            return Response::deny(__('message'));
+        }
+        return Response::allow();
+    }
+}
+```
+
+---
+
+##  Resources
+
+```php
+class WarehousePositionIndexResource extends JsonResource
+{
+    public function toArray($request)
+    {
+        return [
+            'id' => (int) $this->id,
+            'status' => (string) $this->status?->value,
+            'status_label' => (string) $this->status?->label(),
+            'created_at' => $this->created_at?->toISOString(),
+            'usage' => $this->when(
+                method_exists($this->resource, 'getUsage'),
+                fn () => $this->getUsage()
+            ),
+            'aisle' => $this->whenLoaded('aisle'),
+        ];
+    }
+}
+```
+
+Registre: `protected string $resource = WarehousePositionIndexResource::class;`
+
+---
+
+##  Factories com States
+
+```php
+public function blocked(): static
+{
+    return $this->state(fn (array $attributes): array => [
+        'status' => PositionStatusEnum::BLOCKED,
+    ]);
+}
+```
+
+Uso: `WarehousePosition::factory()->blocked()->create();`
+
+---
+
+##  Rotas
+
+```php
+Route::prefix('v1')
+    ->name('v1.')
+    ->namespace('V1')
+    ->controller('WarehousePositionController')  // String!
+    ->group(function (): void {
+        Route::post('{id}/block', 'block')->name('block');
+        Route::apiResource('', 'WarehousePositionController')->parameters(['' => 'id']);
+    });
+```
+
+**Regras:**
+-  String em controller, não array
+-  Parâmetro sempre 'id'
+-  apiResource por último
+
+---
+
+##  Migrations com Timestamps Duplicados
+
+**Problema:** Mesmo timestamp causa erro de ordem
+
+**Solução:** Adicione sufixo numérico
+
+```
+ 2025_12_14_161307_000_create_warehouse_positions_table.php
+ 2025_12_14_161307_100_create_stock_positions_table.php
+```
+
+Incremente de 100 em 100.
+
+---
+
+**Última atualização**: 14/12/2025
+**Versão**: 1.1.0 - Adicionado boas práticas de warehouse positions

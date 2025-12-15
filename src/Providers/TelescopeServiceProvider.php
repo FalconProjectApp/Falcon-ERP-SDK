@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Providers;
 
+use Dom\Text;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Laravel\Telescope\IncomingEntry;
@@ -30,6 +31,10 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 
         Telescope::tag(function ($entry) {
             return ['service:'.Str::slug(config('app.name'))];
+        });
+
+        Telescope::tag(function ($entry) {
+            return ['tenant:'.Str::slug(tenant()->base ?? 'no-tenant')];
         });
 
         $this->hideSensitiveRequestDetails();
