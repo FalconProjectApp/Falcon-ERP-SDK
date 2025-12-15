@@ -138,4 +138,55 @@ class WarehousePosition extends BaseModel implements AuditableContract
 
         return ($this->current_weight / $this->max_weight) * 100;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Actions
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the actions that the model should have with
+    |
+    */
+
+    protected function setActions(): array
+    {
+        return [
+            'can_view'     => $this->canView(),
+            'can_restore'  => $this->canRestore(),
+            'can_update'   => $this->canUpdate(),
+            'can_delete'   => $this->canDelete(),
+            'can_follow'   => $this->canFollow(),
+            'can_unfollow' => $this->canUnfollow(),
+        ];
+    }
+
+    private function canView(): bool
+    {
+        return true;
+    }
+
+    private function canRestore(): bool
+    {
+        return $this->trashed();
+    }
+
+    private function canUpdate(): bool
+    {
+        return !$this->trashed() && PositionStatusEnum::BLOCKED !== $this->status;
+    }
+
+    private function canDelete(): bool
+    {
+        return !$this->trashed() && !$this->stockPositions()->exists();
+    }
+
+    private function canFollow(): bool
+    {
+        return false;
+    }
+
+    private function canUnfollow(): bool
+    {
+        return false;
+    }
 }

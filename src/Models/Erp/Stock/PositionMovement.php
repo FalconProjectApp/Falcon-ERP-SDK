@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Stock;
 
-use App\Enums\MovementTypeEnum;
+use FalconERP\Skeleton\Enums\Stock\MovementTypeEnum;
 use FalconERP\Skeleton\Models\Erp\Stock\Stock;
 use FalconERP\Skeleton\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -103,5 +103,56 @@ class PositionMovement extends BaseModel implements AuditableContract
     public function isExit(): bool
     {
         return MovementTypeEnum::OUT === $this->type;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Actions
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the actions that the model should have with
+    |
+    */
+
+    protected function setActions(): array
+    {
+        return [
+            'can_view'     => $this->canView(),
+            'can_restore'  => $this->canRestore(),
+            'can_update'   => $this->canUpdate(),
+            'can_delete'   => $this->canDelete(),
+            'can_follow'   => $this->canFollow(),
+            'can_unfollow' => $this->canUnfollow(),
+        ];
+    }
+
+    private function canView(): bool
+    {
+        return true;
+    }
+
+    private function canRestore(): bool
+    {
+        return false;
+    }
+
+    private function canUpdate(): bool
+    {
+        return false;
+    }
+
+    private function canDelete(): bool
+    {
+        return false;
+    }
+
+    private function canFollow(): bool
+    {
+        return false;
+    }
+
+    private function canUnfollow(): bool
+    {
+        return false;
     }
 }

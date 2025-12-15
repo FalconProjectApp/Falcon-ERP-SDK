@@ -1,6 +1,9 @@
-# 📋 Manual de Regras de Desenvolvimento - Falcon ERP
+# 📋 Manual de Regras de Desenvolvimento - Laravel
 
-> **Objetivo**: Este documento define os padrões arquiteturais, convenções de código e boas práticas para desenvolvimento nos microserviços do ecossistema Falcon ERP.
+> **Objetivo**: Este documento define os padrões arquiteturais, convenções de código e boas práticas para desenvolvimento em projetos Laravel seguindo Clean Architecture e Service Layer Pattern.
+
+**Autor**: Luis Gustavo Santarosa Pinto  
+**Email**: gustavo-computacao@hotmail.com
 
 ---
 
@@ -29,15 +32,15 @@ app/
 
 ### Escopos de API
 
-1. **Erp**: Funcionalidades principais do sistema
+1. **Api**: Funcionalidades principais do sistema
    - `Public`: Endpoints sem autenticação (cadastro, login)
    - `Private`: Endpoints autenticados (CRUD de recursos)
 
-2. **User**: Funcionalidades do usuário no contexto tenant
-   - Sempre usa middleware `tenant`
-
-3. **BackOffice**: Funcionalidades administrativas
+2. **Admin**: Funcionalidades administrativas
    - Gestão de sistema, dashboards, relatórios
+
+3. **User**: Funcionalidades do contexto do usuário
+   - Perfil, preferências, notificações
 
 ---
 
@@ -50,9 +53,9 @@ app/
 namespace App\Services\{Escopo}\{Visibilidade}\{Versão};
 
 // Exemplos:
-namespace App\Services\Erp\Private\V1;
-namespace App\Services\User\Public\V1;
-namespace App\Services\BackOffice\Private\V1;
+namespace App\Services\Api\Private\V1;
+namespace App\Services\Api\Public\V1;
+namespace App\Services\Admin\Private\V1;
 
 // Controllers
 namespace App\Http\Controllers\{Escopo}\{Visibilidade}\{Versão};
@@ -105,24 +108,21 @@ class SendTokenNotification extends Notification { }
 
 declare(strict_types = 1);
 
-namespace App\Services\Erp\Private\V1;
+namespace App\Services\Api\Private\V1;
 
-use App\Http\Requests\Erp\Private\Service\Service\IndexRequest;
-use App\Http\Requests\Erp\Private\Service\Service\StoreRequest;
-use App\Http\Requests\Erp\Private\Service\Service\UpdateRequest;
-use FalconERP\Skeleton\Models\Erp\Service\Service;
+use App\Http\Requests\Api\Private\Product\IndexRequest;
+use App\Http\Requests\Api\Private\Product\StoreRequest;
+use App\Http\Requests\Api\Private\Product\UpdateRequest;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
 use QuantumTecnology\ServiceBasicsExtension\BaseService;
 use QuantumTecnology\ValidateTrait\Data;
 
-class ServiceService extends BaseService
+class ProductService extends BaseService
 {
     // Model Eloquent associado
-    // Observação: ServiceService tem nome duplicado porque:
-    // - Primeiro "Service" = domínio de negócio (prestação de serviço)
-    // - Segundo "Service" = padrão arquitetural (Service Pattern)
-    protected $model = Service::class;
+    protected $model = Product::class;
     
     // Colunas pesquisáveis para filtros SIMPLES (busca por campo único)
     protected array $searchableColumns = [
@@ -139,7 +139,7 @@ class ServiceService extends BaseService
     // OU optar por validação manual (feature flexível do sistema)
     
     protected $initializedAutoDataTrait = [
-        // Opção A: Validação manual (caso ServiceService - conflito de nomes)
+        // Opção A: Validação manual
         'index',       // Usa IndexRequest para validar filtros complexos
         'customAction',// Método customizado que precisa de validação
         // 'store' e 'update' NÃO estão aqui = validação manual
@@ -185,23 +185,23 @@ class ServiceService extends BaseService
 
     // Métodos customizados SEM entrada do usuário
     // NÃO devem estar em $initializedAutoDataTrait
-    public function follow(Service $service): Model
+    public function activate(Product $product): Model
     {
         abort_if(
-            $service->followers()->where('follower_people_id', people()->id)->exists(),
+            $product->active,
             Response::HTTP_BAD_REQUEST,
-            __('You are already following this service')
+            __('Product is already active')
         );
         
-        $service->followers()->sync(people()->id);
+        $product->update(['active' => true]);
         
-        return $service;
+        return $product;
     }
     
     // Métodos customizados COM entrada do usuário
     // DEVEM estar em $initializedAutoDataTrait
     // Assim usam validação automática via FormRequest
-    public function customAction(Service $service): Model
+    public function customAction(Product $product): Model
     {
         // Como está em $initializedAutoDataTrait:
         // - Crie CustomActionRequest
@@ -212,7 +212,7 @@ class ServiceService extends BaseService
         
         // Lógica de negócio
         
-        return $service;
+        return $product;
     }
 }
 ```
@@ -270,7 +270,7 @@ class ServiceService extends BaseService
 
 declare(strict_types = 1);
 
-namespace App\Http\Requests\Erp\Private\Service\Service;
+namespace App\Http\Requests\Api\Private\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -286,23 +286,25 @@ class StoreRequest extends FormRequest
     {
         return [
             // Campos obrigatórios
-            'description'  => 'required|string|max:255',
+            'name'         => 'required|string|max:255',
+            'sku'          => 'required|string|max:100|unique:products,sku',
             
             // Campos opcionais
-            'value'        => 'nullable|numeric|min:0',
+            'price'        => 'nullable|numeric|min:0',
+            'stock'        => 'nullable|integer|min:0',
             
-            // Validação de data/hora
-            'service_time' => 'nullable|string|date_format:H:i:s',
+            // Validação de data
+            'expires_at'   => 'nullable|date|after:today',
             
             // Boolean
             'active'       => 'boolean',
             
             // Text
-            'observations' => 'nullable|string|max:1000',
+            'description'  => 'nullable|string|max:1000',
             
             // Arrays
-            'shops_id'     => 'sometimes|array',
-            'shops_id.*'   => 'integer|exists:FalconERP\Skeleton\Models\Erp\Shop\Shop,id',
+            'tags'         => 'sometimes|array',
+            'tags.*'       => 'string|max:50',
             
             // Foreign keys com exists
             'category_id'  => 'required|integer|exists:categories,id',
@@ -313,8 +315,8 @@ class StoreRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'description.required' => __('Description is required'),
-            'value.min' => __('Value must be positive'),
+            'name.required' => __('Product name is required'),
+            'price.min' => __('Price must be positive'),
         ];
     }
     
@@ -322,8 +324,8 @@ class StoreRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'description' => __('Description'),
-            'value' => __('Value'),
+            'name' => __('Product Name'),
+            'price' => __('Price'),
         ];
     }
 }
@@ -396,17 +398,17 @@ class IndexRequest extends FormRequest
 
 declare(strict_types = 1);
 
-namespace App\Http\Controllers\Erp\Private\V1;
+namespace App\Http\Controllers\Api\Private\V1;
 
-use App\Services\Erp\Private\V1\ServiceService;
-use FalconERP\Skeleton\Models\Erp\Service\Service;
+use App\Services\Api\Private\V1\ProductService;
+use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
-class ServiceController
+class ProductController
 {
     public function __construct(
-        protected ServiceService $service
+        protected ProductService $service
     ) {}
 
     public function index(): JsonResponse
@@ -424,21 +426,21 @@ class ServiceController
         );
     }
 
-    public function show(Service $service): JsonResponse
+    public function show(Product $product): JsonResponse
     {
-        return response()->json($service);
+        return response()->json($product);
     }
 
-    public function update(Service $service): JsonResponse
+    public function update(Product $product): JsonResponse
     {
         return response()->json(
-            $this->service->update($service)
+            $this->service->update($product)
         );
     }
 
-    public function destroy(Service $service): JsonResponse
+    public function destroy(Product $product): JsonResponse
     {
-        $this->service->destroy($service);
+        $this->service->destroy($product);
         
         return response()->json(
             null,
@@ -447,10 +449,10 @@ class ServiceController
     }
     
     // Ações customizadas
-    public function follow(Service $service): JsonResponse
+    public function activate(Product $product): JsonResponse
     {
         return response()->json(
-            $this->service->follow($service)
+            $this->service->activate($product)
         );
     }
 }
@@ -478,22 +480,20 @@ use Illuminate\Support\Facades\Route;
 return fn () => Route::namespace('App\\Http\\Controllers')
     ->middleware([
         'api',
-        'encrypt',
-        'tenant',
     ])
     ->group(function (): void {
         // Health check
         Route::get('/health', function () {
             return response()->json([
-                'ok'   => true,
-                'time' => now()->toISOString(),
+                'status' => 'ok',
+                'time'   => now()->toISOString(),
             ]);
         });
 
-        // Rotas Erp
-        Route::namespace('Erp')
-            ->name('erp.')
-            ->prefix('erp')
+        // Rotas Api
+        Route::namespace('Api')
+            ->name('api.')
+            ->prefix('api')
             ->group(function (): void {
                 
                 // Private (autenticado)
@@ -503,9 +503,9 @@ return fn () => Route::namespace('App\\Http\\Controllers')
                     ->middleware(['auth:sanctum'])
                     ->group(function (): void {
                         
-                        Route::prefix('services')
-                            ->name('services.')
-                            ->group(base_path('routes/erp/private/service.php'));
+                        Route::prefix('products')
+                            ->name('products.')
+                            ->group(base_path('routes/api/private/products.php'));
                     });
                 
                 // Public (sem autenticação)
@@ -549,57 +549,54 @@ return fn () => Route::namespace('App\\Http\\Controllers')
 ### Helpers Globais
 
 ```php
-// Obter people logado
-$people = people();
-$peopleId = people()->id;
-
-// Obter tenant atual
-$tenant = tenant();
-$database = tenant();
-
 // Obter usuário autenticado
 $user = auth()->user();
+$userId = auth()->id();
+
+// Obter tenant atual (se usar multi-tenancy)
+$tenant = tenant();
+
+// Helper customizado (exemplo)
+$currentCompany = currentCompany();
 ```
 
 ---
 
 ## 🗄️ Banco de Dados
 
-### Models do SDK
+### Models
 
-**Sempre use os models do FalconERP\Skeleton:**
+**Organize seus models por contexto:**
 
 ```php
-use FalconERP\Skeleton\Models\User;
-use FalconERP\Skeleton\Models\Erp\People\People;
-use FalconERP\Skeleton\Models\Erp\Service\Service;
-use FalconERP\Skeleton\Models\BackOffice\Database;
-```
+use App\Models\User;
+use App\Models\Product;
+use App\Models\Category;
+use App\Models\Order;
 
-### Schemas PostgreSQL
+### Schemas PostgreSQL (Opcional)
 
-O sistema usa schemas para organização:
+Se usar PostgreSQL com schemas para organização:
 
-- `people.*` - Dados de pessoas/empresas
-- `finance.*` - Dados financeiros
-- `stock.*` - Dados de estoque
-- `service.*` - Dados de serviços
-- `shop.*` - Dados de lojas
-- `fiscal.*` - Dados fiscais
+- `auth.*` - Autenticação e usuários
+- `core.*` - Funcionalidades principais
+- `billing.*` - Faturamento
+- `analytics.*` - Relatórios e métricas
 
 ### Migrations
 
 ```php
-// Use schemas quando aplicável
-Schema::create('people.types', function (Blueprint $table) {
+// Exemplo básico
+Schema::create('products', function (Blueprint $table) {
     $table->id();
-    $table->string('description');
+    $table->string('name');
+    $table->decimal('price', 10, 2);
     $table->timestamps();
 });
 
-// Foreign keys com schema
-$table->foreignId('people_id')
-    ->constrained('people.peoples')
+// Foreign keys
+$table->foreignId('category_id')
+    ->constrained('categories')
     ->onDelete('cascade');
 ```
 
@@ -616,11 +613,11 @@ tests/
 │   ├── Services/
 │   └── Jobs/
 ├── Feature/           # Testes de integração
-│   ├── Erp/
+│   ├── Api/
 │   │   ├── Private/
 │   │   └── Public/
-│   ├── User/
-│   └── BackOffice/
+│   ├── Admin/
+│   └── User/
 └── TestCase.php       # Classe base
 ```
 
@@ -631,7 +628,8 @@ tests/
 
 declare(strict_types=1);
 
-use FalconERP\Skeleton\Models\User;
+use App\Models\User;
+use App\Models\Product;
 use Laravel\Sanctum\Sanctum;
 
 // Usando TestCase customizado (se necessário)
@@ -647,12 +645,12 @@ test('GET /endpoint retorna dados corretamente', function (): void {
     $user = User::factory()->create();
     Sanctum::actingAs($user);
     
-    $response = $this->getJson('/erp/private/services/v1');
+    $response = $this->getJson('/api/private/products/v1');
     
     $response->assertStatus(200)
         ->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'description'],
+                '*' => ['id', 'name', 'price'],
             ],
         ]);
 });
@@ -660,29 +658,29 @@ test('GET /endpoint retorna dados corretamente', function (): void {
 // Teste com factory
 test('POST /endpoint cria recurso', function (): void {
     $data = [
-        'description' => 'Test Service',
-        'value' => 100.00,
+        'name' => 'Test Product',
+        'price' => 99.99,
     ];
     
-    $response = $this->postJson('/erp/private/services/v1', $data);
+    $response = $this->postJson('/api/private/products/v1', $data);
     
     $response->assertStatus(201);
     
-    expect(Service::where('description', 'Test Service')->exists())
+    expect(Product::where('name', 'Test Product')->exists())
         ->toBeTrue();
 });
 
 // Teste de validação
 test('POST /endpoint valida campos obrigatórios', function (): void {
-    $response = $this->postJson('/erp/private/services/v1', []);
+    $response = $this->postJson('/api/private/products/v1', []);
     
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['description']);
+        ->assertJsonValidationErrors(['name']);
 });
 
 // Teste com autenticação
 test('GET /endpoint requer autenticação', function (): void {
-    $response = $this->getJson('/erp/private/services/v1');
+    $response = $this->getJson('/api/private/products/v1');
     
     $response->assertStatus(401);
 });
@@ -712,21 +710,22 @@ test('funcionalidade futura', function (): void {
 
 namespace Database\Factories;
 
-use FalconERP\Skeleton\Models\Erp\Service\Service;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class ServiceFactory extends Factory
+class ProductFactory extends Factory
 {
-    protected $model = Service::class;
+    protected $model = Product::class;
 
     public function definition(): array
     {
         return [
-            'description' => fake()->sentence(3),
-            'value' => fake()->randomFloat(2, 10, 1000),
-            'service_time' => fake()->time('H:i:s'),
+            'name' => fake()->words(3, true),
+            'sku' => fake()->unique()->bothify('SKU-####-??'),
+            'price' => fake()->randomFloat(2, 10, 1000),
+            'stock' => fake()->numberBetween(0, 100),
             'active' => true,
-            'observations' => fake()->paragraph(),
+            'description' => fake()->paragraph(),
         ];
     }
     
@@ -752,8 +751,8 @@ protected array $searchableColumns = [
     'email',
 ];
 
-// URL: /services?search=keyword
-// Busca em description, code e email automaticamente
+// URL: /products?search=keyword
+// Busca em name, sku e description automaticamente
 ```
 
 **Filtros Complexos (múltiplos scopes)**
@@ -782,7 +781,7 @@ public function scopeCategory($query, int $categoryId)
     return $query->where('category_id', $categoryId);
 }
 
-// URL: /services?status[]=active&status[]=pending&category_id=5
+// URL: /products?status[]=active&status[]=pending&category_id=5
 ```
 
 ### 
@@ -824,12 +823,12 @@ lang/
 
 ```php
 // ✅ Correto - evita N+1
-$services = Service::with(['followers', 'shops'])->get();
+$products = Product::with(['category', 'manufacturer'])->get();
 
 // ❌ Errado - causa N+1
-$services = Service::all();
-foreach ($services as $service) {
-    $service->followers; // Query extra!
+$products = Product::all();
+foreach ($products as $product) {
+    $product->category; // Query extra!
 }
 ```
 
@@ -839,17 +838,17 @@ foreach ($services as $service) {
 use Illuminate\Support\Facades\Cache;
 
 // Cache com tempo
-Cache::remember('services.active', 3600, function () {
-    return Service::where('active', true)->get();
+Cache::remember('products.active', 3600, function () {
+    return Product::where('active', true)->get();
 });
 
 // Cache de tag
-Cache::tags(['services'])->remember('services.all', 3600, function () {
-    return Service::all();
+Cache::tags(['products'])->remember('products.all', 3600, function () {
+    return Product::all();
 });
 
 // Limpar cache
-Cache::tags(['services'])->flush();
+Cache::tags(['products'])->flush();
 ```
 
 ### Jobs Assíncronos
@@ -948,10 +947,10 @@ public function update(Service $service)
 }
 
 // ❌ ERRADO - sem validação
-public function update(Service $service): Model
+public function update(Product $product): Model
 {
     // Sem validação nenhuma!
-    return parent::update($service);
+    return parent::update($product);
 }
 
 // ✅ CORRETO - Opção 1: Validação Manual (flexível)
@@ -968,11 +967,11 @@ public function store(): Model
     return parent::store();
 }
 
-public function update(Service $service): Model
+public function update(Product $product): Model
 {
     // Validação manual explícita
     data($this->validate(UpdateRequest::class));
-    return parent::update($service);
+    return parent::update($product);
 }
 
 // ✅ CORRETO - Opção 2: Validação Automática
@@ -991,11 +990,11 @@ public function store(): Model
     return parent::store();
 }
 
-public function update(Service $service): Model
+public function update(Product $product): Model
 {
     // Validação automática via UpdateRequest
     // Dados já estão em data()
-    return parent::update($service);
+    return parent::update($product);
 }
 
 // ✅ CORRETO - método customizado COM entrada
@@ -1004,7 +1003,7 @@ protected $initializedAutoDataTrait = [
     'customAction', // Usa validação automática
 ];
 
-public function customAction(Service $service): Model
+public function customAction(Product $product): Model
 {
     // Como está em $initializedAutoDataTrait:
     // - Crie CustomActionRequest
@@ -1012,7 +1011,7 @@ public function customAction(Service $service): Model
     // - Dados já em data()
     
     $data = data(); // Dados validados
-    return $service;
+    return $product;
 }
 
 // ✅ CORRETO - index com filtros complexos
@@ -1098,16 +1097,13 @@ Antes de criar/modificar código, verifique:
 
 ### Packages Principais
 
-- **QuantumTecnology/ServiceBasicsExtension**: Base para Services
-- **QuantumTecnology/ValidateTrait**: Validação automática
-- **QuantumTecnology/PerPageTrait**: Paginação customizável
-- **QuantumTecnology/HandlerBasicsExtension**: Exception handler
-- **FalconERP/Skeleton**: Models e estruturas compartilhadas
 - **Laravel Sanctum**: Autenticação API
-- **Laravel Telescope**: Debug e monitoramento
-- **Spatie/Prometheus**: Métricas e observabilidade
-- **OwenIt/Auditing**: Auditoria de mudanças
+- **Laravel Telescope**: Debug e monitoramento (dev)
 - **Pest PHP**: Framework de testes
+- **Spatie/Laravel-Query-Builder**: Query builder para APIs
+- **Spatie/Laravel-Permission**: Gerenciamento de roles e permissões
+- **OwenIt/Auditing**: Auditoria de mudanças
+- Packages customizados conforme necessidade do projeto
 
 ### Comandos Úteis
 
@@ -1132,9 +1128,9 @@ php artisan migrate:fresh --seed
 
 ### Criar um novo recurso completo
 
-1. **Model** (use do SDK)
+1. **Model**
 ```php
-use FalconERP\Skeleton\Models\Erp\Service\Service;
+use App\Models\Product;
 ```
 
 2. **Requests**
@@ -1146,11 +1142,11 @@ use FalconERP\Skeleton\Models\Erp\Service\Service;
 
 3. **Service**
 ```php
-class ServiceService extends BaseService
+class ProductService extends BaseService
 {
-    protected $model = Service::class;
+    protected $model = Product::class;
     
-    protected array $searchableColumns = ['description'];
+    protected array $searchableColumns = ['name', 'sku'];
     
     // LISTA DE INCLUSÃO para validação automática
     protected $initializedAutoDataTrait = [
@@ -1164,10 +1160,10 @@ class ServiceService extends BaseService
         return parent::store();
     }
     
-    public function update(Service $service): Model
+    public function update(Product $product): Model
     {
         data($this->validate(UpdateRequest::class));
-        return parent::update($service);
+        return parent::update($product);
     }
     
     public function index(): Data
@@ -1176,33 +1172,33 @@ class ServiceService extends BaseService
         return parent::index();
     }
     
-    public function follow(Service $service): Model
+    public function activate(Product $product): Model
     {
         // Sem entrada do usuário
-        $service->followers()->sync(people()->id);
-        return $service;
+        $product->update(['active' => true]);
+        return $product;
     }
 }
 ```
 
 4. **Controller**
 ```php
-class ServiceController
+class ProductController
 {
     public function __construct(
-        protected ServiceService $service
+        protected ProductService $service
     ) {}
 }
 ```
 
 5. **Routes**
 ```php
-Route::apiResource('services', ServiceController::class);
+Route::apiResource('products', ProductController::class);
 ```
 
 6. **Tests**
 ```php
-test('lista serviços', function () {
+test('lista produtos', function () {
     // Teste aqui
 });
 ```
@@ -1336,22 +1332,22 @@ Este manual é um guia vivo. Sempre que identificar novos padrões ou melhores p
 Quando trabalhando com recursos hierárquicos, organize FormRequests refletindo a hierarquia:
 
 ```
-app/Http/Requests/Erp/Private/V1/
-└── Warehouse/
+app/Http/Requests/Api/Private/V1/
+└── Product/
     ├── StoreRequest.php
     ├── UpdateRequest.php  
-    ├── Aisle/
+    ├── Category/
     │   ├── StoreRequest.php
     │   └── UpdateRequest.php
-    ├── Position/
+    ├── Variant/
     │   ├── StoreRequest.php
-    │   └── BlockRequest.php
-    └── StockPosition/
-        ├── AllocateRequest.php
+    │   └── UpdateRequest.php
+    └── Stock/
+        ├── AdjustRequest.php
         └── TransferRequest.php
 ```
 
-**Namespace:** `App\Http\Requests\Erp\Private\V1\Warehouse\Aisle`
+**Namespace:** `App\Http\Requests\Api\Private\V1\Product\Category`
 
 **Benefícios:**
 - Organização visual clara da hierarquia
@@ -1495,9 +1491,9 @@ class WarehousePositionIndexResource extends JsonResource
             'max_weight' => (float) $this->max_weight,
             
             // Datas em ISO8601
-            'blocked_at' => $this->blocked_at?->toISOString(),
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
+            'blocked_at' => $this->blocked_at,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
             
             // Propriedades computadas (conditional)
             'usage_percentage' => $this->when(
@@ -1671,8 +1667,8 @@ Laravel pode executar `stock_positions` antes de `warehouse_positions`, causando
 Adicione sufixo numérico ao timestamp:
 
 ```
-✅ 2025_12_14_161307_000_create_warehouse_positions_table.php
-✅ 2025_12_14_161307_100_create_stock_positions_table.php
+✅ 2025_12_15_161307_000_create_products_table.php
+✅ 2025_12_15_161307_100_create_product_variants_table.php
 ```
 
 **Convenção:**
@@ -1693,14 +1689,14 @@ Não precisa quando:
 
 ---
 
-**Última atualização**: 14/12/2025  
-**Versão**: 1.1.0
+**Última atualização**: 15/12/2025  
+**Versão**: 2.0.0 - Versão genérica para projetos Laravel
 
 ---
 
-##  Organiza��o de Hierarquia em FormRequests
+##  Organiza��o de Hierarquia em FormRequests
 
-Quando trabalhando com recursos hier�rquicos, organize FormRequests refletindo a hierarquia:
+Quando trabalhando com recursos hier�rquicos, organize FormRequests refletindo a hierarquia:
 
 ```
 app/Http/Requests/Erp/Private/V1/
@@ -1722,17 +1718,19 @@ app/Http/Requests/Erp/Private/V1/
 
 ---
 
-##  Models no Skeleton vs Locais
+##  Organização de Models
 
-### Models Compartilhados (FalconERP/Skeleton)
+### Models por Contexto
 
-Models compartilhados entre microservi�os v�o para o Skeleton:
-- `use FalconERP\Skeleton\Models\Erp\Stock\Warehouse`
+Organize models por domínio/contexto:
+- `use App\Models\Product`
+- `use App\Models\Order`
+- `use App\Models\Customer`
 
 **IMPORTANTE:**
--  Migrations ficam no microservi�o
--  Models no Skeleton
--  Factories no microservi�o (referenciam Skeleton)
+-  Migrations no mesmo projeto
+-  Models organizados por contexto
+-  Factories junto aos models
 
 ---
 
@@ -1750,15 +1748,15 @@ Gate::inspect('action', $model)->authorize();
 
 **Policy:**
 ```php
-#[UsePolicy(WarehousePositionPolicy::class)]
-class WarehousePosition extends Model { }
+#[UsePolicy(ProductPolicy::class)]
+class Product extends Model { }
 
-class WarehousePositionPolicy
+class ProductPolicy
 {
-    public function block(User $user, WarehousePosition $position): Response
+    public function update(User $user, Product $product): Response
     {
-        if (condition) {
-            return Response::deny(__('message'));
+        if ($product->user_id !== $user->id) {
+            return Response::deny(__('You can only edit your own products'));
         }
         return Response::allow();
     }
@@ -1770,41 +1768,43 @@ class WarehousePositionPolicy
 ##  Resources
 
 ```php
-class WarehousePositionIndexResource extends JsonResource
+class ProductIndexResource extends JsonResource
 {
     public function toArray($request)
     {
         return [
             'id' => (int) $this->id,
-            'status' => (string) $this->status?->value,
-            'status_label' => (string) $this->status?->label(),
-            'created_at' => $this->created_at?->toISOString(),
-            'usage' => $this->when(
-                method_exists($this->resource, 'getUsage'),
-                fn () => $this->getUsage()
+            'name' => (string) $this->name,
+            'sku' => (string) $this->sku,
+            'price' => (float) $this->price,
+            'active' => (bool) $this->active,
+            'created_at' => $this->created_at,
+            'discount_percentage' => $this->when(
+                method_exists($this->resource, 'getDiscount'),
+                fn () => $this->getDiscount()
             ),
-            'aisle' => $this->whenLoaded('aisle'),
+            'category' => $this->whenLoaded('category'),
         ];
     }
 }
 ```
 
-Registre: `protected string $resource = WarehousePositionIndexResource::class;`
+Registre: `protected string $resource = ProductIndexResource::class;`
 
 ---
 
 ##  Factories com States
 
 ```php
-public function blocked(): static
+public function inactive(): static
 {
     return $this->state(fn (array $attributes): array => [
-        'status' => PositionStatusEnum::BLOCKED,
+        'active' => false,
     ]);
 }
 ```
 
-Uso: `WarehousePosition::factory()->blocked()->create();`
+Uso: `Product::factory()->inactive()->create();`
 
 ---
 
@@ -1814,17 +1814,17 @@ Uso: `WarehousePosition::factory()->blocked()->create();`
 Route::prefix('v1')
     ->name('v1.')
     ->namespace('V1')
-    ->controller('WarehousePositionController')  // String!
+    ->controller('ProductController')  // String!
     ->group(function (): void {
-        Route::post('{id}/block', 'block')->name('block');
-        Route::apiResource('', 'WarehousePositionController')->parameters(['' => 'id']);
+        Route::post('{id}/activate', 'activate')->name('activate');
+        Route::apiResource('', 'ProductController')->parameters(['' => 'id']);
     });
 ```
 
 **Regras:**
--  String em controller, n�o array
--  Par�metro sempre 'id'
--  apiResource por �ltimo
+-  String em controller, n�o array
+-  Par�metro sempre 'id'
+-  apiResource por �ltimo
 
 ---
 
@@ -1832,7 +1832,7 @@ Route::prefix('v1')
 
 **Problema:** Mesmo timestamp causa erro de ordem
 
-**Solu��o:** Adicione sufixo num�rico
+**Solu��o:** Adicione sufixo num�rico
 
 ```
  2025_12_14_161307_000_create_warehouse_positions_table.php
@@ -1843,5 +1843,5 @@ Incremente de 100 em 100.
 
 ---
 
-**�ltima atualiza��o**: 14/12/2025
-**Vers�o**: 1.1.0 - Adicionado boas pr�ticas de warehouse positions
+**Última atualização**: 15/12/2025
+**Versão**: 2.0.0 - Versão genérica para projetos Laravel
