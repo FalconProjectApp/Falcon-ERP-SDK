@@ -250,11 +250,96 @@ class ProductService extends BaseService
 - ❌ **Nada deve chegar ao Service sem validação**
 - ❌ Não faça queries diretas, use Repositories se necessário
 - ❌ Não retorne arrays, use `Data` ou `Model`
-- ✅ Use `abort_if()` / `abort_unless()` para validações
+- ✅ Use `abort_if()` / `abort_unless()` para validações (ou prefira Policies com `Gate::inspect()`)
 - ✅ Traduza mensagens com `__()`
 - ✅ Use constantes para valores mágicos
-- ❌ Não faça queries diretas, use Repositories se necessário
-- ❌ Não retorne arrays, use `Data` ou `Model`
+
+#### Hooks do Ciclo de Vida (Lifecycle Hooks)
+
+O `BaseService` fornece hooks que são executados automaticamente durante operações CRUD. Use-os para adicionar lógica antes/depois de criar ou atualizar registros:
+
+**Hooks disponíveis:**
+- `storing(): void` - Antes de criar (store)
+- `stored($model)` - Depois de criar (store) - **DEVE retornar o model**
+- `updating(): void` - Antes de atualizar (update)
+- `updated($model)` - Depois de atualizar (update) - **DEVE retornar o model**
+- `deleting($model): void` - Antes de deletar (destroy)
+- `deleted($model): void` - Depois de deletar (destroy)
+
+**Exemplo prático:**
+
+```php
+class FaqTopicService extends BaseService
+{
+    protected string $model = FaqTopic::class;
+    
+    protected array $initializedAutoDataTrait = [
+        'store',
+        'update',
+    ];
+    
+    // Hook: preparar dados ANTES de criar
+    protected function storing(): void
+    {
+        data()->merge([
+            'user_id' => auth()->id(),
+            'status' => data('status', 'open'),
+        ]);
+    }
+    
+    // Hook: executar lógica DEPOIS de criar
+    // IMPORTANTE: Não tipar o parâmetro para compatibilidade com BaseService
+    // IMPORTANTE: DEVE retornar o model
+    protected function stored($topic)
+    {
+        // Incrementar contador de tópicos do usuário
+        $this->updateUserLevel($topic->user_id, 'incrementTopics');
+        $this->addExperience($topic->user_id, 5);
+        
+        // Enviar notificação
+        event(new TopicCreated($topic));
+        
+        return $topic;
+    }
+    
+    // Hook: preparar dados ANTES de atualizar
+    protected function updating(): void
+    {
+        data()->merge([
+            'updated_by' => auth()->id(),
+        ]);
+    }
+    
+    // Hook: executar lógica DEPOIS de atualizar
+    // IMPORTANTE: Não tipar o parâmetro para compatibilidade com BaseService
+    // IMPORTANTE: DEVE retornar o model
+    protected function updated($topic)
+    {
+        // Invalidar cache
+        Cache::forget("topic.{$topic->id}");
+        
+        // Registrar auditoria
+        Log::info("Topic {$topic->id} updated by " . auth()->id());
+        
+        return $topic;
+    }
+}
+```
+
+**Regras para Hooks:**
+
+- ✅ Use `storing()` e `updating()` para preparar/modificar dados antes de salvar
+- ✅ Use `stored()` e `updated()` para lógica pós-salvamento (notificações, cache, contadores)
+- ✅ Hooks `storing()` e `updating()` são `void` - não retornam nada
+- ✅ Hooks `stored()` e `updated()` **DEVEM retornar o model**
+- ✅ Hooks `deleting()` e `deleted()` são `void` - não retornam nada
+- ✅ Use `data()->merge([])` para adicionar/modificar dados nos hooks `storing()` e `updating()`
+- ✅ Use `data('campo', 'default')` para obter valores com fallback
+- ✅ **Não tipar parâmetros dos hooks** para compatibilidade com BaseService
+- ✅ **NUNCA sobrescreva `store()` ou `update()` apenas para adicionar dados** - use hooks
+- ✅ Sobrescreva `store()` ou `update()` apenas se precisar de lógica complexa que não se encaixa nos hooks
+- ❌ Não faça queries pesadas em hooks (use Jobs/Queues se necessário)
+- ❌ Não lance exceptions em hooks `stored/updated` - o registro já foi salvo
 
 ### 2. Form Requests (Validação)
 
@@ -818,6 +903,107 @@ lang/
 ---
 
 ## 🚀 Performance e Otimização
+
+### Computed Attributes (Atributos Calculados)
+
+Use computed attributes para adicionar dados calculados em tempo real aos seus Models sem salvar no banco:
+
+```php
+class FaqTopic extends BaseModel
+{
+    // Computed attribute: calcula upvotes dinamicamente
+    public function getUpvotesAttribute(): int
+    {
+        return $this->votes()
+            ->where('vote_type', 'up')
+            ->count();
+    }
+    
+    // Computed attribute: calcula downvotes dinamicamente
+    public function getDownvotesAttribute(): int
+    {
+        return $this->votes()
+            ->where('vote_type', 'down')
+            ->count();
+    }
+    
+    // Computed attribute: retorna voto do usuário autenticado
+    public function getUserVoteAttribute(): ?string
+    {
+        if (!auth()->check()) {
+            return null;
+        }
+        
+        return $this->votes()
+            ->where('user_id', auth()->id())
+            ->value('vote_type');
+    }
+    
+    // Computed attribute com lógica complexa
+    public function getExperienceToNextLevelAttribute(): int
+    {
+        $nextLevel = $this->level + 1;
+        return ($nextLevel ** 2) * 50;
+    }
+}
+```
+
+**Acessando computed attributes:**
+
+```php
+$topic = FaqTopic::find(1);
+
+// Acesso direto como propriedade
+$upvotes = $topic->upvotes;              // 42
+$downvotes = $topic->downvotes;          // 5
+$userVote = $topic->user_vote;           // 'up' ou null
+$xpToNext = $topic->experience_to_next_level; // 200
+
+// Funciona automaticamente em Resources
+class TopicResource extends JsonResource
+{
+    public function toArray($request)
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'upvotes' => $this->upvotes,           // Computed
+            'downvotes' => $this->downvotes,       // Computed
+            'user_vote' => $this->user_vote,       // Computed
+        ];
+    }
+}
+```
+
+**Regras para Computed Attributes:**
+
+- ✅ Use padrão `get{Nome}Attribute()` para criar computed attributes
+- ✅ Perfeitos para dados que mudam frequentemente (contadores, votos)
+- ✅ Ideais para dados específicos do usuário (user_vote, permissions)
+- ✅ Não exigem coluna no banco de dados
+- ✅ São automaticamente serializados em JSON/Arrays
+- ✅ Use tipagem de retorno apropriada
+- ⚠️ Cuidado com N+1 - se usar queries, considere eager loading
+- ⚠️ Evite lógica pesada - será calculado toda vez que acessar
+- ❌ Não use para dados que devem persistir no banco
+
+**Alternativa para performance (caching):**
+
+```php
+// Se o cálculo for pesado, use cache
+public function getStatsAttribute(): array
+{
+    return Cache::remember(
+        "user.{$this->id}.stats",
+        now()->addMinutes(5),
+        fn () => [
+            'questions_asked' => $this->total_topics,
+            'answers_given' => $this->total_answers,
+            'best_answers' => $this->total_best_answers,
+        ]
+    );
+}
+```
 
 ### Eager Loading
 

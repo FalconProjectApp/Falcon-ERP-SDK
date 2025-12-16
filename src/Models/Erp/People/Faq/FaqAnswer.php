@@ -17,11 +17,13 @@ use QuantumTecnology\ModelBasicsExtension\Observers\EventDispatcherObserver;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Auth\Access\Attributes\UsePolicy;
 
 #[ObservedBy([
     CacheObserver::class,
     EventDispatcherObserver::class,
 ])]
+#[UsePolicy('App\\Policies\\FaqAnswerPolicy')]
 class FaqAnswer extends BaseModel implements AuditableContract
 {
     use ActionTrait;
