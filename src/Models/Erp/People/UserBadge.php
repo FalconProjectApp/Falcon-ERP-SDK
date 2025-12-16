@@ -2,32 +2,29 @@
 
 declare(strict_types = 1);
 
-namespace FalconERP\Skeleton\Models\Erp\People\Faq;
+namespace FalconERP\Skeleton\Models\Erp\People;
 
 use FalconERP\Skeleton\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
-class FaqVote extends BaseModel
+class UserBadge extends BaseModel
 {
     use SetSchemaTrait;
 
     protected $connection = 'pgsql';
 
-    protected $table = 'faq_votes';
-
-    public $timestamps = true;
+    protected $table = 'user_badges';
 
     protected $fillable = [
         'user_id',
-        'votable_id',
-        'votable_type',
-        'vote_type',
+        'badge_id',
+        'earned_at',
     ];
 
     protected $casts = [
+        'earned_at'  => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -39,20 +36,15 @@ class FaqVote extends BaseModel
         return $this->belongsTo(User::class);
     }
 
-    public function votable(): MorphTo
+    public function badge(): BelongsTo
     {
-        return $this->morphTo();
+        return $this->belongsTo(FaqBadge::class, 'badge_id');
     }
 
     // Scopes
 
-    public function scopeUpvotes($query)
+    public function scopeRecent($query)
     {
-        return $query->where('vote_type', 'upvote');
-    }
-
-    public function scopeDownvotes($query)
-    {
-        return $query->where('vote_type', 'downvote');
+        return $query->orderBy('earned_at', 'desc');
     }
 }

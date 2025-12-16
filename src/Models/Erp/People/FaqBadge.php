@@ -2,43 +2,43 @@
 
 declare(strict_types = 1);
 
-namespace FalconERP\Skeleton\Models\Erp\People\Faq;
+namespace FalconERP\Skeleton\Models\Erp\People;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
-class ForumCategory extends BaseModel
+class FaqBadge extends BaseModel
 {
     use SetSchemaTrait;
 
     protected $connection = 'pgsql';
 
-    protected $table = 'forum_categories';
+    protected $table = 'faq_badges';
 
     protected $fillable = [
+        'type',
         'name',
         'description',
         'icon',
         'color',
-        'topics_count',
-        'order',
+        'rarity',
+        'required_points',
         'is_active',
     ];
 
     protected $casts = [
-        'topics_count' => 'integer',
-        'order'        => 'integer',
-        'is_active'    => 'boolean',
-        'created_at'   => 'datetime',
-        'updated_at'   => 'datetime',
+        'required_points' => 'integer',
+        'is_active'       => 'boolean',
+        'created_at'      => 'datetime',
+        'updated_at'      => 'datetime',
     ];
 
     // Relationships
 
-    public function topics(): HasMany
+    public function userBadges(): HasMany
     {
-        return $this->hasMany(FaqTopic::class, 'category_id');
+        return $this->hasMany(UserBadge::class, 'badge_id');
     }
 
     // Scopes
@@ -48,8 +48,8 @@ class ForumCategory extends BaseModel
         return $query->where('is_active', true);
     }
 
-    public function scopeOrdered($query)
+    public function scopeOrderByPoints($query)
     {
-        return $query->orderBy('order', 'asc');
+        return $query->orderBy('required_points', 'asc');
     }
 }

@@ -2,9 +2,11 @@
 
 declare(strict_types = 1);
 
-namespace FalconERP\Skeleton\Models\Erp\People\Faq;
+namespace FalconERP\Skeleton\Models\Erp\People;
 
 use FalconERP\Skeleton\Models\User;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -23,8 +25,8 @@ use Illuminate\Auth\Access\Attributes\UsePolicy;
     CacheObserver::class,
     EventDispatcherObserver::class,
 ])]
-#[UsePolicy('App\\Policies\\FaqTopicPolicy')]
-class FaqTopic extends BaseModel implements AuditableContract
+#[UsePolicy('App\\Policies\\FaqAnswerPolicy')]
+class FaqAnswer extends BaseModel implements AuditableContract
 {
     use ActionTrait;
     use Auditable;
@@ -33,37 +35,27 @@ class FaqTopic extends BaseModel implements AuditableContract
 
     protected $connection = 'pgsql';
 
-    protected $table = 'faq_topics';
+    protected $table = 'faq_answers';
 
     protected $fillable = [
+        'topic_id',
         'user_id',
-        'category_id',
-        'title',
+        'parent_id',
         'content',
-        'status',
-        'views_count',
-        'answers_count',
         'votes_count',
-        'best_answer_id',
-        'is_pinned',
-        'is_solved',
-        'is_locked',
-        'last_activity_at',
-        'tags',
+        'is_best_answer',
+        'is_edited',
+        'edited_at',
     ];
 
     protected $casts = [
-        'views_count'      => 'integer',
-        'answers_count'    => 'integer',
-        'votes_count'      => 'integer',
-        'is_pinned'        => 'boolean',
-        'is_solved'        => 'boolean',
-        'is_locked'        => 'boolean',
-        'tags'             => 'array',
-        'last_activity_at' => 'datetime',
-        'created_at'       => 'datetime',
-        'updated_at'       => 'datetime',
-        'deleted_at'       => 'datetime',
+        'votes_count'    => 'integer',
+        'is_best_answer' => 'boolean',
+        'is_edited'      => 'boolean',
+        'edited_at'      => 'datetime',
+        'created_at'     => 'datetime',
+        'updated_at'     => 'datetime',
+        'deleted_at'     => 'datetime',
     ];
 
     protected $appends = [
@@ -72,24 +64,24 @@ class FaqTopic extends BaseModel implements AuditableContract
 
     // Relationships
 
+    public function topic(): BelongsTo
+    {
+        return $this->belongsTo(FaqTopic::class, 'topic_id');
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function category(): BelongsTo
+    public function parent(): BelongsTo
     {
-        return $this->belongsTo(ForumCategory::class, 'category_id');
+        return $this->belongsTo(FaqAnswer::class, 'parent_id');
     }
 
-    public function answers(): HasMany
+    public function replies(): HasMany
     {
-        return $this->hasMany(FaqAnswer::class, 'topic_id');
-    }
-
-    public function bestAnswer(): BelongsTo
-    {
-        return $this->belongsTo(FaqAnswer::class, 'best_answer_id');
+        return $this->hasMany(FaqAnswer::class, 'parent_id');
     }
 
     public function votes(): MorphMany
@@ -97,29 +89,48 @@ class FaqTopic extends BaseModel implements AuditableContract
         return $this->morphMany(FaqVote::class, 'votable');
     }
 
-    // Scopes
+    /*
+    |--------------------------------------------------------------------------
+    | Scopes
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the scopes that the model should have with
+    |
+    */
 
-    public function scopeOpen($query)
+    #[Scope]
+    public function byBestAnswers(Builder $query, string | array $params = []): Builder
     {
-        return $query->where('status', 'open');
+        return $query
+            ->when($this->filtered($params, 'is_best_answer'), function ($query, $params) {
+                $query->where('is_best_answer', $params);
+            });
     }
 
-    public function scopePinned($query)
+    #[Scope]
+    public function byTopLevel(Builder $query, string | array $params = []): Builder
     {
-        return $query->where('is_pinned', true);
+        return $query->whereNull('parent_id');
     }
 
-    public function scopePopular($query)
+    #[Scope]
+    public function byParentId(Builder $query, string | array $params = []): Builder
     {
-        return $query->where('views_count', '>', 100)->orderBy('views_count', 'desc');
+        return $query
+            ->when($this->filtered($params, 'parent_id'), function ($query, $params) {
+                if ($params === 'null' || $params === null) {
+                    $query->whereNull('parent_id');
+                } else {
+                    $query->where('parent_id', $params);
+                }
+            });
     }
 
-    public function scopeRecent($query)
-    {
-        return $query->orderBy('created_at', 'desc');
-    }
-
-    // ActionTrait Implementation
+    /*
+    |--------------------------------------------------------------------------
+    | ActionTrait Implementation
+    |--------------------------------------------------------------------------
+    */
 
     protected function setActions(): array
     {
@@ -159,34 +170,28 @@ class FaqTopic extends BaseModel implements AuditableContract
 
     protected function canFollow(): bool
     {
-        return ! $this->trashed();
+        return false;
     }
 
     protected function canUnfollow(): bool
     {
-        return ! $this->trashed();
+        return false;
     }
 
     // Helper Methods
 
-    public function incrementViews(): void
+    public function markAsBest(): void
     {
-        $this->increment('views_count');
+        $this->update(['is_best_answer' => true]);
+        $this->topic->markBestAnswer($this->id);
     }
 
-    public function markBestAnswer(string $answerId): void
+    public function markAsEdited(): void
     {
         $this->update([
-            'best_answer_id' => $answerId,
-            'status'         => 'answered',
-            'is_solved'      => true,
-            'last_activity_at' => now(),
+            'is_edited' => true,
+            'edited_at' => now(),
         ]);
-    }
-
-    public function updateLastActivity(): void
-    {
-        $this->update(['last_activity_at' => now()]);
     }
 
     // Computed attributes

@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace FalconERP\Skeleton\Models\Erp\People\Faq;
+namespace FalconERP\Skeleton\Models\Erp\People;
 
 use FalconERP\Skeleton\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

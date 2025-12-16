@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace FalconERP\Skeleton\Models\Erp\People\Faq;
+namespace FalconERP\Skeleton\Models\Erp\People;
 
 use FalconERP\Skeleton\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,8 +23,8 @@ use Illuminate\Auth\Access\Attributes\UsePolicy;
     CacheObserver::class,
     EventDispatcherObserver::class,
 ])]
-#[UsePolicy('App\\Policies\\FaqAnswerPolicy')]
-class FaqAnswer extends BaseModel implements AuditableContract
+#[UsePolicy('App\\Policies\\FaqTopicPolicy')]
+class FaqTopic extends BaseModel implements AuditableContract
 {
     use ActionTrait;
     use Auditable;
@@ -33,27 +33,37 @@ class FaqAnswer extends BaseModel implements AuditableContract
 
     protected $connection = 'pgsql';
 
-    protected $table = 'faq_answers';
+    protected $table = 'faq_topics';
 
     protected $fillable = [
-        'topic_id',
         'user_id',
-        'parent_id',
+        'category_id',
+        'title',
         'content',
+        'status',
+        'views_count',
+        'answers_count',
         'votes_count',
-        'is_best_answer',
-        'is_edited',
-        'edited_at',
+        'best_answer_id',
+        'is_pinned',
+        'is_solved',
+        'is_locked',
+        'last_activity_at',
+        'tags',
     ];
 
     protected $casts = [
-        'votes_count'    => 'integer',
-        'is_best_answer' => 'boolean',
-        'is_edited'      => 'boolean',
-        'edited_at'      => 'datetime',
-        'created_at'     => 'datetime',
-        'updated_at'     => 'datetime',
-        'deleted_at'     => 'datetime',
+        'views_count'      => 'integer',
+        'answers_count'    => 'integer',
+        'votes_count'      => 'integer',
+        'is_pinned'        => 'boolean',
+        'is_solved'        => 'boolean',
+        'is_locked'        => 'boolean',
+        'tags'             => 'array',
+        'last_activity_at' => 'datetime',
+        'created_at'       => 'datetime',
+        'updated_at'       => 'datetime',
+        'deleted_at'       => 'datetime',
     ];
 
     protected $appends = [
@@ -62,24 +72,24 @@ class FaqAnswer extends BaseModel implements AuditableContract
 
     // Relationships
 
-    public function topic(): BelongsTo
-    {
-        return $this->belongsTo(FaqTopic::class, 'topic_id');
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function parent(): BelongsTo
+    public function category(): BelongsTo
     {
-        return $this->belongsTo(FaqAnswer::class, 'parent_id');
+        return $this->belongsTo(ForumCategory::class, 'category_id');
     }
 
-    public function replies(): HasMany
+    public function answers(): HasMany
     {
-        return $this->hasMany(FaqAnswer::class, 'parent_id');
+        return $this->hasMany(FaqAnswer::class, 'topic_id');
+    }
+
+    public function bestAnswer(): BelongsTo
+    {
+        return $this->belongsTo(FaqAnswer::class, 'best_answer_id');
     }
 
     public function votes(): MorphMany
@@ -89,19 +99,24 @@ class FaqAnswer extends BaseModel implements AuditableContract
 
     // Scopes
 
-    public function scopeBestAnswers($query)
+    public function scopeOpen($query)
     {
-        return $query->where('is_best_answer', true);
+        return $query->where('status', 'open');
     }
 
-    public function scopeTopLevel($query)
+    public function scopePinned($query)
     {
-        return $query->whereNull('parent_id');
+        return $query->where('is_pinned', true);
     }
 
-    public function scopeReplies($query)
+    public function scopePopular($query)
     {
-        return $query->whereNotNull('parent_id');
+        return $query->where('views_count', '>', 100)->orderBy('views_count', 'desc');
+    }
+
+    public function scopeRecent($query)
+    {
+        return $query->orderBy('created_at', 'desc');
     }
 
     // ActionTrait Implementation
@@ -144,28 +159,34 @@ class FaqAnswer extends BaseModel implements AuditableContract
 
     protected function canFollow(): bool
     {
-        return false;
+        return ! $this->trashed();
     }
 
     protected function canUnfollow(): bool
     {
-        return false;
+        return ! $this->trashed();
     }
 
     // Helper Methods
 
-    public function markAsBest(): void
+    public function incrementViews(): void
     {
-        $this->update(['is_best_answer' => true]);
-        $this->topic->markBestAnswer($this->id);
+        $this->increment('views_count');
     }
 
-    public function markAsEdited(): void
+    public function markBestAnswer(string $answerId): void
     {
         $this->update([
-            'is_edited' => true,
-            'edited_at' => now(),
+            'best_answer_id' => $answerId,
+            'status'         => 'answered',
+            'is_solved'      => true,
+            'last_activity_at' => now(),
         ]);
+    }
+
+    public function updateLastActivity(): void
+    {
+        $this->update(['last_activity_at' => now()]);
     }
 
     // Computed attributes
