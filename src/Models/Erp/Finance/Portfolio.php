@@ -46,6 +46,8 @@ class Portfolio extends BaseModel implements AuditableContract
      */
     protected function valueTotal(): Attribute
     {
+        $this->loadMissing('actions');
+
         $total = 0;
 
         foreach ($this->actions as $action) {
@@ -62,6 +64,8 @@ class Portfolio extends BaseModel implements AuditableContract
      */
     protected function dividendValueTotal(): Attribute
     {
+        $this->loadMissing('actions');
+
         $total = 0;
         foreach ($this->actions as $action) {
             $total += $action->value_total_earnings;
@@ -77,6 +81,8 @@ class Portfolio extends BaseModel implements AuditableContract
      */
     protected function investedValueTotal(): Attribute
     {
+        $this->loadMissing('actions');
+
         $total = 0;
         foreach ($this->actions as $action) {
             $total += $action->value_total_buy;
@@ -92,6 +98,8 @@ class Portfolio extends BaseModel implements AuditableContract
      */
     protected function investmentValueTotal(): Attribute
     {
+        $this->loadMissing('actions');
+
         $total = 0;
         foreach ($this->actions as $action) {
             $total += $action->value_total_sell;

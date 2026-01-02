@@ -48,6 +48,8 @@ class Action extends BaseModel implements AuditableContract
      */
     protected function amountTotal(): Attribute
     {
+        $this->loadMissing('ActionsMovements');
+
         $total = 0;
         foreach ($this->ActionsMovements as $movement) {
             $total += $movement->amount;
@@ -63,6 +65,8 @@ class Action extends BaseModel implements AuditableContract
      */
     protected function valueTotal(): Attribute
     {
+        $this->loadMissing('ActionsMovements');
+
         $total = 0;
         foreach ($this->ActionsMovements as $movement) {
             if ('compra' == $movement->types) {
@@ -83,6 +87,8 @@ class Action extends BaseModel implements AuditableContract
      */
     protected function valueTotalSell(): Attribute
     {
+        $this->loadMissing('ActionsMovements');
+
         $total = 0;
         foreach ($this->ActionsMovements as $movement) {
             if ('venda' == $movement->types) {
@@ -100,6 +106,8 @@ class Action extends BaseModel implements AuditableContract
      */
     protected function valueTotalBuy(): Attribute
     {
+        $this->loadMissing('ActionsMovements');
+
         $total = 0;
         foreach ($this->ActionsMovements as $movement) {
             if ('compra' == $movement->types) {
@@ -117,6 +125,8 @@ class Action extends BaseModel implements AuditableContract
      */
     protected function valueTotalEarnings(): Attribute
     {
+        $this->loadMissing('ActionsDividends');
+
         $total = 0;
         foreach ($this->ActionsDividends as $dividends) {
             $total += $dividends->amount * $dividends->value;
