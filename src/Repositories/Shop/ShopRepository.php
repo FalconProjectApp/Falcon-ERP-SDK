@@ -8,6 +8,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use QuantumTecnology\ControllerBasicsExtension\Libs\Cryptography\Encoder;
 use QuantumTecnology\ValidateTrait\Data;
 
 class ShopRepository
@@ -170,14 +171,14 @@ class ShopRepository
             ->acceptJson()
             ->asJson()
             ->connectTimeout($this->timeout)
-            ->post($this->urlApi, $this->data->toArray());
+            ->post($this->urlApi, Encoder::encodeArray($this->data->toArray()));
 
         $this->http_code = $response->status();
 
         if (!$response->successful()) {
             $this->message = $response->object()->message ?? $this->message;
             $this->errors  = $response->object()->data ?? $this->errors;
-            $this->data    = collect();
+            $this->data    = $this->data ?? collect();
 
             Log::error('Request failed', [
                 'http_code' => $this->http_code,
