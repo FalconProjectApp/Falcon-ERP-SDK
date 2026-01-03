@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
+use QuantumTecnology\ValidateTrait\Data;
 use RuntimeException;
 
 class TenantMiddleware
@@ -25,12 +26,12 @@ class TenantMiddleware
             tenant()->disconnect();
         }
 
-        $tenant = false;
-
-        if ($request->hasHeader('authorization') && !blank($request->header('authorization')) && !in_array($request->header('authorization'), ['Bearer ', 'Bearer null'])) {
-            $user   = $this->getUser($request->header('authorization'));
-            $tenant = $user->databasesAccess()->where('is_active', true)->sole();
-        }
+        $data = match (config('auth.defaults.guard')) {
+            'sanctum'  => $this->sanctumAuth($request),
+            'keycloak' => $this->keycloakAuth($request),
+            'kong'     => $this->kongAuth($request),
+            default    => Log::warning('Using an unrecognized authentication guard for tenant identification.'),
+        };
 
         if ($request->hasHeader('x-shop-name') && !blank($request->header('x-shop-name'))) {
             $shopName = $request->header('x-shop-name');
@@ -53,25 +54,82 @@ class TenantMiddleware
             $tenant = $shop->databases;
         }
 
-        if (!$tenant) {
+        if (!$data->tenant) {
             return $next($request);
         }
 
-        tenant($tenant);
+        tenant($data->tenant);
 
         $isLoggedIn = auth()->check();
-
-        $tenant->connect();
-        Log::info('Tenant connected: ' . $tenant->id);
-        Log::debug('Tenant details: ', $tenant->toArray());
+        $data->tenant->connect();
+        Log::info('Tenant connected: ' . $data->tenant->id);
+        Log::debug('Tenant details: ', $data->tenant->toArray());
 
         if ($isLoggedIn) {
-            Log::debug('User ' . auth()->id() . ' connected to tenant: ' . $tenant->id);
+            Log::debug('User ' . auth()->id() . ' connected to tenant: ' . $data->tenant->id);
 
             people($this->getPeople());
         }
 
         return $next($request);
+    }
+
+    private function keycloakAuth(Request $request): ?string
+    {
+        Log::info('Using Keycloak guard for tenant identification.');
+
+        abort_if(
+            !$request->hasHeader('Authorization'),
+            Response::HTTP_UNAUTHORIZED,
+            __('Authorization header is missing.')
+        );
+
+        throw new RuntimeException('Keycloak tenant identification not implemented yet.');
+
+        return null;
+    }
+
+    private function sanctumAuth(Request $request): Data
+    {
+        Log::info('Using Sanctum or API guard for tenant identification.');
+
+        abort_if(
+            !$request->hasHeader('Authorization')
+            && blank($request->header('authorization'))
+            && in_array($request->header('authorization'), ['Bearer ', 'Bearer null']),
+            Response::HTTP_UNAUTHORIZED,
+            __('Authorization header is missing.')
+        );
+
+        $user = $this->getUser($request->header('authorization'));
+
+        return new Data([
+            'user'   => $user,
+            'tenant' => $user->databasesAccess()->where('is_active', true)->sole(),
+        ]);
+    }
+
+    private function kongAuth(Request $request): Data
+    {
+        Log::info('Using Kong guard for tenant identification.');
+
+        if ($request->hasHeader('x-tenant-name') && !blank($request->header('x-tenant-name'))) {
+            $tenantName = $request->header('x-tenant-name');
+
+            $tenant = Database::query()
+                ->where('base', $tenantName)
+                ->sole();
+
+            abort_if(
+                null === $tenant,
+                Response::HTTP_NOT_FOUND,
+                __('Database not found or inactive!')
+            );
+        }
+
+        return new Data([
+            'tenant' => $tenant ?? null,
+        ]);
     }
 
     private function getUser(string $token): User

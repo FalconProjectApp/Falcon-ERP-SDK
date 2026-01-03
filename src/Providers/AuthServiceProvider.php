@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Providers;
 
-use FalconERP\Skeleton\Models\BackOffice\DataBase\Database;
-use FalconERP\Skeleton\Models\Erp\People\People;
+use FalconERP\Skeleton\Models\User;
+use Illuminate\Auth\RequestGuard;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Crypt;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -28,6 +26,24 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerPolicies();
+
+        /*
+        * Kong Guard - Registrar o driver customizado
+        */
+        Auth::extend('kong', function ($app, $name, array $config) {
+            $provider = Auth::createUserProvider($config['provider'] ?? null);
+
+            return new RequestGuard(function ($request) {
+                // A autenticação Kong passa os dados via headers
+                if ($request->hasHeader('x-user-id')) {
+                    $userId = (int) $request->header('x-user-id');
+
+                    return User::find($userId);
+                }
+
+                return null;
+            }, $app['request'], $provider);
+        });
 
         /*
          * Credentials
