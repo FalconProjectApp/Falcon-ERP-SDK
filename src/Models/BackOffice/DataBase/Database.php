@@ -111,6 +111,8 @@ class Database extends BaseModel
 
         DB::purge('tenant');
 
+        $this->loadMissing('group');
+
         Config::set([
             'database.default'                           => 'tenant',
             'database.connections.tenant.driver'         => config('database.connections.pgsql.driver'),

@@ -95,8 +95,8 @@ class TenantMiddleware
 
         abort_if(
             !$request->hasHeader('Authorization')
-            && blank($request->header('authorization'))
-            && in_array($request->header('authorization'), ['Bearer ', 'Bearer null']),
+            || blank($request->header('authorization'))
+            || in_array($request->header('authorization'), ['Bearer ', 'Bearer null']),
             Response::HTTP_UNAUTHORIZED,
             __('Authorization header is missing.')
         );

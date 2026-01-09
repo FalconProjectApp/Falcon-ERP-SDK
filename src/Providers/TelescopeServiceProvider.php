@@ -1,41 +1,33 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Providers;
 
-use Dom\Text;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
 use Laravel\Telescope\TelescopeApplicationServiceProvider;
+use Override;
 
 class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 {
     /**
      * Register any application services.
      */
-    #[\Override]
+    #[Override]
     public function register(): void
     {
         Telescope::night();
 
-        Telescope::tag(function ($entry) {
-            return ['env:'.Str::slug(config('app.env'))];
-        });
+        Telescope::tag(fn (): array => ['env:' . Str::slug(config('app.env'))]);
 
-        Telescope::tag(function ($entry) {
-            return ['debug:'.Str::slug(config('app.debug'))];
-        });
+        Telescope::tag(fn (): array => ['debug:' . Str::slug(config('app.debug'))]);
 
-        Telescope::tag(function ($entry) {
-            return ['service:'.Str::slug(config('app.name'))];
-        });
+        Telescope::tag(fn (): array => ['service:' . Str::slug(config('app.name'))]);
 
-        Telescope::tag(function ($entry) {
-            return ['tenant:'.Str::slug(tenant()->base ?? 'no-tenant')];
-        });
+        Telescope::tag(fn (): array => ['tenant:' . Str::slug(tenant()->base ?? 'no-tenant')]);
 
         $this->hideSensitiveRequestDetails();
 
@@ -82,14 +74,15 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         ]);
     }
 
-    #[\Override]
+    #[Override]
     protected function gate(): void
     {
         Gate::define('viewTelescope', fn ($user): bool => in_array($user->email, [
+            // Adicione e-mails autorizados aqui
         ]));
     }
 
-    #[\Override]
+    #[Override]
     protected function authorization(): void
     {
         $this->gate();
