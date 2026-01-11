@@ -499,14 +499,14 @@ class ProductController
     public function index(): JsonResponse
     {
         return response()->json(
-            $this->service->index()
+            $this->getService()->index()
         );
     }
 
     public function store(): JsonResponse
     {
         return response()->json(
-            $this->service->store(),
+            $this->getService()->store(),
             Response::HTTP_CREATED
         );
     }
@@ -519,13 +519,13 @@ class ProductController
     public function update(Product $product): JsonResponse
     {
         return response()->json(
-            $this->service->update($product)
+            $this->getService()->update($product)
         );
     }
 
     public function destroy(Product $product): JsonResponse
     {
-        $this->service->destroy($product);
+        $this->getService()->destroy($product);
         
         return response()->json(
             null,
@@ -537,7 +537,7 @@ class ProductController
     public function activate(Product $product): JsonResponse
     {
         return response()->json(
-            $this->service->activate($product)
+            $this->getService()->activate($product)
         );
     }
 }
@@ -1091,14 +1091,14 @@ class Service extends Model
 // Errado
 public function index()
 {
-    return $this->service->index();
+    return $this->getService()->index();
 }
 
 // Correto
 public function index(): JsonResponse
 {
     return response()->json(
-        $this->service->index()
+        $this->getService()->index()
     );
 }
 ```
@@ -1118,7 +1118,7 @@ public function store(Request $request)
 public function store(): JsonResponse
 {
     return response()->json(
-        $this->service->store(),
+        $this->getService()->store(),
         Response::HTTP_CREATED
     );
 }

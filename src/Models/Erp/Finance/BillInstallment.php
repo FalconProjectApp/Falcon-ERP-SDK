@@ -47,11 +47,13 @@ class BillInstallment extends BaseModel implements AuditableContract
     ];
 
     protected $fillable = [
+        'financial_account_id',
         'due_date',
         'issue_date',
         'value',
         'value_interest',
         'value_paid',
+        'discount',
         'status',
         'obs',
     ];
@@ -100,6 +102,11 @@ class BillInstallment extends BaseModel implements AuditableContract
             ->withTrashed();
     }
 
+    public function financialAccount(): BelongsTo
+    {
+        return $this->belongsTo(FinancialAccount::class);
+    }
+
     /**
      * RegistrationFile1 function.
      * Returning the main email of the people.
@@ -114,7 +121,7 @@ class BillInstallment extends BaseModel implements AuditableContract
     protected function valueTotal(): Attribute
     {
         return new Attribute(
-            get: fn () => $this->value + $this->value_interest,
+            get: fn () => $this->value + $this->value_interest - $this->discount,
         );
     }
 

@@ -68,6 +68,11 @@ class FinancialAccount extends BaseModel implements AuditableContract
             ->withTrashed();
     }
 
+    public function billInstallments(): HasMany
+    {
+        return $this->hasMany(BillInstallment::class, 'financial_account_id');
+    }
+
     #[Scope]
     public function byPeopleIds($query, array $params = [])
     {
