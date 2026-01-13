@@ -54,6 +54,9 @@ class Database extends BaseModel
                 'is_active',
                 'environment',
                 'base_people_id',
+            ])
+            ->withCasts([
+                'is_active' => 'boolean',
             ]);
     }
 
