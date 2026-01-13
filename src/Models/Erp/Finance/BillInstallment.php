@@ -116,7 +116,20 @@ class BillInstallment extends BaseModel implements AuditableContract
     protected function registrationFile1(): Attribute
     {
         return new Attribute(
-            get: fn () => $this->lastArchiveByName(ArchiveEnum::NAME_BILL_FILE)->s3_key ?? null,
+            get: function () {
+                // Se archives já foi carregado com eager loading, busca da relação
+                if ($this->relationLoaded('archives')) {
+                    $archive = $this->archives
+                        ->where('name', ArchiveEnum::NAME_BILL_FILE)
+                        ->sortByDesc('created_at')
+                        ->first();
+                    
+                    return $archive?->s3_key ?? null;
+                }
+                
+                // Caso contrário, faz a query (fallback)
+                return $this->lastArchiveByName(ArchiveEnum::NAME_BILL_FILE)?->s3_key ?? null;
+            },
         );
     }
 
@@ -260,17 +273,27 @@ class BillInstallment extends BaseModel implements AuditableContract
 
     private function canFollow(): bool
     {
+        // Eager load followers se ainda não carregado
+        if (!$this->relationLoaded('followers')) {
+            $this->loadMissing('followers');
+        }
+        
         return (!$this->trashed()
             && !$this->is_public
-            && !$this->followers()->where('follower_people_id', people()?->id)->exists()
+            && !$this->followers->where('follower_people_id', people()?->id)->isNotEmpty()
             && $this->id !== people()?->id) ?? false;
     }
 
     private function canUnfollow(): bool
     {
+        // Eager load followers se ainda não carregado
+        if (!$this->relationLoaded('followers')) {
+            $this->loadMissing('followers');
+        }
+        
         return (!$this->trashed()
             && !$this->is_public
-            && $this->followers()->where('follower_people_id', people()?->id)->exists()) ?? false;
+            && $this->followers->where('follower_people_id', people()?->id)->isNotEmpty()) ?? false;
     }
 
     private function canCancel(): bool
