@@ -105,7 +105,7 @@ class TenantMiddleware
 
         return new Data([
             'user'   => $user,
-            'tenant' => $user->databasesAccess()->where('is_active', true)->sole(),
+            'tenant' => $user->databasesAccess()->whereRaw('is_active = ?', [true])->sole(),
         ]);
     }
 
