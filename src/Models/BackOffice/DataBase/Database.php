@@ -123,7 +123,7 @@ class Database extends BaseModel
             'database.connections.tenant.database'       => sprintf('bc_%s', $this->base),
             'database.connections.tenant.charset'        => config('database.connections.pgsql.charset'),
             'database.connections.tenant.prefix_indexes' => config('database.connections.pgsql.prefix_indexes'),
-            'database.connections.tenant.search_path'    => config('database.connections.pgsql.search_path'),
+            'database.connections.tenant.search_path'    => config('database.connections.tenant.search_path', 'public'),
             'database.connections.tenant.sslmode'        => config('database.connections.pgsql.sslmode'),
         ]);
 
