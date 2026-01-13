@@ -6,6 +6,7 @@ namespace FalconERP\Skeleton\Models\Erp\Finance;
 
 use FalconERP\Skeleton\Enums\ArchiveEnum;
 use FalconERP\Skeleton\Enums\Finance\BillEnum;
+use FalconERP\Skeleton\Events\BillCheck;
 use FalconERP\Skeleton\Events\InstallmentCheck;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -44,6 +45,7 @@ class BillInstallment extends BaseModel implements AuditableContract
 
     public $events = [
         InstallmentCheck::class,
+        BillCheck::class,
     ];
 
     protected $fillable = [

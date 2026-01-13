@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
+use FalconERP\Skeleton\Events\BillCheck;
 use FalconERP\Skeleton\Events\InstallmentCheck;
 use FalconERP\Skeleton\Models\Erp\People\People;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
@@ -40,6 +41,7 @@ class Bill extends BaseModel implements AuditableContract
 
     public $events = [
         InstallmentCheck::class,
+        BillCheck::class,
     ];
 
     protected $fillable = [
