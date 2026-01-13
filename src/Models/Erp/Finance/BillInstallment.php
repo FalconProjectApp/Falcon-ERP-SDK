@@ -62,6 +62,7 @@ class BillInstallment extends BaseModel implements AuditableContract
 
     protected $appends = [
         'valueTotal',
+        // Removido 'registrationFile1' do appends para evitar auto-append
     ];
 
     public function bill(): BelongsTo
@@ -235,8 +236,9 @@ class BillInstallment extends BaseModel implements AuditableContract
 
     protected function setActions(): array
     {
-        $this->loadMissing('bill');
-
+        // Removido loadMissing para evitar queries durante serialização
+        // As relações devem ser eager loaded antes se necessário
+        
         return [
             'can_view'     => $this->canView(),
             'can_restore'  => $this->canRestore(),
@@ -273,27 +275,23 @@ class BillInstallment extends BaseModel implements AuditableContract
 
     private function canFollow(): bool
     {
-        // Eager load followers se ainda não carregado
-        if (!$this->relationLoaded('followers')) {
-            $this->loadMissing('followers');
-        }
+        // Use whereExists ao invés de carregar toda a relação
+        $peopleId = people()?->id;
         
         return (!$this->trashed()
             && !$this->is_public
-            && !$this->followers->where('follower_people_id', people()?->id)->isNotEmpty()
-            && $this->id !== people()?->id) ?? false;
+            && !$this->followers()->where('follower_people_id', $peopleId)->exists()
+            && $this->id !== $peopleId) ?? false;
     }
 
     private function canUnfollow(): bool
     {
-        // Eager load followers se ainda não carregado
-        if (!$this->relationLoaded('followers')) {
-            $this->loadMissing('followers');
-        }
+        // Use whereExists ao invés de carregar toda a relação
+        $peopleId = people()?->id;
         
         return (!$this->trashed()
             && !$this->is_public
-            && $this->followers->where('follower_people_id', people()?->id)->isNotEmpty()) ?? false;
+            && $this->followers()->where('follower_people_id', $peopleId)->exists()) ?? false;
     }
 
     private function canCancel(): bool
@@ -303,24 +301,33 @@ class BillInstallment extends BaseModel implements AuditableContract
 
     private function canPay(): bool
     {
+        // Só verifica tipo se bill já foi carregado, evita lazy loading
+        $bill = $this->relationLoaded('bill') ? $this->bill : null;
+        
         return !$this->trashed()
             && in_array($this->status, [BillEnum::STATUS_OPEN, BillEnum::STATUS_PAID_PARTIAL])
-            && null !== $this->bill
-            && BillEnum::TYPE_PAY === $this->bill?->type;
+            && null !== $bill
+            && BillEnum::TYPE_PAY === $bill?->type;
     }
 
     private function canReceive(): bool
     {
+        // Só verifica tipo se bill já foi carregado, evita lazy loading
+        $bill = $this->relationLoaded('bill') ? $this->bill : null;
+        
         return !$this->trashed()
             && in_array($this->status, [BillEnum::STATUS_OPEN, BillEnum::STATUS_PAID_PARTIAL])
-            && null !== $this->bill
-            && BillEnum::TYPE_RECEIVE === $this->bill?->type;
+            && null !== $bill
+            && BillEnum::TYPE_RECEIVE === $bill?->type;
     }
 
     private function canReversal(): bool
     {
+        // Só verifica se bill existe se já foi carregado, evita lazy loading
+        $bill = $this->relationLoaded('bill') ? $this->bill : null;
+        
         return !$this->trashed()
             && BillEnum::STATUS_PAID === $this->status
-            && null !== $this->bill;
+            && null !== $bill;
     }
 }
