@@ -88,12 +88,12 @@ class Database extends BaseModel
         return $query->with([
             'databasesUsersAccess' => fn ($query) => $query
                 ->where('user_id', $user->id)
-                ->when($active, fn ($query) => $query->where('is_active', true)),
+                ->when($active, fn ($query) => $query->whereRaw('is_active = ?', [true])),
         ])
             ->whereHas('databasesUsersAccess', function ($query) use ($active, $user) {
                 $query
                     ->where('user_id', $user->id)
-                    ->when($active, fn ($query) => $query->where('is_active', true));
+                    ->when($active, fn ($query) => $query->whereRaw('is_active = ?', [true]));
             });
     }
 
