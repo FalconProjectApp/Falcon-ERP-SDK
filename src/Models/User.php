@@ -123,6 +123,9 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
                 'base_people_id',
                 'is_active',
                 'environment',
+            ])
+            ->withCasts([
+                'is_active' => 'boolean',
             ]);
     }
 
