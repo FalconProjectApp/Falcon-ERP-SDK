@@ -5,9 +5,10 @@ declare(strict_types = 1);
 namespace FalconERP\Skeleton\Observers;
 
 use FalconERP\Skeleton\Models\Erp\People\Notification;
+use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 use Illuminate\Database\Eloquent\Model;
 
-class NotificationObserver
+class NotificationObserver implements ShouldHandleEventsAfterCommit
 {
     public function updated(Model $model): void
     {

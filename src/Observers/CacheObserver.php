@@ -6,6 +6,7 @@ use FalconERP\Skeleton\Enums\CacheEnum;
 use FalconERP\Skeleton\Models\Erp\People\People;
 use FalconERP\Skeleton\Models\Erp\Stock\Product;
 use FalconERP\Skeleton\Models\Erp\Stock\Stock;
+use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @see QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver
  * @since 1.7.21
  */
-class CacheObserver
+class CacheObserver implements ShouldHandleEventsAfterCommit
 {
     public function deleted(Model $model)
     {
