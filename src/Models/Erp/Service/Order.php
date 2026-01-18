@@ -4,6 +4,7 @@ namespace FalconERP\Skeleton\Models\Erp\Service;
 
 use FalconERP\Skeleton\Enums\CacheEnum;
 use FalconERP\Skeleton\Models\Erp\People\People;
+use FalconERP\Skeleton\Models\Erp\Service\Traits\Order\OrderNfseTrait;
 use FalconERP\Skeleton\Observers\NotificationObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -27,6 +28,7 @@ class Order extends BaseModel implements AuditableContract
 {
     use HasFactory;
     use SoftDeletes;
+    use OrderNfseTrait;
     use SetSchemaTrait;
     use Auditable;
 
