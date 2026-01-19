@@ -1,17 +1,24 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\Service\Traits\Order;
 
 use Hadder\NfseNacional\Dps;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Response;
 use QuantumTecnology\ValidateTrait\Data;
-use stdClass;
 
 trait OrderNfseTrait
 {
+    abstract public function taker(): BelongsTo;
+
+    abstract public function provider(): BelongsTo;
+
+    abstract public function orderBodies(bool $withTrashed = false): HasMany;
+
     public function xml(): Attribute
     {
         if (isset($this->attributeCastCache['xml'])) {
@@ -26,11 +33,11 @@ trait OrderNfseTrait
             __('A classe Dps do pacote Hadder\NfseNacional não foi encontrada. Verifique se o pacote está instalado corretamente.')
         );
 
-        $std = new stdClass();
+        $std = new \stdClass();
         /*
          * INFORMAÇÕES
          */
-        $std->infDPS           = new stdClass();
+        $std->infDPS           = new \stdClass();
         $std->infDPS->tpAmb    = $this->tp_amb;
         $std->infDPS->dhEmi    = $this->dh_emi;
         $std->infDPS->verAplic = $this->ver_aplic;
@@ -181,28 +188,124 @@ trait OrderNfseTrait
                     'cMotivo'   => '01', // 01 - Desenquadramento de NFS-e do Simples Nacional; 02 - Enquadramento de NFS-e no Simples Nacional; 03 - Inclusão Retroativa de Imunidade/Isenção para NFS-e; 04 - Exclusão Retroativa de Imunidade/Isenção para NFS-e; 05 - Rejeição de NFS-e pelo tomador ou pelo intermediário se responsável pelo recolhimento do tributo; 99 - Outros;
                     'xMotivo'   => 'Descreva o motivo', // Descrição do motivo da substituição quando cMotivo = 9
                 ],
-                default => null
+                default => null,
             },
         );
     }
 
-    /**
-     * prest.
+    /*
+     * Dados do Prestador do Serviço
+     *
+     * IM - Número de inscrição municipal do tomaador do serviço.
      */
-    protected function prest(): Attribute
+    public function prest(): Attribute
+    {
+        dd($this);
+        return new Attribute(
+            // get: fn (): ?object => $this->provider ?? null,
+            get: fn (): ?object => (object) [
+                mb_strlen(preg_replace('/\D/', '', $this->cpf_cnpj)) > 11 ? 'CNPJ' : 'CPF' => preg_replace('/\D/', '', $this->cpf_cnpj),
+                'NIF'                                                                      => null, // Número de identificação fiscal fornecido por órgão de administração tributária no exterior.
+                'cNaoNIF'                                                                  => null, // Motivo para não informação do NIF: 0 - Não informado na nota de origem; 1 - Dispensado do NIF; 2 - Não exigência do NIF;
+                'CAEPF'                                                                    => null, // Número do Cadastro de Atividade Econômica da Pessoa Física (CAEPF) do tomaador do serviço.
+                'IM'                                                                       => match (false) {
+                    true == empty($this->tributacao?->inscricao_municipal) => $this->tributacao?->inscricao_municipal,
+                    default                                                => null,
+                },
+                // 'xNome'   => $this->razao_social,
+                'fone'  => preg_replace('/\D/', '', $this->telefone),
+                'email' => $this->email,
+                // 'end'     => $this->address,
+                'regTrib' => $this->reg_trib,
+            ],
+        );
+    }
+
+    public function address(): Attribute
     {
         return new Attribute(
-            get: fn (): ?object => $this->provider ?? null,
+            get: fn () => (object) [
+                'xLgr'    => $this->rua,
+                'nro'     => $this->numero,
+                'xCpl'    => null,
+                'xBairro' => $this->bairro,
+                'endNac'  => $this->end_nac,
+                // 'endExt'  => $this->end_ext,
+            ],
+        );
+    }
+
+    /*
+     * Dados do Tomador do Serviço
+     */
+    public function toma(): Attribute
+    {
+        return new Attribute(
+            // get: fn (): ?object => $this->taker ?? null,
+            get: fn (): ?object => (object) [
+                'CNPJ' => match (mb_strlen(preg_replace('/\D/', '', $this->cpf_cnpj))) {
+                    14      => preg_replace('/\D/', '', $this->cpf_cnpj),
+                    default => null,
+                },
+                'CPF' => match (mb_strlen(preg_replace('/\D/', '', $this->cpf_cnpj))) {
+                    11      => preg_replace('/\D/', '', $this->cpf_cnpj),
+                    default => null,
+                },
+                'NIF'     => null, // Número de identificação fiscal fornecido por órgão de administração tributária no exterior.
+                'cNaoNIF' => null, // Motivo para não informação do NIF: 0 - Não informado na nota de origem; 1 - Dispensado do NIF; 2 - Não exigência do NIF;
+                'CAEPF'   => null, // Número do Cadastro de Atividade Econômica da Pessoa Física (CAEPF) do tomaador do serviço.
+                'IM'      => null, // Número de inscrição municipal do tomaador do serviço.
+                'xNome'   => $this->razao_social,
+                'fone'    => $this->telefone,
+                'email'   => $this->email,
+                'end'     => $this->end,
+            ],
+        );
+    }
+
+    public function end(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => (object) [
+                'xLgr'    => $this->rua,
+                'nro'     => $this->numero,
+                'xCpl'    => $this->complemento,
+                'xBairro' => $this->bairro,
+                'endNac'  => $this->end_nac,
+                'endExt'  => match (false) {
+                    true    => $this->end_ext,
+                    default => null,
+                },
+            ],
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Attributes
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the attributes that should be cast to native types.
+    |
+    */
+
+    /**
+     * has_errors.
+     */
+    protected function hasErrors(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): bool => count($this->errors) > 0,
         );
     }
 
     /**
-     * toma.
+     * errors.
      */
-    protected function toma(): Attribute
+    protected function errors(): Attribute
     {
-        return new Attribute(
-            get: fn (): ?object => $this->taker ?? null,
+        return Attribute::make(
+            get: fn (): bool => $this->xml->getErrors() ?? false,
         );
     }
 }

@@ -3,6 +3,7 @@
 namespace FalconERP\Skeleton\Models\Erp\Service;
 
 use FalconERP\Skeleton\Enums\CacheEnum;
+use FalconERP\Skeleton\Enums\Service\OrderEnum;
 use FalconERP\Skeleton\Models\Erp\People\People;
 use FalconERP\Skeleton\Models\Erp\Service\Traits\Order\OrderNfseTrait;
 use FalconERP\Skeleton\Observers\NotificationObserver;
@@ -155,5 +156,98 @@ class Order extends BaseModel implements AuditableContract
             ->when($this->filtered($params, 'status'), function ($query, $params) {
                 $query->whereIn('status', $params);
             });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Actions
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the actions that the model should have with
+    |
+    */
+    protected function setActions(): array
+    {
+        return [
+            'can_view'              => $this->canView(),
+            'can_restore'           => $this->canRestore(),
+            'can_update'            => $this->canUpdate(),
+            'can_delete'            => $this->canDelete(),
+            'can_follow'            => $this->canFollow(),
+            'can_unfollow'          => $this->canUnfollow(),
+            'can_work'              => $this->canWork(),
+            'can_pause'             => $this->canPause(),
+            'can_close'             => $this->canClose(),
+            'can_download_xml'      => $this->canDownloadXml(),
+        ];
+    }
+
+    private function canView(): bool
+    {
+        return true;
+    }
+
+    private function canRestore(): bool
+    {
+        return $this->trashed();
+    }
+
+    private function canUpdate(): bool
+    {
+        return !$this->trashed();
+    }
+
+    private function canDelete(): bool
+    {
+        return !$this->trashed();
+    }
+
+    private function canFollow(): bool
+    {
+        return (
+            !$this->trashed()
+                && auth()->check()
+                && !$this->followers()->where('follower_people_id', people()->id)->exists()
+        ) ?? false;
+    }
+
+    private function canUnfollow(): bool
+    {
+        return (
+            !$this->trashed()
+                && auth()->check()
+                && $this->followers()->where('follower_people_id', people()->id)->exists()
+        ) ?? false;
+    }
+
+    private function canDownloadXml(): bool
+    {
+        return
+            !$this->trashed()
+            && $this->has_errors === false;
+    }
+
+    private function canWork(): bool
+    {
+        return (
+            !$this->trashed()
+                && in_array($this->status, [OrderEnum::STATUS_OPEN, OrderEnum::STATUS_PAUSE])
+        ) ?? false;
+    }
+
+    private function canPause(): bool
+    {
+        return (
+            !$this->trashed()
+                && OrderEnum::STATUS_IN_PROGRESS === $this->status
+        ) ?? false;
+    }
+
+    private function canClose(): bool
+    {
+        return (
+            !$this->trashed()
+                && in_array($this->status, [OrderEnum::STATUS_IN_PROGRESS, OrderEnum::STATUS_PAUSE])
+        ) ?? false;
     }
 }
