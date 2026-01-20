@@ -32,6 +32,9 @@ abstract class CacheEnum extends BaseEnum
     public const KEY_ORDER_STATUS_PAUSE_COUNT  = 'order_status_pause_count';
     public const KEY_ORDER_STATUS_CLOSEDS_COUNT = 'order_status_closeds_count';
 
+    public const KEY_FINANCE_RELEASE_TYPE_RECEIPT_ID = 'finance_release_type_receipt_id';
+    public const KEY_FINANCE_RELEASE_TYPE_PAYMENT_ID = 'finance_release_type_payment_id';
+
     public static function keys(): Collection
     {
         return new Collection(static::filterConstants('KEY'));
