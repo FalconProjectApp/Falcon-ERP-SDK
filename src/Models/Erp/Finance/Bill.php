@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
 use FalconERP\Skeleton\Events\BillCheck;
-use FalconERP\Skeleton\Events\InstallmentCheck;
 use FalconERP\Skeleton\Models\Erp\People\People;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -40,7 +39,6 @@ class Bill extends BaseModel implements AuditableContract
     use SoftDeletes;
 
     public $events = [
-        InstallmentCheck::class,
         BillCheck::class,
     ];
 
