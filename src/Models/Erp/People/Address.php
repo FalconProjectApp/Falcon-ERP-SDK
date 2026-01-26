@@ -55,7 +55,7 @@ class Address extends BaseModel
     ];
 
     /**
-     * TODO: esta quebrando esta função, e deveria ser um evento talvez. ou um observed
+     * TODO: esta quebrando esta função, e deveria ser um evento talvez. ou um observed.
      */
     /*     protected function cityIbge(): Attribute
         {
@@ -157,6 +157,42 @@ class Address extends BaseModel
     {
         return Attribute::make(
             get: fn () => $this->road,
+        );
+    }
+
+    /**
+     * end_nac.
+     *
+     * CEP - Código de Endereçamento Postal do tomador do serviço.
+     * cMun - Código do município do tomador do serviço (IBGE).
+     */
+    protected function endNac(): Attribute
+    {
+        return new Attribute(
+            get: fn (): object => (object) [
+                'CEP'  => $this->cep,
+                'cMun' => $this->city_ibge,
+            ],
+        );
+    }
+
+    /**
+     * end_ext.
+     *
+     * cPais - Código do país do endereço do tomaador do tomaador do serviço. (Tabela de Países ISO)
+     * cEndPost - Código alfanumérico do Endereçamento Postal no exterior do tomaador do serviço.
+     * xCidade - Nome da cidade no exterior do tomaador do serviço.
+     * xEstProvReg - Estado, província ou região da cidade no exterior do tomaador do serviço.
+     */
+    protected function endExt(): Attribute
+    {
+        return new Attribute(
+            get: fn (): object => (object) [
+                'cPais'       => '',
+                'cEndPost'    => '',
+                'xCidade'     => '',
+                'xEstProvReg' => '',
+            ],
         );
     }
 }

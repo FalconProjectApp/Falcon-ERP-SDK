@@ -122,10 +122,10 @@ class BillInstallment extends BaseModel implements AuditableContract
                         ->where('name', ArchiveEnum::NAME_BILL_FILE)
                         ->sortByDesc('created_at')
                         ->first();
-                    
+
                     return $archive?->s3_key ?? null;
                 }
-                
+
                 // Caso contrário, faz a query (fallback)
                 return $this->lastArchiveByName(ArchiveEnum::NAME_BILL_FILE)?->s3_key ?? null;
             },
@@ -236,7 +236,7 @@ class BillInstallment extends BaseModel implements AuditableContract
     {
         // Removido loadMissing para evitar queries durante serialização
         // As relações devem ser eager loaded antes se necessário
-        
+
         return [
             'can_view'     => $this->canView(),
             'can_restore'  => $this->canRestore(),
@@ -248,10 +248,15 @@ class BillInstallment extends BaseModel implements AuditableContract
             'can_pay'      => $this->canPay(),
             'can_receive'  => $this->canReceive(),
             'can_reversal' => $this->canReversal(),
+            'can_clone'    => $this->canClone(),
         ];
     }
 
     private function canView(): bool
+    {
+        return true;
+    }
+    private function canClone(): bool
     {
         return true;
     }
@@ -275,7 +280,7 @@ class BillInstallment extends BaseModel implements AuditableContract
     {
         // Use whereExists ao invés de carregar toda a relação
         $peopleId = people()?->id;
-        
+
         return (!$this->trashed()
             && !$this->is_public
             && !$this->followers()->where('follower_people_id', $peopleId)->exists()
@@ -286,7 +291,7 @@ class BillInstallment extends BaseModel implements AuditableContract
     {
         // Use whereExists ao invés de carregar toda a relação
         $peopleId = people()?->id;
-        
+
         return (!$this->trashed()
             && !$this->is_public
             && $this->followers()->where('follower_people_id', $peopleId)->exists()) ?? false;
@@ -301,7 +306,7 @@ class BillInstallment extends BaseModel implements AuditableContract
     {
         // Só verifica tipo se bill já foi carregado, evita lazy loading
         $bill = $this->relationLoaded('bill') ? $this->bill : null;
-        
+
         return !$this->trashed()
             && in_array($this->status, [BillEnum::STATUS_OPEN, BillEnum::STATUS_PAID_PARTIAL])
             && null !== $bill
@@ -312,7 +317,7 @@ class BillInstallment extends BaseModel implements AuditableContract
     {
         // Só verifica tipo se bill já foi carregado, evita lazy loading
         $bill = $this->relationLoaded('bill') ? $this->bill : null;
-        
+
         return !$this->trashed()
             && in_array($this->status, [BillEnum::STATUS_OPEN, BillEnum::STATUS_PAID_PARTIAL])
             && null !== $bill
@@ -323,7 +328,7 @@ class BillInstallment extends BaseModel implements AuditableContract
     {
         // Só verifica se bill existe se já foi carregado, evita lazy loading
         $bill = $this->relationLoaded('bill') ? $this->bill : null;
-        
+
         return !$this->trashed()
             && BillEnum::STATUS_PAID === $this->status
             && null !== $bill;

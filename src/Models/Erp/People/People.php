@@ -295,6 +295,13 @@ class People extends BaseModel implements AuditableContract
         );
     }
 
+    protected function cnpjOrCpf(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->cnpj ?? $this->cpf,
+        );
+    }
+
     protected function indFinal(): Attribute
     {
         return Attribute::make(
@@ -329,7 +336,7 @@ class People extends BaseModel implements AuditableContract
     protected function isLegalEntityType(): Attribute
     {
         $this->loadMissing('type');
-        
+
         return Attribute::make(
             get: fn (): bool => LegalEntityTypesEnum::COMPANY === $this->type?->legal_entity_type,
         );
