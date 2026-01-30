@@ -103,6 +103,12 @@ class BillInstallment extends BaseModel implements AuditableContract
             ->withTrashed();
     }
 
+    public function tags(): MorphToMany
+    {
+        return $this->morphToMany(Tag::class, 'taggable', 'taggables')
+            ->withTimestamps();
+    }
+
     public function financialAccount(): BelongsTo
     {
         return $this->belongsTo(FinancialAccount::class);

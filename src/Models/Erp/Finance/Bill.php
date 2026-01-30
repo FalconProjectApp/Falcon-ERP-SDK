@@ -120,6 +120,12 @@ class Bill extends BaseModel implements AuditableContract
             ->withTrashed();
     }
 
+    public function tags(): MorphToMany
+    {
+        return $this->morphToMany(Tag::class, 'taggable', 'taggables')
+            ->withTimestamps();
+    }
+
     #[Scope]
     public function byPeopleIds($query, array $params = [])
     {
