@@ -1,12 +1,14 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
 use FalconERP\Skeleton\Events\BillCheck;
 use FalconERP\Skeleton\Models\Erp\People\People;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use FalconERP\Skeleton\Observers\Finance\BillObserver;
+use FalconERP\Skeleton\Traits\HasTagsTrait;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -24,8 +26,6 @@ use QuantumTecnology\ModelBasicsExtension\Observers\EventDispatcherObserver;
 use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use FalconERP\Skeleton\Traits\HasTagsTrait;
-use FalconERP\Skeleton\Observers\Finance\BillObserver;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -126,8 +126,7 @@ class Bill extends BaseModel implements AuditableContract
 
     public function tags(): MorphToMany
     {
-        return $this->morphToMany(Tag::class, 'taggable', 'taggables')
-            ->withTimestamps();
+        return $this->morphToMany(Tag::class, 'taggable', 'taggables');
     }
 
     #[Scope]
