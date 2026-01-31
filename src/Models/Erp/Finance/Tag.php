@@ -6,6 +6,7 @@ namespace FalconERP\Skeleton\Models\Erp\Finance;
 
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
@@ -15,7 +16,6 @@ use QuantumTecnology\ModelBasicsExtension\Observers\EventDispatcherObserver;
 use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -34,6 +34,7 @@ class Tag extends BaseModel implements AuditableContract
 
     protected $fillable = [
         'name',
+        'color',
     ];
 
     public function taggables(): HasMany
