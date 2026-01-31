@@ -25,11 +25,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 ])]
 class Taggable extends BaseModel implements AuditableContract
 {
-    use ActionTrait;
     use Auditable;
     use HasFactory;
     use SetSchemaTrait;
-    use SoftDeletes;
 
     public $events = [];
 
