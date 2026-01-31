@@ -174,7 +174,7 @@ class BillInstallment extends BaseModel implements AuditableContract
     {
         return $query->when($this->filtered($params, 'tag_ids'), function ($query, $tagIds) {
             return $query->whereHas('tags', function ($q) use ($tagIds) {
-                $q->whereIn('id', $tagIds);
+                $q->whereIn('tags.id', $tagIds);
             });
         });
     }
