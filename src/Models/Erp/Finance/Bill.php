@@ -127,37 +127,43 @@ class Bill extends BaseModel implements AuditableContract
     }
 
     #[Scope]
-    public function byPeopleIds($query, array $params = [])
+    protected function byTags($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'tags'), fn ($query, $params) => $query->whereIn('name', $params));
+    }
+
+    #[Scope]
+    protected function byPeopleIds($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'people_ids'), fn ($query, $params) => $query->whereIn('people_id', $params));
     }
 
     #[Scope]
-    public function byFinancialAccountIds($query, array $params = [])
+    protected function byFinancialAccountIds($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'financial_account_ids'), fn ($query, $params) => $query->whereIn('financial_account_id', $params));
     }
 
     #[Scope]
-    public function byType($query, array $params = [])
+    protected function byType($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'type'), fn ($query, $params) => $query->whereIn('type', $params));
     }
 
     #[Scope]
-    public function byRepetition($query, array $params = [])
+    protected function byRepetition($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'repetition'), fn ($query, $params) => $query->whereIn('repetition', $params));
     }
 
     #[Scope]
-    public function byPeriodicity($query, array $params = [])
+    protected function byPeriodicity($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'periodicity'), fn ($query, $params) => $query->whereIn('periodicity', $params));
     }
 
     #[Scope]
-    public function byStatus($query, array $params = [])
+    protected function byStatus($query, array $params = [])
     {
         return $query->when($this->filtered($params, 'status'), fn ($query, $params) => $query->whereIn('status', $params));
     }

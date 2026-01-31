@@ -167,6 +167,12 @@ class BillInstallment extends BaseModel implements AuditableContract
     }
 
     #[Scope]
+    protected function byTags($query, array $params = [])
+    {
+        return $query->when($this->filtered($params, 'tags'), fn ($query, $params) => $query->whereIn('name', $params));
+    }
+
+    #[Scope]
     protected function byBillIds(Builder $query, array $bills = []): Builder
     {
         return $query->when(
