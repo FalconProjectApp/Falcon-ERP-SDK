@@ -24,17 +24,21 @@ use QuantumTecnology\ModelBasicsExtension\Observers\EventDispatcherObserver;
 use QuantumTecnology\ModelBasicsExtension\Observers\NotificationObserver;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
+use FalconERP\Skeleton\Traits\HasTagsTrait;
+use FalconERP\Skeleton\Observers\Finance\BillObserver;
 
 #[ObservedBy([
     CacheObserver::class,
     NotificationObserver::class,
     EventDispatcherObserver::class,
+    BillObserver::class,
 ])]
 class Bill extends BaseModel implements AuditableContract
 {
     use ActionTrait;
     use Auditable;
     use HasFactory;
+    use HasTagsTrait;
     use SetSchemaTrait;
     use SoftDeletes;
 
@@ -129,7 +133,11 @@ class Bill extends BaseModel implements AuditableContract
     #[Scope]
     protected function byTags($query, array $params = [])
     {
-        return $query->when($this->filtered($params, 'tags'), fn ($query, $params) => $query->whereIn('name', $params));
+        return $query->when($this->filtered($params, 'tags'), function ($query, $tagNames) {
+            return $query->whereHas('tags', function ($q) use ($tagNames) {
+                $q->whereIn('name', $tagNames);
+            });
+        });
     }
 
     #[Scope]
