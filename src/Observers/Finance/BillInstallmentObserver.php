@@ -9,17 +9,9 @@ use FalconERP\Skeleton\Models\Erp\Finance\BillInstallment;
 class BillInstallmentObserver
 {
     /**
-     * Handle the BillInstallment "created" event.
+     * Handle the BillInstallment "saved" event (after created or updated).
      */
-    public function created(BillInstallment $billInstallment): void
-    {
-        $this->syncTags($billInstallment);
-    }
-
-    /**
-     * Handle the BillInstallment "updated" event.
-     */
-    public function updated(BillInstallment $billInstallment): void
+    public function saved(BillInstallment $billInstallment): void
     {
         $this->syncTags($billInstallment);
     }
@@ -29,10 +21,16 @@ class BillInstallmentObserver
      */
     private function syncTags(BillInstallment $billInstallment): void
     {
-        // Verifica se há tags na requisição
-        $tags = request()->input('tags', []);
+        // Tenta pegar tags de data() ou request()
+        $tags = [];
+        
+        if (function_exists('data') && data() && data()->has('tags')) {
+            $tags = data('tags');
+        } elseif (request()->has('tags')) {
+            $tags = request()->input('tags', []);
+        }
 
-        if (empty($tags)) {
+        if (empty($tags) || !is_array($tags)) {
             return;
         }
 
