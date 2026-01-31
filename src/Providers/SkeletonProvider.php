@@ -66,5 +66,15 @@ class SkeletonProvider extends ServiceProvider
         $this->publishes([
             realpath(__DIR__.'/../../database/seeders') => database_path('seeders'),
         ], 'seeders');
+
+        // Registrar comandos do console
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \FalconERP\Skeleton\Console\Commands\TenantMigrate::class,
+                \FalconERP\Skeleton\Console\Commands\TenantRollback::class,
+                \FalconERP\Skeleton\Console\Commands\TenantStatus::class,
+                \FalconERP\Skeleton\Console\Commands\CheckMigrations::class,
+            ]);
+        }
     }
 }
