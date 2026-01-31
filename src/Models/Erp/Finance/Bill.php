@@ -130,11 +130,11 @@ class Bill extends BaseModel implements AuditableContract
     }
 
     #[Scope]
-    protected function byTags($query, array $params = [])
+    protected function byTagIds($query, array $params = [])
     {
-        return $query->when($this->filtered($params, 'tags'), function ($query, $tagNames) {
-            return $query->whereHas('tags', function ($q) use ($tagNames) {
-                $q->whereIn('name', $tagNames);
+        return $query->when($this->filtered($params, 'tag_ids'), function ($query, $tagIds) {
+            return $query->whereHas('tags', function ($q) use ($tagIds) {
+                $q->whereIn('id', $tagIds);
             });
         });
     }
