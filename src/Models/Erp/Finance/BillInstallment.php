@@ -27,11 +27,14 @@ use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Models\Archive;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
+use FalconERP\Skeleton\Traits\HasTagsTrait;
+use FalconERP\Skeleton\Observers\Finance\BillInstallmentObserver;
 
 #[ObservedBy([
     CacheObserver::class,
     NotificationObserver::class,
     EventDispatcherObserver::class,
+    BillInstallmentObserver::class,
 ])]
 class BillInstallment extends BaseModel implements AuditableContract
 {
@@ -39,6 +42,7 @@ class BillInstallment extends BaseModel implements AuditableContract
     use ArchiveModelTrait;
     use Auditable;
     use HasFactory;
+    use HasTagsTrait;
     use SetSchemaTrait;
     use SoftDeletes;
 
