@@ -11,6 +11,7 @@ use FalconERP\Skeleton\Observers\Finance\BillObserver;
 use FalconERP\Skeleton\Traits\HasTagsTrait;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -130,7 +131,7 @@ class Bill extends BaseModel implements AuditableContract
     }
 
     #[Scope]
-    protected function byTagIds($query, array $params = [])
+    protected function byTagIds(Builder $query, array $params = []): Builder
     {
         return $query->when($this->filtered($params, 'tag_ids'), function ($query, $tagIds) {
             return $query->whereHas('tags', function ($q) use ($tagIds) {
@@ -140,37 +141,37 @@ class Bill extends BaseModel implements AuditableContract
     }
 
     #[Scope]
-    protected function byPeopleIds($query, array $params = [])
+    protected function byPeopleIds(Builder $query, array $params = []): Builder
     {
         return $query->when($this->filtered($params, 'people_ids'), fn ($query, $params) => $query->whereIn('people_id', $params));
     }
 
     #[Scope]
-    protected function byFinancialAccountIds($query, array $params = [])
+    protected function byFinancialAccountIds(Builder $query, array $params = []): Builder
     {
         return $query->when($this->filtered($params, 'financial_account_ids'), fn ($query, $params) => $query->whereIn('financial_account_id', $params));
     }
 
     #[Scope]
-    protected function byType($query, array $params = [])
+    protected function byType(Builder $query, array $params = []): Builder
     {
         return $query->when($this->filtered($params, 'type'), fn ($query, $params) => $query->whereIn('type', $params));
     }
 
     #[Scope]
-    protected function byRepetition($query, array $params = [])
+    protected function byRepetition(Builder $query, array $params = []): Builder
     {
         return $query->when($this->filtered($params, 'repetition'), fn ($query, $params) => $query->whereIn('repetition', $params));
     }
 
     #[Scope]
-    protected function byPeriodicity($query, array $params = [])
+    protected function byPeriodicity(Builder $query, array $params = []): Builder
     {
         return $query->when($this->filtered($params, 'periodicity'), fn ($query, $params) => $query->whereIn('periodicity', $params));
     }
 
     #[Scope]
-    protected function byStatus($query, array $params = [])
+    protected function byStatus(Builder $query, array $params = []): Builder
     {
         return $query->when($this->filtered($params, 'status'), fn ($query, $params) => $query->whereIn('status', $params));
     }
