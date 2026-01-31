@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Observers\Finance;
 
@@ -13,7 +13,8 @@ class BillObserver
      */
     public function saved(Bill $bill): void
     {
-        $this->syncTags($bill);
+        // TODO: nova possibilidade de começar a salvar os relacionamentos. ainda em estudo.
+        // $this->syncTags($bill);
     }
 
     /**
@@ -23,7 +24,7 @@ class BillObserver
     {
         // Tenta pegar tags de data() ou request()
         $tags = [];
-        
+
         if (function_exists('data') && data() && data()->has('tags')) {
             $tags = data('tags');
         } elseif (request()->has('tags')) {

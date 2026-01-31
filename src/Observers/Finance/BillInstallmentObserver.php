@@ -13,7 +13,8 @@ class BillInstallmentObserver
      */
     public function saved(BillInstallment $billInstallment): void
     {
-        $this->syncTags($billInstallment);
+        //TODO: nova possibilidade de começar a salvar os relacionamentos. ainda em estudo.
+        //$this->syncTags($billInstallment);
     }
 
     /**
