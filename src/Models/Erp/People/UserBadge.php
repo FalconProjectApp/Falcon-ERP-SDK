@@ -7,12 +7,9 @@ namespace FalconERP\Skeleton\Models\Erp\People;
 use FalconERP\Skeleton\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class UserBadge extends BaseModel
 {
-    use SetSchemaTrait;
-
     protected $connection = 'pgsql';
 
     protected $table = 'user_badges';

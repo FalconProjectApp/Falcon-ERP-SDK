@@ -6,12 +6,9 @@ namespace FalconERP\Skeleton\Models\Erp\People;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class ForumCategory extends BaseModel
 {
-    use SetSchemaTrait;
-
     protected $connection = 'pgsql';
 
     protected $table = 'forum_categories';

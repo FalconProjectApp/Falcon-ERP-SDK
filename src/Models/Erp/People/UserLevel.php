@@ -6,14 +6,10 @@ namespace FalconERP\Skeleton\Models\Erp\People;
 
 use FalconERP\Skeleton\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class UserLevel extends BaseModel
 {
-    use SetSchemaTrait;
-
     protected $connection = 'pgsql';
 
     protected $table = 'user_levels';
@@ -32,16 +28,16 @@ class UserLevel extends BaseModel
     ];
 
     protected $casts = [
-        'level'                => 'integer',
-        'experience_points'    => 'integer',
-        'total_topics'         => 'integer',
-        'total_answers'        => 'integer',
-        'total_upvotes'        => 'integer',
-        'total_downvotes'      => 'integer',
-        'total_best_answers'   => 'integer',
-        'total_compliments'    => 'integer',
-        'created_at'           => 'datetime',
-        'updated_at'           => 'datetime',
+        'level'              => 'integer',
+        'experience_points'  => 'integer',
+        'total_topics'       => 'integer',
+        'total_answers'      => 'integer',
+        'total_upvotes'      => 'integer',
+        'total_downvotes'    => 'integer',
+        'total_best_answers' => 'integer',
+        'total_compliments'  => 'integer',
+        'created_at'         => 'datetime',
+        'updated_at'         => 'datetime',
     ];
 
     // Relationships
@@ -62,16 +58,16 @@ class UserLevel extends BaseModel
     public function updateLevel(): void
     {
         // Fórmula: experience_to_next_level = (level^2) * 50
-        $newLevel = 1;
+        $newLevel     = 1;
         $pointsNeeded = 0;
 
         // Calcular nível baseado na experiência acumulada
         while ($pointsNeeded <= $this->experience_points) {
-            $newLevel++;
+            ++$newLevel;
             $pointsNeeded += ($newLevel * $newLevel) * 50;
         }
 
-        $newLevel--; // Voltar um nível pois ultrapassou
+        --$newLevel; // Voltar um nível pois ultrapassou
 
         if ($newLevel !== $this->level) {
             $this->update([
@@ -104,11 +100,11 @@ class UserLevel extends BaseModel
     public function getStatsAttribute(): array
     {
         return [
-            'questions_asked'    => $this->total_topics,
-            'answers_given'      => $this->total_answers,
-            'best_answers'       => $this->total_best_answers,
-            'upvotes_received'   => $this->total_upvotes,
-            'helpful_votes'      => $this->total_upvotes,
+            'questions_asked'  => $this->total_topics,
+            'answers_given'    => $this->total_answers,
+            'best_answers'     => $this->total_best_answers,
+            'upvotes_received' => $this->total_upvotes,
+            'helpful_votes'    => $this->total_upvotes,
         ];
     }
 

@@ -6,12 +6,9 @@ namespace FalconERP\Skeleton\Models\Erp\People;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class FaqBadge extends BaseModel
 {
-    use SetSchemaTrait;
-
     protected $connection = 'pgsql';
 
     protected $table = 'faq_badges';
@@ -35,6 +32,11 @@ class FaqBadge extends BaseModel
     ];
 
     // Relationships
+
+    public function users(): HasMany
+    {
+        return $this->hasMany(UserBadge::class, 'badge_id');
+    }
 
     public function userBadges(): HasMany
     {

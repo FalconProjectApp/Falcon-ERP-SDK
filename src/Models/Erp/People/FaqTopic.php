@@ -5,6 +5,8 @@ declare(strict_types = 1);
 namespace FalconERP\Skeleton\Models\Erp\People;
 
 use FalconERP\Skeleton\Models\User;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -15,9 +17,6 @@ use QuantumTecnology\ModelBasicsExtension\BaseModel;
 use QuantumTecnology\ModelBasicsExtension\Observers\CacheObserver;
 use QuantumTecnology\ModelBasicsExtension\Observers\EventDispatcherObserver;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Auth\Access\Attributes\UsePolicy;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -28,7 +27,6 @@ class FaqTopic extends BaseModel implements AuditableContract
 {
     use ActionTrait;
     use Auditable;
-    use SetSchemaTrait;
     use SoftDeletes;
 
     protected $connection = 'pgsql';
@@ -119,54 +117,6 @@ class FaqTopic extends BaseModel implements AuditableContract
         return $query->orderBy('created_at', 'desc');
     }
 
-    // ActionTrait Implementation
-
-    protected function setActions(): array
-    {
-        return [
-            'can_view'     => $this->canView(),
-            'can_restore'  => $this->canRestore(),
-            'can_update'   => $this->canUpdate(),
-            'can_delete'   => $this->canDelete(),
-            'can_follow'   => $this->canFollow(),
-            'can_unfollow' => $this->canUnfollow(),
-        ];
-    }
-
-    protected function canView(): bool
-    {
-        return ! $this->trashed();
-    }
-
-    protected function canRestore(): bool
-    {
-        return $this->trashed();
-    }
-
-    protected function canUpdate(): bool
-    {
-        $currentUserId = auth()->id();
-
-        return ! $this->trashed() && ($this->user_id === $currentUserId || auth()->user()?->hasRole('admin'));
-    }
-
-    protected function canDelete(): bool
-    {
-        $currentUserId = auth()->id();
-
-        return ! $this->trashed() && ($this->user_id === $currentUserId || auth()->user()?->hasRole('admin'));
-    }
-
-    protected function canFollow(): bool
-    {
-        return ! $this->trashed();
-    }
-
-    protected function canUnfollow(): bool
-    {
-        return ! $this->trashed();
-    }
-
     // Helper Methods
 
     public function incrementViews(): void
@@ -177,9 +127,9 @@ class FaqTopic extends BaseModel implements AuditableContract
     public function markBestAnswer(string $answerId): void
     {
         $this->update([
-            'best_answer_id' => $answerId,
-            'status'         => 'answered',
-            'is_solved'      => true,
+            'best_answer_id'   => $answerId,
+            'status'           => 'answered',
+            'is_solved'        => true,
             'last_activity_at' => now(),
         ]);
     }
@@ -203,12 +153,60 @@ class FaqTopic extends BaseModel implements AuditableContract
 
     public function getUserVoteAttribute(): ?string
     {
-        if (! auth()->check()) {
+        if (!auth()->check()) {
             return null;
         }
 
         $vote = $this->votes()->where('user_id', auth()->id())->first();
 
         return $vote?->vote_type;
+    }
+
+    // ActionTrait Implementation
+
+    protected function setActions(): array
+    {
+        return [
+            'can_view'     => $this->canView(),
+            'can_restore'  => $this->canRestore(),
+            'can_update'   => $this->canUpdate(),
+            'can_delete'   => $this->canDelete(),
+            'can_follow'   => $this->canFollow(),
+            'can_unfollow' => $this->canUnfollow(),
+        ];
+    }
+
+    protected function canView(): bool
+    {
+        return !$this->trashed();
+    }
+
+    protected function canRestore(): bool
+    {
+        return $this->trashed();
+    }
+
+    protected function canUpdate(): bool
+    {
+        $currentUserId = auth()->id();
+
+        return !$this->trashed() && ($this->user_id === $currentUserId || auth()->user()?->hasRole('admin'));
+    }
+
+    protected function canDelete(): bool
+    {
+        $currentUserId = auth()->id();
+
+        return !$this->trashed() && ($this->user_id === $currentUserId || auth()->user()?->hasRole('admin'));
+    }
+
+    protected function canFollow(): bool
+    {
+        return !$this->trashed();
+    }
+
+    protected function canUnfollow(): bool
+    {
+        return !$this->trashed();
     }
 }

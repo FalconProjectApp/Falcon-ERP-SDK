@@ -8,17 +8,13 @@ use FalconERP\Skeleton\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class FaqVote extends BaseModel
 {
-    use SetSchemaTrait;
-
+    public $timestamps    = true;
     protected $connection = 'pgsql';
 
     protected $table = 'faq_votes';
-
-    public $timestamps = true;
 
     protected $fillable = [
         'user_id',
