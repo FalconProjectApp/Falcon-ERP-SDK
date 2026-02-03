@@ -6,7 +6,9 @@ namespace FalconERP\Skeleton\Models\Erp\People;
 
 use FalconERP\Skeleton\Models\User;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -97,22 +99,26 @@ class FaqTopic extends BaseModel implements AuditableContract
 
     // Scopes
 
-    public function scopeOpen($query)
+    #[Scope]
+    public function open(Builder $query)
     {
         return $query->where('status', 'open');
     }
 
-    public function scopePinned($query)
+    #[Scope]
+    public function pinned(Builder $query)
     {
         return $query->where('is_pinned', true);
     }
 
-    public function scopePopular($query)
+    #[Scope]
+    public function popular(Builder $query)
     {
         return $query->where('views_count', '>', 100)->orderBy('views_count', 'desc');
     }
 
-    public function scopeRecent($query)
+    #[Scope]
+    public function recent(Builder $query)
     {
         return $query->orderBy('created_at', 'desc');
     }
