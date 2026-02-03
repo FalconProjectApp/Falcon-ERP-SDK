@@ -100,27 +100,30 @@ class FaqTopic extends BaseModel implements AuditableContract
     // Scopes
 
     #[Scope]
-    public function open(Builder $query)
+    public function byPopular(Builder $query, string | array $params = []): Builder
     {
-        return $query->where('status', 'open');
+        return $query
+            ->when($this->filtered($params, 'popular', isBoolean: true), function ($query) {
+                $query->where('views_count', '>', 100)->orderBy('views_count', 'desc');
+            });
     }
 
     #[Scope]
-    public function pinned(Builder $query)
+    public function byPinned(Builder $query, string | array $params = []): Builder
     {
-        return $query->where('is_pinned', true);
+        return $query
+            ->when($this->filtered($params, 'pinned', isBoolean: true), function ($query) {
+                $query->where('is_pinned', true)->orderBy('last_activity_at', 'desc');
+            });
     }
 
     #[Scope]
-    public function popular(Builder $query)
+    public function byStatus(Builder $query, string | array $params = []): Builder
     {
-        return $query->where('views_count', '>', 100)->orderBy('views_count', 'desc');
-    }
-
-    #[Scope]
-    public function recent(Builder $query)
-    {
-        return $query->orderBy('created_at', 'desc');
+        return $query
+            ->when($this->filtered($params, 'status'), function ($query, $params) {
+                $query->whereIn('status', (array) $params);
+            });
     }
 
     // Helper Methods
