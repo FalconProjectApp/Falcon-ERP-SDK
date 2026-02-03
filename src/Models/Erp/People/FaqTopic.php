@@ -98,13 +98,21 @@ class FaqTopic extends BaseModel implements AuditableContract
     }
 
     // Scopes
-
     #[Scope]
     public function byPopular(Builder $query, string | array $params = []): Builder
     {
         return $query
             ->when($this->filtered($params, 'popular', isBoolean: true), function ($query) {
                 $query->where('views_count', '>', 100)->orderBy('views_count', 'desc');
+            });
+    }
+
+    #[Scope]
+    public function byUnAnswered(Builder $query, string | array $params = []): Builder
+    {
+        return $query
+            ->when($this->filtered($params, 'unanswered', isBoolean: true), function ($query) {
+                $query->whereDoesntHave('answers');
             });
     }
 
