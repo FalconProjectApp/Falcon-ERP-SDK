@@ -32,6 +32,11 @@ class SkeletonProvider extends ServiceProvider
         );
 
         $this->mergeConfigFrom(
+            __DIR__.'/../Config/telescope.php',
+            'telescope'
+        );
+
+        $this->mergeConfigFrom(
             __DIR__.'/../Config/perpage.php',
             'perpage'
         );
