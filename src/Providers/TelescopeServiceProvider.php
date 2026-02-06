@@ -19,6 +19,12 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     #[Override]
     public function register(): void
     {
+        // Merge config do Skeleton
+        $this->mergeConfigFrom(
+            __DIR__ . '/../Config/telescope.php',
+            'telescope'
+        );
+
         Telescope::night();
 
         Telescope::tag(fn (): array => ['env:' . Str::slug(config('app.env'))]);
