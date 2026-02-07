@@ -8,6 +8,8 @@ use FalconERP\Skeleton\Enums\ArchiveEnum;
 use FalconERP\Skeleton\Enums\Finance\BillEnum;
 use FalconERP\Skeleton\Events\BillCheck;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
+use FalconERP\Skeleton\Observers\Finance\BillInstallmentObserver;
+use FalconERP\Skeleton\Traits\HasTagsTrait;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,8 +29,6 @@ use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 use QuantumTecnology\ServiceBasicsExtension\Models\Archive;
 use QuantumTecnology\ServiceBasicsExtension\Traits\ArchiveModelTrait;
-use FalconERP\Skeleton\Traits\HasTagsTrait;
-use FalconERP\Skeleton\Observers\Finance\BillInstallmentObserver;
 
 #[ObservedBy([
     CacheObserver::class,
@@ -115,6 +115,20 @@ class BillInstallment extends BaseModel implements AuditableContract
     public function financialAccount(): BelongsTo
     {
         return $this->belongsTo(FinancialAccount::class);
+    }
+
+    public function clone(
+        ?string $dueDate = null,
+    ): true {
+        $billInstallmentClone             = $this->replicate();
+        $billInstallmentClone->due_date   = $dueDate ?? $this->due_date;
+        $billInstallmentClone->status     = BillEnum::STATUS_OPEN;
+        $billInstallmentClone->value_paid = 0;
+        $billInstallmentClone->created_at = now();
+        $billInstallmentClone->updated_at = now();
+        $billInstallmentClone->save();
+
+        return true;
     }
 
     /**
@@ -275,6 +289,7 @@ class BillInstallment extends BaseModel implements AuditableContract
     {
         return true;
     }
+
     private function canClone(): bool
     {
         return true;
