@@ -1,27 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
-use OwenIt\Auditing\Auditable;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Attributes\Scope;
-use QuantumTecnology\ModelBasicsExtension\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use QuantumTecnology\ModelBasicsExtension\HasManySyncable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use QuantumTecnology\ModelBasicsExtension\BaseModel;
+use QuantumTecnology\ModelBasicsExtension\HasManySyncable;
 use QuantumTecnology\ModelBasicsExtension\Traits\ActionTrait;
 use QuantumTecnology\ModelBasicsExtension\Traits\SetSchemaTrait;
 
 class Action extends BaseModel implements AuditableContract
 {
     use ActionTrait;
-    use HasFactory;
-    use SoftDeletes;
-    use SetSchemaTrait;
     use Auditable;
+    use HasFactory;
+    use SetSchemaTrait;
+    use SoftDeletes;
 
     protected $fillable = [
         'description',
@@ -37,21 +39,105 @@ class Action extends BaseModel implements AuditableContract
         'average_price',
     ];
 
-    public $allowedIncludes = [
-        'actions_movements',
-        'actions_dividends',
-        'portfolio',
-    ];
+    public function actionsMovements(): HasManySyncable
+    {
+        return $this->hasMany(ActionMovement::class);
+    }
 
-    /**
-     * Get the amountTotal.
-     */
+    public function actionsDividends(): HasManySyncable
+    {
+        return $this->hasMany(ActionDividend::class);
+    }
+
+    public function portfolio(): BelongsTo
+    {
+        return $this->belongsTo(Portfolio::class);
+    }
+
+    #[Scope]
+    public function byDescription(Builder $query, string $description, string $operation = '='): Builder
+    {
+        return $query->where('description', $operation, $description);
+    }
+
+    #[Scope]
+    public function byPortfolioID(Builder $query, int $portfolioId, string $operation = '='): Builder
+    {
+        return $query->where('portfolio_id', $operation, $portfolioId);
+    }
+
+    public function buyMovementCreate(
+        string $description,
+        int $amount = 0,
+        int $value = 0,
+        ?string $payday = null,
+    ): true {
+        $this->actionsMovements()->create([
+            'description' => sprintf('Compra de %s', $description),
+            'types'       => 'compra',
+            'amount'      => $amount,
+            'value'       => $value,
+            'payday'      => $payday ?? now()->toDateString(),
+        ]);
+
+        return true;
+    }
+
+    public function sellMovementCreate(
+        string $description,
+        int $amount = 0,
+        int $value = 0,
+        ?string $payday = null,
+    ): true {
+        $this->actionsMovements()->create([
+            'description' => sprintf('Venda de %s', $description),
+            'types'       => 'venda',
+            'amount'      => $amount,
+            'value'       => $value,
+            'payday'      => $payday ?? now()->toDateString(),
+        ]);
+
+        return true;
+    }
+
+    public function earningCreate(
+        int $dividendEventId,
+        string $paymentForecast,
+        string $approvalDate,
+        int $amount = 0,
+        int $value = 0,
+    ): true {
+        $this->actionsDividends()->create([
+            'description'       => sprintf('Rendimento de %s', $this->description),
+            'dividend_event_id' => $dividendEventId,
+            'payment_forecast'  => $paymentForecast,
+            'approval_date'     => $approvalDate,
+            'amount'            => $amount,
+            'value'             => $value,
+        ]);
+
+        return true;
+    }
+
+    public function sell(
+        int $amount = 0,
+        int $value = 0,
+    ): true {
+        $this->update([
+            'amount_total' => $this->amount_total - $amount,
+            'value_total'  => $this->value_total + ($this->amount_total * $value),
+        ]);
+
+        return true;
+    }
+
     protected function amountTotal(): Attribute
     {
-        $this->loadMissing('ActionsMovements');
+        $this->loadMissing('actionsMovements');
 
         $total = 0;
-        foreach ($this->ActionsMovements as $movement) {
+
+        foreach ($this->actionsMovements as $movement) {
             $total += $movement->amount;
         }
 
@@ -60,18 +146,17 @@ class Action extends BaseModel implements AuditableContract
         );
     }
 
-    /**
-     * Get the valueTotal.
-     */
     protected function valueTotal(): Attribute
     {
-        $this->loadMissing('ActionsMovements');
+        $this->loadMissing('actionsMovements');
 
         $total = 0;
-        foreach ($this->ActionsMovements as $movement) {
+
+        foreach ($this->actionsMovements as $movement) {
             if ('compra' == $movement->types) {
                 $total += $movement->amount * $movement->value;
             }
+
             if ('venda' == $movement->types) {
                 $total -= $movement->amount * $movement->value;
             }
@@ -87,10 +172,11 @@ class Action extends BaseModel implements AuditableContract
      */
     protected function valueTotalSell(): Attribute
     {
-        $this->loadMissing('ActionsMovements');
+        $this->loadMissing('actionsMovements');
 
         $total = 0;
-        foreach ($this->ActionsMovements as $movement) {
+
+        foreach ($this->actionsMovements as $movement) {
             if ('venda' == $movement->types) {
                 $total -= $movement->amount * $movement->value;
             }
@@ -106,10 +192,11 @@ class Action extends BaseModel implements AuditableContract
      */
     protected function valueTotalBuy(): Attribute
     {
-        $this->loadMissing('ActionsMovements');
+        $this->loadMissing('actionsMovements');
 
         $total = 0;
-        foreach ($this->ActionsMovements as $movement) {
+
+        foreach ($this->actionsMovements as $movement) {
             if ('compra' == $movement->types) {
                 $total += $movement->amount * $movement->value;
             }
@@ -125,10 +212,11 @@ class Action extends BaseModel implements AuditableContract
      */
     protected function valueTotalEarnings(): Attribute
     {
-        $this->loadMissing('ActionsDividends');
+        $this->loadMissing('actionsDividends');
 
         $total = 0;
-        foreach ($this->ActionsDividends as $dividends) {
+
+        foreach ($this->actionsDividends as $dividends) {
             $total += $dividends->amount * $dividends->value;
         }
 
@@ -153,51 +241,7 @@ class Action extends BaseModel implements AuditableContract
         );
     }
 
-    /**
-     * ActionsMovements function.
-     */
-    public function ActionsMovements(): HasManySyncable
-    {
-        return $this->hasMany(ActionMovement::class);
-    }
-
-    /**
-     * ActionsDividends function.
-     */
-    public function ActionsDividends(): HasManySyncable
-    {
-        return $this->hasMany(ActionDividend::class);
-    }
-
-    /**
-     * ActionsDividends function.
-     *
-     * @return HasManySyncable
-     */
-    public function Portfolio(): BelongsTo
-    {
-        return $this->belongsTo(Portfolio::class);
-    }
-
-    /**
-     * byDescription function.
-     */
-    #[Scope]
-    public function byDescription(Builder $query, string $description, string $operation = '='): Builder
-    {
-        return $query->where('description', $operation, $description);
-    }
-
-    /**
-     * byPortfolioID function.
-     */
-    #[Scope]
-    public function byPortfolioID(Builder $query, int $portfolioId, string $operation = '='): Builder
-    {
-        return $query->where('portfolio_id', $operation, $portfolioId);
-    }
-
-        /*
+    /*
     |--------------------------------------------------------------------------
     | Actions
     |--------------------------------------------------------------------------
@@ -215,6 +259,9 @@ class Action extends BaseModel implements AuditableContract
             'can_delete'   => $this->canDelete(),
             'can_follow'   => $this->canFollow(),
             'can_unfollow' => $this->canUnfollow(),
+            'can_buy'      => true,
+            'can_sell'     => true,
+            'can_earning'  => true,
         ];
     }
 
