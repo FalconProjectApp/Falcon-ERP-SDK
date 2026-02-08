@@ -380,7 +380,7 @@ class BillInstallment extends BaseModel implements AuditableContract
     }
 
     #[Scope]
-    protected function byType(Builder $query, array $types = []): Builder
+    protected function byTypes(Builder $query, array $types = []): Builder
     {
         return $query->when(
             $this->filtered($types, 'types'),
