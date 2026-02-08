@@ -5,7 +5,9 @@ declare(strict_types = 1);
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
 use FalconERP\Skeleton\Enums\ArchiveEnum;
+use FalconERP\Skeleton\Enums\CacheEnum;
 use FalconERP\Skeleton\Enums\Finance\BillEnum;
+use FalconERP\Skeleton\Enums\ReleaseTypeEnum;
 use FalconERP\Skeleton\Events\BillCheck;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
 use FalconERP\Skeleton\Observers\Finance\BillInstallmentObserver;
@@ -127,6 +129,145 @@ class BillInstallment extends BaseModel implements AuditableContract
         $billInstallmentClone->created_at = now();
         $billInstallmentClone->updated_at = now();
         $billInstallmentClone->save();
+
+        return true;
+    }
+
+    public function cancel(): true
+    {
+        $this->status = BillEnum::STATUS_CANCELED;
+        $this->save();
+
+        return true;
+    }
+
+    public function syncStatus(): true
+    {
+        if (
+            $this->value_paid < $this->value
+            && $this->value_paid > 0
+        ) {
+            $this->status = BillEnum::STATUS_PAID_PARTIAL;
+        }
+
+        if (
+            0 === $this->value_paid
+        ) {
+            $this->status = BillEnum::STATUS_OPEN;
+        }
+
+        if (
+            $this->value_paid === $this->value
+        ) {
+            $this->status = BillEnum::STATUS_PAID;
+        }
+
+        if ($this->isDirty('status')) {
+            $this->save();
+        }
+
+        return true;
+    }
+
+    public function revertValuePaid(): true
+    {
+        $this->value_paid = 0;
+
+        if ($this->isDirty('value_paid')) {
+            $this->save();
+        }
+
+        $this->syncStatus();
+
+        return true;
+    }
+
+    public function updateNextInstallments(bool $updateNextInstallments = false): true
+    {
+        if (
+            $updateNextInstallments
+            && $this->bill_id
+            && $this->due_date
+        ) {
+            self::query()
+                ->where('bill_id', $this->bill_id)
+                ->where('due_date', '>', $this->due_date)
+                ->whereIn('status', [BillEnum::STATUS_OPEN, BillEnum::STATUS_PAID_PARTIAL])
+                ->update([
+                    'value'      => $this->value,
+                    'updated_at' => now(),
+                ]);
+        }
+
+        return true;
+    }
+
+    public function registerReceiptMovement(): true
+    {
+        $releaseTypeId = cache()->remember(
+            config('database.connections.tenant.database') . '_' . CacheEnum::KEY_FINANCE_RELEASE_TYPE_RECEIPT_ID,
+            now()->addDay(),
+            fn () => ReleasesType::where('description', ReleaseTypeEnum::RELEASE_DESCRIPTION_RECEIPT)->value('id')
+        );
+
+        FinancialMovement::create(
+            [
+                'financial_account_id' => $this->financial_account_id,
+                'releases_types_id'    => $releaseTypeId,
+                'obs'                  => __('Receipt of installment ID #:id - Bill: :bill - Person: :person', [
+                    'id'     => $this->id,
+                    'bill'   => $this->bill_id,
+                    'person' => people()->name ?? 'N/A',
+                ]),
+            ]
+        );
+
+        return true;
+    }
+
+    public function registerPaymentMovement(): true
+    {
+        $releaseTypeId = cache()->remember(
+            config('database.connections.tenant.database') . '_' . CacheEnum::KEY_FINANCE_RELEASE_TYPE_PAYMENT_ID,
+            now()->addDay(),
+            fn () => ReleasesType::where('description', ReleaseTypeEnum::RELEASE_DESCRIPTION_PAYMENT)->value('id')
+        );
+
+        FinancialMovement::create(
+            [
+                'financial_account_id' => $this->financial_account_id,
+                'releases_types_id'    => $releaseTypeId,
+                'obs'                  => __('Payment of installment ID #:id - Bill: :bill - Person: :person', [
+                    'id'     => $this->id,
+                    'bill'   => $this->bill_id,
+                    'person' => people()->name ?? 'N/A',
+                ]),
+            ]
+        );
+
+        return true;
+    }
+
+    public function financialAccountUpdate(int | string | null $financialAccountId): true
+    {
+        $this->financial_account_id = $financialAccountId ?? $this->bill->financial_account_id;
+
+        if ($this->isDirty('financial_account_id')) {
+            $this->save();
+        }
+
+        return true;
+    }
+
+    public function ValuePaidUpdate(int $valuePaid): true
+    {
+        $this->value_paid += $valuePaid;
+
+        if ($this->isDirty('value_paid')) {
+            $this->save();
+        }
+
+        $this->syncStatus();
 
         return true;
     }
