@@ -212,9 +212,9 @@ class BillInstallment extends BaseModel implements AuditableContract
 
         FinancialMovement::create(
             [
-                'financial_account_id' => $this->financial_account_id,
-                'releases_types_id'    => $releaseTypeId,
-                'obs'                  => __('Receipt of installment ID #:id - Bill: :bill - Person: :person', [
+                'financial_accounts_id' => $this->financial_account_id,
+                'releases_types_id'     => $releaseTypeId,
+                'obs'                   => __('Receipt of installment ID #:id - Bill: :bill - Person: :person', [
                     'id'     => $this->id,
                     'bill'   => $this->bill_id,
                     'person' => people()->name ?? 'N/A',
@@ -250,7 +250,7 @@ class BillInstallment extends BaseModel implements AuditableContract
 
     public function financialAccountUpdate(int | string | null $financialAccountId): true
     {
-        $this->financial_account_id = $financialAccountId ?? $this->bill->financial_account_id;
+        $this->financial_account_id = blank($financialAccountId) ? $this->bill->financial_account_id : $financialAccountId;
 
         if ($this->isDirty('financial_account_id')) {
             $this->save();
