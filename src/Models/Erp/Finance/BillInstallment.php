@@ -235,9 +235,9 @@ class BillInstallment extends BaseModel implements AuditableContract
 
         FinancialMovement::create(
             [
-                'financial_account_id' => $this->financial_account_id,
-                'releases_types_id'    => $releaseTypeId,
-                'obs'                  => __('Payment of installment ID #:id - Bill: :bill - Person: :person', [
+                'financial_accounts_id' => $this->financial_account_id,
+                'releases_types_id'     => $releaseTypeId,
+                'obs'                   => __('Payment of installment ID #:id - Bill: :bill - Person: :person', [
                     'id'     => $this->id,
                     'bill'   => $this->bill_id,
                     'person' => people()->name ?? 'N/A',

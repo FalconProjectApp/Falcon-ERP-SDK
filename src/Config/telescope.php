@@ -143,6 +143,7 @@ return [
 
     'ignore_paths' => [
         'health*',
+        'metrics',
         'livewire*',
         'nova-api*',
         'pulse*',
