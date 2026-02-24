@@ -6,7 +6,8 @@ namespace FalconERP\Skeleton\Models\Erp\Finance;
 
 use FalconERP\Skeleton\Enums\ArchiveEnum;
 use FalconERP\Skeleton\Enums\CacheEnum;
-use FalconERP\Skeleton\Enums\Finance\BillEnum;
+use FalconERP\Skeleton\Enums\Finance\Bill\Status;
+use FalconERP\Skeleton\Enums\Finance\Bill\Type;
 use FalconERP\Skeleton\Enums\ReleaseTypeEnum;
 use FalconERP\Skeleton\Events\BillCheck;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
@@ -69,6 +70,10 @@ class BillInstallment extends BaseModel implements AuditableContract
         // Removido 'registrationFile1' do appends para evitar auto-append
     ];
 
+    protected $casts = [
+        'status' => Status::class,
+    ];
+
     public function bill(): BelongsTo
     {
         return $this->belongsTo(Bill::class);
@@ -124,7 +129,7 @@ class BillInstallment extends BaseModel implements AuditableContract
     ): true {
         $billInstallmentClone             = $this->replicate();
         $billInstallmentClone->due_date   = $dueDate ?? $this->due_date;
-        $billInstallmentClone->status     = BillEnum::STATUS_OPEN;
+        $billInstallmentClone->status     = Status::Open;
         $billInstallmentClone->value_paid = 0;
         $billInstallmentClone->created_at = now();
         $billInstallmentClone->updated_at = now();
@@ -135,7 +140,7 @@ class BillInstallment extends BaseModel implements AuditableContract
 
     public function cancel(): true
     {
-        $this->status = BillEnum::STATUS_CANCELED;
+        $this->status = Status::Canceled;
         $this->save();
 
         return true;
@@ -147,19 +152,19 @@ class BillInstallment extends BaseModel implements AuditableContract
             $this->value_paid < $this->value
             && $this->value_paid > 0
         ) {
-            $this->status = BillEnum::STATUS_PAID_PARTIAL;
+            $this->status = Status::PaidPartial;
         }
 
         if (
             0 === $this->value_paid
         ) {
-            $this->status = BillEnum::STATUS_OPEN;
+            $this->status = Status::Open;
         }
 
         if (
             $this->value_paid === $this->value
         ) {
-            $this->status = BillEnum::STATUS_PAID;
+            $this->status = Status::Paid;
         }
 
         if ($this->isDirty('status')) {
@@ -192,7 +197,7 @@ class BillInstallment extends BaseModel implements AuditableContract
             self::query()
                 ->where('bill_id', $this->bill_id)
                 ->where('due_date', '>', $this->due_date)
-                ->whereIn('status', [BillEnum::STATUS_OPEN, BillEnum::STATUS_PAID_PARTIAL])
+                ->whereIn('status', [Status::Open->value, Status::PaidPartial->value])
                 ->update([
                     'value'      => $this->value,
                     'updated_at' => now(),
@@ -474,7 +479,7 @@ class BillInstallment extends BaseModel implements AuditableContract
 
     private function canCancel(): bool
     {
-        return !$this->trashed() && BillEnum::STATUS_OPEN === $this->status;
+        return !$this->trashed() && Status::Open === $this->status;
     }
 
     private function canPay(): bool
@@ -483,9 +488,9 @@ class BillInstallment extends BaseModel implements AuditableContract
         $bill = $this->relationLoaded('bill') ? $this->bill : null;
 
         return !$this->trashed()
-            && in_array($this->status, [BillEnum::STATUS_OPEN, BillEnum::STATUS_PAID_PARTIAL])
+            && in_array($this->status, [Status::Open, Status::PaidPartial])
             && null !== $bill
-            && BillEnum::TYPE_PAY === $bill?->type;
+            && Type::Pay === $bill?->type;
     }
 
     private function canReceive(): bool
@@ -494,9 +499,9 @@ class BillInstallment extends BaseModel implements AuditableContract
         $bill = $this->relationLoaded('bill') ? $this->bill : null;
 
         return !$this->trashed()
-            && in_array($this->status, [BillEnum::STATUS_OPEN, BillEnum::STATUS_PAID_PARTIAL])
+            && in_array($this->status, [Status::Open, Status::PaidPartial])
             && null !== $bill
-            && BillEnum::TYPE_RECEIVE === $bill?->type;
+            && Type::Receive === $bill?->type;
     }
 
     private function canReversal(): bool
@@ -505,7 +510,7 @@ class BillInstallment extends BaseModel implements AuditableContract
         $bill = $this->relationLoaded('bill') ? $this->bill : null;
 
         return !$this->trashed()
-            && BillEnum::STATUS_PAID === $this->status
+            && Status::Paid === $this->status
             && null !== $bill;
     }
 }

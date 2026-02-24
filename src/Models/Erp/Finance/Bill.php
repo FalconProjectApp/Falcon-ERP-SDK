@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace FalconERP\Skeleton\Models\Erp\Finance;
 
+use FalconERP\Skeleton\Enums\Finance\Bill\Periodicity;
+use FalconERP\Skeleton\Enums\Finance\Bill\Repetition;
+use FalconERP\Skeleton\Enums\Finance\Bill\Status;
+use FalconERP\Skeleton\Enums\Finance\Bill\Type;
 use FalconERP\Skeleton\Events\BillCheck;
 use FalconERP\Skeleton\Models\Erp\People\People;
 use FalconERP\Skeleton\Models\Erp\People\PeopleFollow;
@@ -69,6 +73,13 @@ class Bill extends BaseModel implements AuditableContract
         'installment_value',
         'installment_interest',
         'installment_total',
+    ];
+
+    protected $casts = [
+        'type'        => Type::class,
+        'repetition'  => Repetition::class,
+        'periodicity' => Periodicity::class,
+        'status'      => Status::class,
     ];
 
     public static function booting(): void
